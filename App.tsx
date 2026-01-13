@@ -224,7 +224,7 @@ const App: React.FC = () => {
             const stepTwoResult = await editImage(stepOneImageBase64, stepOneImageMimeType, selectedTransformation.stepTwoPrompt!, null, secondaryImagePayload);
             
             if (stepTwoResult.imageUrl) {
-                stepTwoResult.imageUrl = await embedWatermark(stepTwoResult.imageUrl, "Nano Bananary｜ZHO");
+                stepTwoResult.imageUrl = await embedWatermark(stepTwoResult.imageUrl, "Banana Shop");
             }
 
             const finalResult = { ...stepTwoResult, secondaryImageUrl: stepOneResult.imageUrl };
@@ -241,7 +241,7 @@ const App: React.FC = () => {
             setLoadingMessage(t('app.loading.default'));
             const result = await editImage(primaryBase64, primaryMimeType, promptToUse, maskBase64, secondaryImagePayload);
 
-            if (result.imageUrl) result.imageUrl = await embedWatermark(result.imageUrl, "Nano Bananary｜ZHO");
+            if (result.imageUrl) result.imageUrl = await embedWatermark(result.imageUrl, "Banana Shop");
 
             setGeneratedContent(result);
             setHistory(prev => [result, ...prev]);

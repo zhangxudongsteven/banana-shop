@@ -3,7 +3,7 @@
 
 
 
-# Nano Bananary ｜ 香蕉超市 ｜ ZHO
+# Banana Shop ｜ 香蕉超市
 
 
 
@@ -107,8 +107,6 @@ Use in AI Studio: https://ai.studio/apps/drive/1JknFrFFdiOm7FIA8MLOJa_vtJN2g24c1
 
   功能更新：增加历史记录功能，方便直接使用已生成的图像作为输入
 
-  玩法更新：已经把 我的[🍌提示词库](https://github.com/ZHO-ZHO-ZHO/ZHO-nano-banana-Creation)的主要玩法更新上去了
-
 
 - 20250905
  
@@ -129,28 +127,6 @@ Use in AI Studio: https://ai.studio/apps/drive/1JknFrFFdiOm7FIA8MLOJa_vtJN2g24c1
   
   创建项目
   
-
-## Stars 
-
-[![Star History Chart](https://api.star-history.com/svg?repos=ZHO-ZHO-ZHO/Nano-Bananary&type=Date)](https://star-history.com/#ZHO-ZHO-ZHO/Nano-Bananary&Date)
-
-
-## 关于我 | About me
-
-📬 **联系我**：
-- 邮箱：zhozho3965@gmail.com
-  
-
-🔗 **社交媒体**：
-- 个人页：[-Zho-](https://jike.city/zho)
-- Bilibili：[我的B站主页](https://space.bilibili.com/484366804)
-- X（Twitter）：[我的Twitter](https://twitter.com/ZHO_ZHO_ZHO)
-- 小红书：[我的小红书主页](https://www.xiaohongshu.com/user/profile/63f11530000000001001e0c8?xhsshare=CopyLink&appuid=63f11530000000001001e0c8&apptime=1690528872)
-
-💡 **支持我**：
-- B站：[B站充电](https://space.bilibili.com/484366804)
-- 爱发电：[为我充电](https://afdian.com/a/ZHOZHO)
-
 
 ## Credits
 

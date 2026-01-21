@@ -57,6 +57,7 @@ export default {
       generated: 'Generated',
       lineArt: 'Line Art',
       finalResult: 'Final Result',
+      analysisResult: 'Analysis Result',
     },
     actions: {
       download: 'Download',
@@ -65,6 +66,7 @@ export default {
       useAsInput: 'Use as Input',
       useLineArtAsInput: 'Use Line Art as Input',
       useFinalAsInput: 'Use Final as Input',
+      copyText: 'Copy Text',
     },
     sliderPicker: {
       vs: 'vs',

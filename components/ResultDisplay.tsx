@@ -186,6 +186,38 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
     )
   }
 
+  // Special view for text results (e.g. Vision API analysis)
+  if (!content.imageUrl && content.text) {
+    return (
+      <div className="w-full h-full flex flex-col items-center gap-4 animate-fade-in">
+        <div className="w-full flex-grow bg-[var(--bg-primary)] rounded-lg shadow-inner border border-[var(--border-primary)] p-6 overflow-auto">
+          <div className="prose prose-invert max-w-none">
+            <h3 className="text-lg font-semibold mb-4 text-[var(--text-primary)]">
+              {t('resultDisplay.labels.analysisResult')}
+            </h3>
+            <p className="whitespace-pre-wrap text-[var(--text-secondary)] leading-relaxed">
+              {content.text}
+            </p>
+          </div>
+        </div>
+        <div className="w-full flex flex-col md:flex-row gap-3 mt-2">
+          <ActionButton onClick={() => navigator.clipboard.writeText(content.text!)} isPrimary>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+              <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+            </svg>
+            <span>{t('resultDisplay.actions.copyText')}</span>
+          </ActionButton>
+        </div>
+      </div>
+    )
+  }
+
   // Special view for two-step results
   if (content.secondaryImageUrl && content.imageUrl && originalImageUrl) {
     const imageMap: Record<ImageSelection, string> = {

@@ -57,6 +57,7 @@ export default {
       generated: '生成图',
       lineArt: '线稿',
       finalResult: '最终结果',
+      analysisResult: '分析结果',
     },
     actions: {
       download: '下载',
@@ -65,6 +66,7 @@ export default {
       useAsInput: '用作输入',
       useLineArtAsInput: '使用线稿作为输入',
       useFinalAsInput: '使用最终结果作为输入',
+      copyText: '复制文本',
     },
     sliderPicker: {
       vs: '对',

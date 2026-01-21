@@ -2,46 +2,91 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  /* Default Dark Theme */
-  --bg-primary: #000000;
-  --bg-secondary: #1a1a1a;
-  --bg-card: #111111;
-  --bg-card-alpha: rgba(17, 17, 17, 0.6);
-  --text-primary: #e5e7eb; /* gray-200 */
-  --text-secondary: #9ca3af; /* gray-400 */
-  --text-tertiary: #6b7280; /* gray-500 */
-  --border-primary: rgba(255, 255, 255, 0.1);
-  --accent-primary: #f97316; /* orange-500 */
-  --accent-secondary: #facc15; /* yellow-400 */
-  --accent-primary-hover: #ea580c; /* orange-600 */
-  --accent-secondary-hover: #eab308; /* yellow-500 */
-  --accent-shadow: rgba(249, 115, 22, 0.2);
-  --text-on-accent: #000000;
-  --bg-disabled: #374151; /* gray-700 */
-  --text-disabled: #6b7280; /* gray-500 */
-  --bg-error: rgba(153, 27, 27, 0.5);
-  --border-error: #b91c1c;
-  --text-error: #fca5a5;
+@layer base {
+  :root {
+    /* Default Dark Theme */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 90%;
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 90%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 90%;
+    --primary: 25 95% 53%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 90%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 25 95% 53%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 25 95% 53%;
+    --radius: 0.5rem;
+
+    /* Banana Shop Custom Variables */
+    --bg-primary: #000000;
+    --bg-secondary: #1a1a1a;
+    --bg-card: #111111;
+    --bg-card-alpha: rgba(17, 17, 17, 0.6);
+    --text-primary: #e5e7eb;
+    --text-secondary: #9ca3af;
+    --text-tertiary: #6b7280;
+    --border-primary: rgba(255, 255, 255, 0.1);
+    --accent-primary: #f97316;
+    --accent-secondary: #facc15;
+    --accent-primary-hover: #ea580c;
+    --accent-secondary-hover: #eab308;
+    --accent-shadow: rgba(249, 115, 22, 0.2);
+    --text-on-accent: #000000;
+    --bg-disabled: #374151;
+    --text-disabled: #6b7280;
+    --bg-error: rgba(153, 27, 27, 0.5);
+    --border-error: #b91c1c;
+    --text-error: #fca5a5;
+  }
 }
 
 html[data-theme='light'] {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 10%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 10%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 10%;
+  --primary: 25 95% 70%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 0 0% 96%;
+  --secondary-foreground: 0 0% 10%;
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 45%;
+  --accent: 25 95% 70%;
+  --accent-foreground: 0 0% 0%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 90%;
+  --input: 0 0% 90%;
+  --ring: 25 95% 70%;
+
+  /* Banana Shop Custom Variables - Light */
   --bg-primary: #ffffff;
   --bg-secondary: #f3f4f6;
   --bg-card: #ffffff;
   --bg-card-alpha: rgba(255, 255, 255, 0.6);
-  --text-primary: #111827; /* gray-900 */
-  --text-secondary: #4b5563; /* gray-600 */
-  --text-tertiary: #6b7280; /* gray-500 */
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-tertiary: #6b7280;
   --border-primary: rgba(0, 0, 0, 0.1);
   --accent-primary: #ff96ac;
-  --accent-secondary: #f87171; /* red-400 */
-  --accent-primary-hover: #f472b6; /* pink-400 */
-  --accent-secondary-hover: #ef4444; /* red-500 */
+  --accent-secondary: #f87171;
+  --accent-primary-hover: #f472b6;
+  --accent-secondary-hover: #ef4444;
   --accent-shadow: rgba(255, 150, 172, 0.25);
   --text-on-accent: #ffffff;
-  --bg-disabled: #e5e7eb; /* gray-200 */
-  --text-disabled: #9ca3af; /* gray-400 */
+  --bg-disabled: #e5e7eb;
+  --text-disabled: #9ca3af;
   --bg-error: rgba(255, 235, 238, 1);
   --border-error: #ef4444;
   --text-error: #dc2626;

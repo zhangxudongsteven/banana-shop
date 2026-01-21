@@ -1,6 +1,8 @@
 import React from 'react'
 import { LanguageProvider } from '../i18n/context'
 import { ThemeProvider } from '../theme/context'
+import { AuthProvider } from '../components/AuthProvider'
+import { Toaster } from 'sonner'
 import './globals.css'
 
 export const metadata = {
@@ -13,9 +15,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <head></head>
       <body>
-        <LanguageProvider>
-          <ThemeProvider>{children}</ThemeProvider>
-        </LanguageProvider>
+        <AuthProvider>
+          <LanguageProvider>
+            <ThemeProvider>{children}</ThemeProvider>
+          </LanguageProvider>
+        </AuthProvider>
+        <Toaster position="top-center" richColors />
       </body>
     </html>
   )

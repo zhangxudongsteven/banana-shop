@@ -1,39 +1,43 @@
+'use client';
+
 import React, { useState, useCallback, useEffect } from 'react';
-import { TRANSFORMATIONS } from './constants';
-import { editImage, generateVideo } from './services/openaiService';
-import type { GeneratedContent, Transformation } from './types';
-import TransformationSelector from './components/TransformationSelector';
-import ResultDisplay from './components/ResultDisplay';
-import LoadingSpinner from './components/LoadingSpinner';
-import ErrorMessage from './components/ErrorMessage';
-import ImageEditorCanvas from './components/ImageEditorCanvas';
-import { dataUrlToFile, embedWatermark, loadImage, resizeImageToMatch, downloadImage } from './utils/fileUtils';
-import ImagePreviewModal from './components/ImagePreviewModal';
-import MultiImageUploader from './components/MultiImageUploader';
-import HistoryPanel from './components/HistoryPanel';
-import { useTranslation } from './i18n/context';
-import LanguageSwitcher from './components/LanguageSwitcher';
-import ThemeSwitcher from './components/ThemeSwitcher';
+import { TRANSFORMATIONS } from '../constants';
+import { editImage, generateVideo } from '../services/openaiService';
+import type { GeneratedContent, Transformation } from '../types';
+import TransformationSelector from '../components/TransformationSelector';
+import ResultDisplay from '../components/ResultDisplay';
+import LoadingSpinner from '../components/LoadingSpinner';
+import ErrorMessage from '../components/ErrorMessage';
+import ImageEditorCanvas from '../components/ImageEditorCanvas';
+import { dataUrlToFile, embedWatermark, loadImage, resizeImageToMatch, downloadImage } from '../utils/fileUtils';
+import ImagePreviewModal from '../components/ImagePreviewModal';
+import MultiImageUploader from '../components/MultiImageUploader';
+import HistoryPanel from '../components/HistoryPanel';
+import { useTranslation } from '../i18n/context';
+import LanguageSwitcher from '../components/LanguageSwitcher';
+import ThemeSwitcher from '../components/ThemeSwitcher';
 
 type ActiveTool = 'mask' | 'none';
 
-const App: React.FC = () => {
+const Page: React.FC = () => {
   const { t } = useTranslation();
   const [transformations, setTransformations] = useState<Transformation[]>(() => {
     try {
-      const savedOrder = localStorage.getItem('transformationOrder');
-      if (savedOrder) {
-        const orderedKeys = JSON.parse(savedOrder) as string[];
-        const transformationMap = new Map(TRANSFORMATIONS.map(t => [t.key, t]));
-        
-        const orderedTransformations = orderedKeys
-          .map(key => transformationMap.get(key))
-          .filter((t): t is Transformation => !!t);
+      if (typeof window !== 'undefined') {
+        const savedOrder = localStorage.getItem('transformationOrder');
+        if (savedOrder) {
+          const orderedKeys = JSON.parse(savedOrder) as string[];
+          const transformationMap = new Map(TRANSFORMATIONS.map(t => [t.key, t]));
+          
+          const orderedTransformations = orderedKeys
+            .map(key => transformationMap.get(key))
+            .filter((t): t is Transformation => !!t);
 
-        const savedKeysSet = new Set(orderedKeys);
-        const newTransformations = TRANSFORMATIONS.filter(t => !savedKeysSet.has(t.key));
-        
-        return [...orderedTransformations, ...newTransformations];
+          const savedKeysSet = new Set(orderedKeys);
+          const newTransformations = TRANSFORMATIONS.filter(t => !savedKeysSet.has(t.key));
+          
+          return [...orderedTransformations, ...newTransformations];
+        }
       }
     } catch (e) {
       console.error("Failed to load or parse transformation order from localStorage", e);
@@ -575,25 +579,4 @@ const App: React.FC = () => {
   );
 };
 
-// Add fade-in animation for view transitions
-const style = document.createElement('style');
-style.innerHTML = `
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .animate-fade-in {
-    animation: fadeIn 0.4s ease-out forwards;
-  }
-  @keyframes fadeInFast {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  .animate-fade-in-fast {
-    animation: fadeInFast 0.2s ease-out forwards;
-  }
-`;
-document.head.appendChild(style);
-
-
-export default App;
+export default Page;

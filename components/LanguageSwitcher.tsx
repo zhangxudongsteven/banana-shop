@@ -1,13 +1,13 @@
-import React from 'react';
-import { useTranslation } from '../i18n/context';
+import React from 'react'
+import { useTranslation } from '../i18n/context'
 
 const LanguageSwitcher: React.FC = () => {
-  const { language, changeLanguage } = useTranslation();
+  const { language, changeLanguage } = useTranslation()
 
   const toggleLanguage = () => {
-    const newLang = language === 'en' ? 'zh' : 'en';
-    changeLanguage(newLang);
-  };
+    const newLang = language === 'en' ? 'zh' : 'en'
+    changeLanguage(newLang)
+  }
 
   return (
     <button
@@ -17,7 +17,7 @@ const LanguageSwitcher: React.FC = () => {
     >
       {language === 'en' ? '中文' : 'EN'}
     </button>
-  );
-};
+  )
+}
 
-export default LanguageSwitcher;
+export default LanguageSwitcher

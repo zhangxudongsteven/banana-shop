@@ -1,29 +1,22 @@
-import React from 'react';
-import { LanguageProvider } from '../i18n/context';
-import { ThemeProvider } from '../theme/context';
-import './globals.css';
+import React from 'react'
+import { LanguageProvider } from '../i18n/context'
+import { ThemeProvider } from '../theme/context'
+import './globals.css'
 
 export const metadata = {
   title: '🍌 Banana Shop',
   description: 'AI Image Editor',
-};
+}
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <head>
-      </head>
+      <head></head>
       <body>
         <LanguageProvider>
-          <ThemeProvider>
-            {children}
-          </ThemeProvider>
+          <ThemeProvider>{children}</ThemeProvider>
         </LanguageProvider>
       </body>
     </html>
-  );
+  )
 }

@@ -1,21 +1,23 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { TRANSFORMATIONS } from '../constants';
 import { editImage, generateVideo } from '../services/openaiService';
 import type { GeneratedContent, Transformation } from '../types';
 import TransformationSelector from '../components/TransformationSelector';
-import ResultDisplay from '../components/ResultDisplay';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
-import ImageEditorCanvas from '../components/ImageEditorCanvas';
 import { dataUrlToFile, embedWatermark, loadImage, resizeImageToMatch, downloadImage } from '../utils/fileUtils';
-import ImagePreviewModal from '../components/ImagePreviewModal';
-import MultiImageUploader from '../components/MultiImageUploader';
-import HistoryPanel from '../components/HistoryPanel';
 import { useTranslation } from '../i18n/context';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import ThemeSwitcher from '../components/ThemeSwitcher';
+
+const ImageEditorCanvas = dynamic(() => import('../components/ImageEditorCanvas'), { ssr: false });
+const ResultDisplay = dynamic(() => import('../components/ResultDisplay'), { ssr: false });
+const ImagePreviewModal = dynamic(() => import('../components/ImagePreviewModal'), { ssr: false });
+const MultiImageUploader = dynamic(() => import('../components/MultiImageUploader'), { ssr: false });
+const HistoryPanel = dynamic(() => import('../components/HistoryPanel'), { ssr: false });
 
 type ActiveTool = 'mask' | 'none';
 

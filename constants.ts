@@ -18,47 +18,53 @@ export const TRANSFORMATIONS: Transformation[] = [
     secondaryUploaderDescription: "transformations.effects.customPrompt.uploader2Desc",
   },
   // Viral & Fun (Flattened)
-  { 
+  {
     key: "figurine",
-    titleKey: "transformations.effects.figurine.title", 
-    prompt: "turn this photo into a character figure. Behind it, place a box with the character’s image printed on it, and a computer showing the Blender modeling process on its screen. In front of the box, add a round plastic base with the character figure standing on it. set the scene indoors if possible", 
+    titleKey: "transformations.effects.figurine.title",
+    prompt: "turn this photo into a character figure. Behind it, place a box with the character's image printed on it, and a computer showing the Blender modeling process on its screen. In front of the box, add a round plastic base with the character figure standing on it. set the scene indoors if possible",
     emoji: "🧍",
-    descriptionKey: "transformations.effects.figurine.description"
+    descriptionKey: "transformations.effects.figurine.description",
+    exampleImage: "/examples/figurine.jpg"
   },
-  { 
+  {
     key: "funko",
-    titleKey: "transformations.effects.funko.title", 
-    prompt: "Transform the person into a Funko Pop figure, shown inside and next to its packaging.", 
+    titleKey: "transformations.effects.funko.title",
+    prompt: "Transform the person into a Funko Pop figure, shown inside and next to its packaging.",
     emoji: "📦",
-    descriptionKey: "transformations.effects.funko.description"
+    descriptionKey: "transformations.effects.funko.description",
+    exampleImage: "/examples/funko.jpg"
   },
-  { 
+  {
     key: "lego",
-    titleKey: "transformations.effects.lego.title", 
-    prompt: "Transform the person into a LEGO minifigure, inside its packaging box.", 
+    titleKey: "transformations.effects.lego.title",
+    prompt: "Transform the person into a LEGO minifigure, inside its packaging box.",
     emoji: "🧱",
-    descriptionKey: "transformations.effects.lego.description"
+    descriptionKey: "transformations.effects.lego.description",
+    exampleImage: "/examples/lego.jpg"
   },
-  { 
+  {
     key: "crochet",
-    titleKey: "transformations.effects.crochet.title", 
-    prompt: "Transform the subject into a handmade crocheted yarn doll with a cute, chibi-style appearance.", 
+    titleKey: "transformations.effects.crochet.title",
+    prompt: "Transform the subject into a handmade crocheted yarn doll with a cute, chibi-style appearance.",
     emoji: "🧶",
-    descriptionKey: "transformations.effects.crochet.description"
+    descriptionKey: "transformations.effects.crochet.description",
+    exampleImage: "/examples/crochet.jpg"
   },
-  { 
+  {
     key: "cosplay",
-    titleKey: "transformations.effects.cosplay.title", 
-    prompt: "Generate a highly detailed, realistic photo of a person cosplaying the character in this illustration. Replicate the pose, expression, and framing.", 
+    titleKey: "transformations.effects.cosplay.title",
+    prompt: "Generate a highly detailed, realistic photo of a person cosplaying the character in this illustration. Replicate the pose, expression, and framing.",
     emoji: "🎭",
-    descriptionKey: "transformations.effects.cosplay.description"
+    descriptionKey: "transformations.effects.cosplay.description",
+    exampleImage: "/examples/cosplay.jpg"
   },
-  { 
+  {
     key: "plushie",
-    titleKey: "transformations.effects.plushie.title", 
-    prompt: "Turn the person in this photo into a cute, soft plushie doll.", 
+    titleKey: "transformations.effects.plushie.title",
+    prompt: "Turn the person in this photo into a cute, soft plushie doll.",
     emoji: "🧸",
-    descriptionKey: "transformations.effects.plushie.description"
+    descriptionKey: "transformations.effects.plushie.description",
+    exampleImage: "/examples/plushie.jpg"
   },
   { 
     key: "keychain",
@@ -69,16 +75,17 @@ export const TRANSFORMATIONS: Transformation[] = [
   },
 
   // Photo & Pro Edits (Flattened)
-   { 
+   {
     key: "hdEnhance",
-    titleKey: "transformations.effects.hdEnhance.title", 
-    prompt: "Enhance this image to high resolution, improving sharpness and clarity.", 
+    titleKey: "transformations.effects.hdEnhance.title",
+    prompt: "Enhance this image to high resolution, improving sharpness and clarity.",
     emoji: "🔍",
-    descriptionKey: "transformations.effects.hdEnhance.description"
+    descriptionKey: "transformations.effects.hdEnhance.description",
+    exampleImage: "/examples/hdEnhance.jpg"
   },
-  { 
+  {
     key: "pose",
-    titleKey: "transformations.effects.pose.title", 
+    titleKey: "transformations.effects.pose.title",
     prompt: "Apply the pose from the second image to the character in the first image. Render as a professional studio photograph.",
     emoji: "💃",
     descriptionKey: "transformations.effects.pose.description",
@@ -88,35 +95,38 @@ export const TRANSFORMATIONS: Transformation[] = [
     secondaryUploaderTitle: "transformations.effects.pose.uploader2Title",
     secondaryUploaderDescription: "transformations.effects.pose.uploader2Desc",
   },
-  { 
+  {
     key: "photorealistic",
-    titleKey: "transformations.effects.photorealistic.title", 
-    prompt: "Turn this illustration into a photorealistic version.", 
+    titleKey: "transformations.effects.photorealistic.title",
+    prompt: "Turn this illustration into a photorealistic version.",
     emoji: "🪄",
     descriptionKey: "transformations.effects.photorealistic.description"
   },
-  { 
+  {
     key: "fashion",
-    titleKey: "transformations.effects.fashion.title", 
-    prompt: "Transform the photo into a stylized, ultra-realistic fashion magazine portrait with cinematic lighting.", 
+    titleKey: "transformations.effects.fashion.title",
+    prompt: "Transform the photo into a stylized, ultra-realistic fashion magazine portrait with cinematic lighting.",
     emoji: "📸",
-    descriptionKey: "transformations.effects.fashion.description"
+    descriptionKey: "transformations.effects.fashion.description",
+    exampleImage: "/examples/fashion.jpg"
   },
-  { 
+  {
     key: "hyperrealistic",
-    titleKey: "transformations.effects.hyperrealistic.title", 
-    prompt: "Generate a hyper-realistic, fashion-style photo with strong, direct flash lighting, grainy texture, and a cool, confident pose.", 
+    titleKey: "transformations.effects.hyperrealistic.title",
+    prompt: "Generate a hyper-realistic, fashion-style photo with strong, direct flash lighting, grainy texture, and a cool, confident pose.",
     emoji: "✨",
-    descriptionKey: "transformations.effects.hyperrealistic.description"
+    descriptionKey: "transformations.effects.hyperrealistic.description",
+    exampleImage: "/examples/hyperrealistic.jpg"
   },
 
   // Design & Product (Flattened)
-   { 
+   {
     key: "architecture",
-    titleKey: "transformations.effects.architecture.title", 
-    prompt: "Convert this photo of a building into a miniature architecture model, placed on a cardstock in an indoor setting. Show a computer with modeling software in the background.", 
+    titleKey: "transformations.effects.architecture.title",
+    prompt: "Convert this photo of a building into a miniature architecture model, placed on a cardstock in an indoor setting. Show a computer with modeling software in the background.",
     emoji: "🏗️",
-    descriptionKey: "transformations.effects.architecture.description"
+    descriptionKey: "transformations.effects.architecture.description",
+    exampleImage: "/examples/architecture.jpg"
   },
   { 
     key: "productRender",
@@ -148,7 +158,7 @@ export const TRANSFORMATIONS: Transformation[] = [
   },
 
   // Creative Tools (Flattened)
-  { 
+  {
     key: "colorPalette",
     titleKey: "transformations.effects.colorPalette.title",
     prompt: "Turn this image into a clean, hand-drawn line art sketch.", // Step 1 prompt
@@ -161,6 +171,7 @@ export const TRANSFORMATIONS: Transformation[] = [
     primaryUploaderDescription: "transformations.effects.colorPalette.uploader1Desc",
     secondaryUploaderTitle: "transformations.effects.colorPalette.uploader2Title",
     secondaryUploaderDescription: "transformations.effects.colorPalette.uploader2Desc",
+    exampleImage: "/examples/colorPalette.jpg"
   },
   {
     key: "videoGeneration",
@@ -263,7 +274,7 @@ export const TRANSFORMATIONS: Transformation[] = [
       { key: "cyberpunk", titleKey: "transformations.effects.cyberpunk.title", prompt: "Transform the scene into a futuristic cyberpunk city.", emoji: "🤖", descriptionKey: "transformations.effects.cyberpunk.description" },
       { key: "vanGogh", titleKey: "transformations.effects.vanGogh.title", prompt: "Reimagine the photo in the style of Van Gogh's 'Starry Night'.", emoji: "🌌", descriptionKey: "transformations.effects.vanGogh.description" },
       { key: "lineArt", titleKey: "transformations.effects.lineArt.title", prompt: "Turn the image into a clean, hand-drawn line art sketch.", emoji: "✍🏻", descriptionKey: "transformations.effects.lineArt.description" },
-      { key: "paintingProcess", titleKey: "transformations.effects.paintingProcess.title", prompt: "Generate a 4-panel grid showing the artistic process of creating this image, from sketch to final render.", emoji: "🖼️", descriptionKey: "transformations.effects.paintingProcess.description" },
+      { key: "paintingProcess", titleKey: "transformations.effects.paintingProcess.title", prompt: "Generate a 4-panel grid showing the artistic process of creating this image, from sketch to final render.", emoji: "🖼️", descriptionKey: "transformations.effects.paintingProcess.description", exampleImage: "/examples/paintingProcess.jpg" },
       { key: "markerSketch", titleKey: "transformations.effects.markerSketch.title", prompt: "Redraw the image in the style of a Copic marker sketch, often used in design.", emoji: "🖊️", descriptionKey: "transformations.effects.markerSketch.description" },
     ]
   },

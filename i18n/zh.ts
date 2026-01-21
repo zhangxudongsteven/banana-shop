@@ -6,7 +6,7 @@ export default {
     chooseAnotherEffect: "选择其他效果",
     generateImage: "生成图像",
     generating: "生成中...",
-    result: "结果",
+    result: "效果图",
     yourImageWillAppear: "您生成的图像将显示在这里。",
     error: {
       uploadAndSelect: "请上传图像并选择一个效果。",
@@ -66,7 +66,8 @@ export default {
     },
     sliderPicker: {
       vs: "对"
-    }
+    },
+    exampleBadge: "效果图"
   },
   history: {
     title: "生成历史",

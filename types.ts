@@ -16,6 +16,7 @@ export interface Transformation {
   primaryUploaderDescription?: string;
   secondaryUploaderDescription?: string;
   isVideo?: boolean;
+  exampleImage?: string;
 }
 
 export interface GeneratedContent {

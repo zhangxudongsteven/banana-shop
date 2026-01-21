@@ -6,7 +6,7 @@ export default {
     chooseAnotherEffect: "Choose Another Effect",
     generateImage: "Generate Image",
     generating: "Generating...",
-    result: "Result",
+    result: "Example",
     yourImageWillAppear: "Your generated image will appear here.",
     error: {
       uploadAndSelect: "Please upload an image and select an effect.",
@@ -66,7 +66,8 @@ export default {
     },
     sliderPicker: {
       vs: "vs"
-    }
+    },
+    exampleBadge: "Example"
   },
   history: {
     title: "Generation History",

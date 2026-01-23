@@ -223,7 +223,7 @@ await logout()
 
 - `/home` - 首页
 - `/login` - 登录页
-- `/editor` - 编辑器（需要登录）
+- `/dashboard` - 编辑器（需要登录）
 - `/api/auth/*` - 认证 API
 
 ## 开发建议

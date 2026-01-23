@@ -13,7 +13,7 @@ export function proxy(request: NextRequest) {
   const authToken = request.cookies.get('auth_token')?.value
 
   // Define protected routes
-  const protectedRoutes = ['/editor']
+  const protectedRoutes = ['/dashboard']
   const authRoutes = ['/login']
 
   // Check if the current path is a protected route
@@ -30,10 +30,10 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  // Redirect to editor if already authenticated and trying to access auth routes
+  // Redirect to dashboard if already authenticated and trying to access auth routes
   if (isAuthRoute && authToken) {
-    const editorUrl = new URL('/editor', request.url)
-    return NextResponse.redirect(editorUrl)
+    const dashboardUrl = new URL('/dashboard', request.url)
+    return NextResponse.redirect(dashboardUrl)
   }
 
   return NextResponse.next()

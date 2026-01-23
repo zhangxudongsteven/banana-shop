@@ -4,9 +4,11 @@ export default {
     history: 'History',
     back: 'Back',
     chooseAnotherEffect: 'Choose Another Effect',
+    prompt: 'Prompt',
     generateImage: 'Generate Image',
     generating: 'Generating...',
     result: 'Example',
+    resultPlaceholder: 'Generated result will appear here',
     yourImageWillAppear: 'Your generated image will appear here.',
     error: {
       uploadAndSelect: 'Please upload an image and select an effect.',
@@ -110,6 +112,7 @@ export default {
         uploader1Desc: 'The main image to edit.',
         uploader2Title: 'Reference Image (Optional)',
         uploader2Desc: 'A second image for style, content, or context.',
+        promptPlaceholder: 'e.g., Make the character look like a superhero',
       },
       figurine: {
         title: '3D Figurine',

@@ -34,8 +34,8 @@ Banana Shop 使用 Next.js 16 的 **Proxy** 功能来保护需要认证的路由
 
 当前受保护的路由：
 
-- `/editor` - 编辑器页面
-- `/editor/*` - 编辑器的所有子路由
+- `/dashboard` - 编辑器页面
+- `/dashboard/*` - 编辑器的所有子路由
 
 ### 公开路由
 
@@ -48,13 +48,13 @@ Banana Shop 使用 Next.js 16 的 **Proxy** 功能来保护需要认证的路由
 ### 1. 未认证用户访问受保护路由
 
 ```
-用户访问 /editor
+用户访问 /dashboard
     ↓
 Proxy 检查 auth_token Cookie
     ↓
 Token 不存在
     ↓
-重定向到 /login?redirect=/editor
+重定向到 /login?redirect=/dashboard
     ↓
 用户登录后返回原页面
 ```
@@ -62,13 +62,13 @@ Token 不存在
 ### 2. 已认证用户访问受保护路由
 
 ```
-用户访问 /editor
+用户访问 /dashboard
     ↓
 Proxy 检查 auth_token Cookie
     ↓
 Token 存在
     ↓
-允许访问 /editor
+允许访问 /dashboard
 ```
 
 ### 3. 已认证用户访问登录页
@@ -80,7 +80,7 @@ Proxy 检查 auth_token Cookie
     ↓
 Token 存在
     ↓
-重定向到 /editor
+重定向到 /dashboard
 ```
 
 ## 配置修改
@@ -190,7 +190,7 @@ if (isProtectedRoute && !authToken) {
 
 ```tsx
 const searchParams = useSearchParams()
-const redirectTo = searchParams.get('redirect') || '/editor'
+const redirectTo = searchParams.get('redirect') || '/dashboard'
 
 // 登录成功后
 router.push(redirectTo)
@@ -239,9 +239,9 @@ filter: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif
    - 确认 `auth_token` Cookie 存在
 
 3. **测试不同场景**
-   - 未登录访问 `/editor` → 应重定向到 `/login?redirect=/editor`
-   - 已登录访问 `/editor` → 应正常显示
-   - 已登录访问 `/login` → 应重定向到 `/editor`
+   - 未登录访问 `/dashboard` → 应重定向到 `/login?redirect=/dashboard`
+   - 已登录访问 `/dashboard` → 应正常显示
+   - 已登录访问 `/login` → 应重定向到 `/dashboard`
 
 ### 常见问题
 

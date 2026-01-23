@@ -22,7 +22,7 @@ function LoginForm() {
   const [showSmsVerify, setShowSmsVerify] = useState(false)
 
   // Get redirect URL from search params
-  const redirectTo = searchParams.get('redirect') || '/editor'
+  const redirectTo = searchParams.get('redirect') || '/dashboard'
 
   // Password login state
   const [username, setUsername] = useState('')

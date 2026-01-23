@@ -1,4 +1,4 @@
-import type { Transformation } from './types'
+import type { Transformation } from '../types'
 
 export const TRANSFORMATIONS: Transformation[] = [
   // Moved custom prompt to the top and enabled multi-image

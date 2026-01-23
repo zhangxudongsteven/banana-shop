@@ -4,9 +4,11 @@ export default {
     history: '历史记录',
     back: '返回',
     chooseAnotherEffect: '选择其他效果',
+    prompt: '提示词',
     generateImage: '生成图像',
     generating: '生成中...',
     result: '效果图',
+    resultPlaceholder: '生成结果将显示在这里',
     yourImageWillAppear: '您生成的图像将显示在这里。',
     error: {
       uploadAndSelect: '请上传图像并选择一个效果。',
@@ -109,6 +111,7 @@ export default {
         uploader1Desc: '要编辑的主要图像。',
         uploader2Title: '参考图像（可选）',
         uploader2Desc: '用于风格、内容或上下文的第二张图像。',
+        promptPlaceholder: '例如：让角色看起来像个超级英雄',
       },
       figurine: {
         title: '3D手办',

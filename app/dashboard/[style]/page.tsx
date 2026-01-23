@@ -4,7 +4,7 @@ import React, { useState, useCallback, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { useParams, useRouter } from 'next/navigation'
 import { TRANSFORMATIONS } from '../../../lib/constants'
-import { editImage, generateVideo } from '../../../services/openaiService'
+import { editImage, generateVideo, generateImage } from '../../../services/openaiService'
 import type { GeneratedContent, Transformation } from '../../../types'
 import LoadingSpinner from '../../../components/LoadingSpinner'
 import ErrorMessage from '../../../components/ErrorMessage'
@@ -183,6 +183,32 @@ export default function GenerationPage() {
   }, [selectedTransformation, customPrompt, primaryImageUrl, aspectRatio, t, addHistoryItem])
 
   const handleGenerateImage = useCallback(async () => {
+    if (selectedTransformation?.isTextToImage) {
+      const promptToUse = customPrompt
+      if (!promptToUse.trim()) {
+        setError(t('app.error.enterPrompt'))
+        return
+      }
+
+      setIsLoading(true)
+      setError(null)
+      setGeneratedContent(null)
+      setLoadingMessage('')
+
+      try {
+        const result = await generateImage(promptToUse, selectedTransformation.model)
+        setGeneratedContent(result)
+        addHistoryItem(result)
+      } catch (err) {
+        console.error(err)
+        setError(err instanceof Error ? err.message : t('app.error.unknown'))
+      } finally {
+        setIsLoading(false)
+        setLoadingMessage('')
+      }
+      return
+    }
+
     if (!primaryImageUrl || !selectedTransformation) {
       setError(t('app.error.uploadAndSelect'))
       return
@@ -319,6 +345,8 @@ export default function GenerationPage() {
   let isGenerateDisabled = true
   if (selectedTransformation.isVideo) {
     isGenerateDisabled = isLoading || !customPrompt.trim()
+  } else if (selectedTransformation.isTextToImage) {
+    isGenerateDisabled = isLoading || !customPrompt.trim()
   } else {
     let imagesReady = false
     if (selectedTransformation.isMultiImage) {
@@ -409,6 +437,23 @@ export default function GenerationPage() {
                   />
                 </div>
               </>
+            ) : selectedTransformation.isTextToImage ? (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
+                  {t('transformations.effects.customPrompt.promptLabel')}
+                </label>
+                <textarea
+                  value={customPrompt}
+                  onChange={(e) => setCustomPrompt(e.target.value)}
+                  placeholder={t(
+                    selectedTransformation.key === 'glmImage'
+                      ? 'transformations.effects.glmImage.promptPlaceholder'
+                      : 'transformations.effects.customPrompt.promptPlaceholder'
+                  )}
+                  rows={4}
+                  className="w-full p-3 bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-lg focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-[var(--accent-primary)] transition-colors placeholder-[var(--text-tertiary)]"
+                />
+              </div>
             ) : selectedTransformation.isMultiImage ? (
               <MultiImageUploader
                 onPrimarySelect={handlePrimaryImageSelect}

@@ -111,7 +111,13 @@ export default {
         uploader1Desc: '要编辑的主要图像。',
         uploader2Title: '参考图像（可选）',
         uploader2Desc: '用于风格、内容或上下文的第二张图像。',
+        promptLabel: '提示词',
         promptPlaceholder: '例如：让角色看起来像个超级英雄',
+      },
+      glmImage: {
+        title: 'GLM 图像生成',
+        description: '使用 GLM 模型根据文本描述生成高质量图像。',
+        promptPlaceholder: '例如：一只可爱的小猫咪，坐在阳光明媚的窗台上，背景是蓝天白云',
       },
       figurine: {
         title: '3D手办',

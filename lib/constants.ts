@@ -15,6 +15,17 @@ export const TRANSFORMATIONS: Transformation[] = [
     secondaryUploaderTitle: 'transformations.effects.customPrompt.uploader2Title',
     secondaryUploaderDescription: 'transformations.effects.customPrompt.uploader2Desc',
   },
+  {
+    key: 'glmImage',
+    titleKey: 'transformations.effects.glmImage.title',
+    prompt:
+      '竖版手工剪贴簿风格的图像。顶部是一条亮红色粗糙撕裂边缘的纸质横幅，用半透明和纸胶带斜着固定，左上角夹着金色回形针，压着一小块写有「首发」的碎纸。横幅上用粗黑体手工剪报风写着主标题「GLM-Image 开源：国产芯片炼出图像生成 SOTA」，标题周围用黑色马克笔画着放射线和手绘画笔调色盘图标。 背景是拼贴的AI生成图片碎片、芯片电路图纹理、水彩晕染和浅蓝色卡纸。左侧有一个带磨损金属边的数码相框，用透明胶带斜贴，相框内大字写着「自回归 + 扩散解码器」，副标题「9B 自回归理解指令 + 7B DiT 精绘细节」，背景是文字prompt气泡到精美图像的箭头连接图，边缘有手绘箭头标注「读懂指令」「写对文字」。 右侧散落三张不同颜色的撕裂纸条便利贴，被和纸胶带交叉固定。配有芯片实物照片剪影加华为logo小贴纸、中文艺术字海报截图、多分辨率图像网格等插图。三个撕裂纸条标签带粗黑描边：「昇腾 A2 + 昇思 MindSpore：全程国产训练」「CVTG-2K & LongText-Bench：文字渲染开源第一」「384×384 到 2048×2048：任意比例原生支持」。旁边还有一条窄蓝色撕裂纸条写着「认知型生成：知识 + 推理新范式」，上面有马克笔波浪线和星星。 底部是一整条深蓝色撕裂纸带，印着电路纹理，用和纸胶带固定。通栏大标题「从”画个图”到”懂你想要什么”的认知型生成引擎」',
+    emoji: '🎨',
+    descriptionKey: 'transformations.effects.glmImage.description',
+    isTextToImage: true,
+    model: 'glm-image',
+    exampleImage: '/examples/glmImage.jpg',
+  },
   // Viral & Fun (Flattened)
   {
     key: 'figurine',

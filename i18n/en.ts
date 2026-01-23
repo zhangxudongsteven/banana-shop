@@ -112,7 +112,14 @@ export default {
         uploader1Desc: 'The main image to edit.',
         uploader2Title: 'Reference Image (Optional)',
         uploader2Desc: 'A second image for style, content, or context.',
+        promptLabel: 'Prompt',
         promptPlaceholder: 'e.g., Make the character look like a superhero',
+      },
+      glmImage: {
+        title: 'GLM Image Generation',
+        description: 'Generate high-quality images from text descriptions using the GLM model.',
+        promptPlaceholder:
+          'e.g., A cute little cat sitting on a sunny windowsill with a blue sky background',
       },
       figurine: {
         title: '3D Figurine',

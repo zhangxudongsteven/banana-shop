@@ -15,6 +15,8 @@ export interface Transformation {
   secondaryUploaderDescription?: string
   isVideo?: boolean
   exampleImage?: string
+  isTextToImage?: boolean
+  model?: string
 }
 
 export interface GeneratedContent {

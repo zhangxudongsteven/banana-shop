@@ -38,6 +38,38 @@ export async function editImage(
   }
 }
 
+export async function generateImage(
+  prompt: string,
+  model: string = 'glm-image'
+): Promise<GeneratedContent> {
+  try {
+    const response = await fetch('/api/generate-image', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        prompt,
+        model,
+      }),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      throw new Error(errorData.error || `Server error: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    return data as GeneratedContent
+  } catch (error) {
+    console.error('Error calling backend API:', error)
+    if (error instanceof Error) {
+      throw new Error(error.message)
+    }
+    throw new Error('An unknown error occurred while communicating with the backend.')
+  }
+}
+
 export async function generateVideo(
   prompt: string,
   image: { base64: string; mimeType: string } | null,

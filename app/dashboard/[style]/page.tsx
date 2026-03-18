@@ -4,7 +4,7 @@ import React, { useState, useCallback, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { useParams, useRouter } from 'next/navigation'
 import { TRANSFORMATIONS } from '../../../lib/constants'
-import { editImage, generateVideo, generateImage } from '../../../services/openaiService'
+import { generateVideoAction, generateImageAction } from '../../../actions/image-actions'
 import type { GeneratedContent, Transformation } from '../../../types'
 import LoadingSpinner from '../../../components/LoadingSpinner'
 import ErrorMessage from '../../../components/ErrorMessage'
@@ -31,6 +31,44 @@ const MultiImageUploader = dynamic(() => import('../../../components/MultiImageU
 })
 
 type ActiveTool = 'mask' | 'none'
+type EditImageResponse = {
+  success: boolean
+  data?: GeneratedContent
+  error?: string
+}
+
+const callEditImageApi = async (
+  base64ImageData: string,
+  mimeType: string,
+  prompt: string,
+  maskBase64: string | null,
+  secondaryImage?: { base64: string; mimeType: string } | null
+): Promise<EditImageResponse> => {
+  const response = await fetch('/api/image/edit', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      base64ImageData,
+      mimeType,
+      prompt,
+      maskBase64,
+      secondaryImage: secondaryImage ?? null,
+    }),
+  })
+
+  const result = (await response.json().catch(() => null)) as EditImageResponse | null
+  if (result) {
+    return result
+  }
+
+  if (!response.ok) {
+    return { success: false, error: `请求失败: ${response.status}` }
+  }
+
+  return { success: false, error: '服务端返回异常' }
+}
 
 export default function GenerationPage() {
   const router = useRouter()
@@ -141,22 +179,17 @@ export default function GenerationPage() {
     setIsLoading(true)
     setError(null)
     setGeneratedContent(null)
+    setLoadingMessage(t('app.loading.default'))
 
     try {
-      let imagePayload = null
-      if (primaryImageUrl) {
-        const primaryMimeType = primaryImageUrl.split(';')[0].split(':')[1] ?? 'image/png'
-        const primaryBase64 = primaryImageUrl.split(',')[1]
-        imagePayload = { base64: primaryBase64, mimeType: primaryMimeType }
+      const actionResult = await generateVideoAction(promptToUse, aspectRatio)
+
+      if (!actionResult.success) {
+        setError(actionResult.error || '生成失败')
+        return
       }
 
-      const videoDownloadUrl = await generateVideo(
-        promptToUse,
-        imagePayload,
-        aspectRatio,
-        (message) => setLoadingMessage(message)
-      )
-
+      const videoDownloadUrl = actionResult.data.videoUrl
       setLoadingMessage(t('app.loading.videoFetching'))
       const response = await fetch(videoDownloadUrl)
       if (!response.ok) {
@@ -180,7 +213,7 @@ export default function GenerationPage() {
       setIsLoading(false)
       setLoadingMessage('')
     }
-  }, [selectedTransformation, customPrompt, primaryImageUrl, aspectRatio, t, addHistoryItem])
+  }, [selectedTransformation, customPrompt, aspectRatio, t, addHistoryItem])
 
   const handleGenerateImage = useCallback(async () => {
     if (selectedTransformation?.isTextToImage) {
@@ -196,9 +229,13 @@ export default function GenerationPage() {
       setLoadingMessage('')
 
       try {
-        const result = await generateImage(promptToUse, selectedTransformation.model)
-        setGeneratedContent(result)
-        addHistoryItem(result)
+        const actionResult = await generateImageAction(promptToUse, selectedTransformation.model)
+        if (!actionResult.success) {
+          setError(actionResult.error || '生成失败')
+          return
+        }
+        setGeneratedContent(actionResult.data)
+        addHistoryItem(actionResult.data)
       } catch (err) {
         console.error(err)
         setError(err instanceof Error ? err.message : t('app.error.unknown'))
@@ -241,7 +278,7 @@ export default function GenerationPage() {
 
       if (selectedTransformation.isTwoStep) {
         setLoadingMessage(t('app.loading.step1'))
-        const stepOneResult = await editImage(
+        const stepOneActionResult = await callEditImageApi(
           primaryBase64,
           primaryMimeType,
           promptToUse,
@@ -249,8 +286,12 @@ export default function GenerationPage() {
           null
         )
 
-        if (!stepOneResult.imageUrl)
-          throw new Error('Step 1 (line art) failed to generate an image.')
+        if (!stepOneActionResult.success || !stepOneActionResult.data.imageUrl) {
+          setError(stepOneActionResult.error || 'Step 1 (line art) failed to generate an image.')
+          return
+        }
+
+        const stepOneResult = stepOneActionResult.data
 
         setLoadingMessage(t('app.loading.step2'))
         const stepOneImageBase64 = stepOneResult.imageUrl.split(',')[1]
@@ -267,7 +308,7 @@ export default function GenerationPage() {
           secondaryImagePayload = { base64: secondaryBase64, mimeType: secondaryMimeType }
         }
 
-        const stepTwoResult = await editImage(
+        const stepTwoActionResult = await callEditImageApi(
           stepOneImageBase64,
           stepOneImageMimeType,
           selectedTransformation.stepTwoPrompt!,
@@ -275,6 +316,12 @@ export default function GenerationPage() {
           secondaryImagePayload
         )
 
+        if (!stepTwoActionResult.success) {
+          setError(stepTwoActionResult.error || 'Step 2 failed.')
+          return
+        }
+
+        const stepTwoResult = stepTwoActionResult.data
         if (stepTwoResult.imageUrl) {
           stepTwoResult.imageUrl = await embedWatermark(stepTwoResult.imageUrl, 'Banana Shop')
         }
@@ -290,7 +337,7 @@ export default function GenerationPage() {
           secondaryImagePayload = { base64: secondaryBase64, mimeType: secondaryMimeType }
         }
         setLoadingMessage(t('app.loading.default'))
-        const result = await editImage(
+        const actionResult = await callEditImageApi(
           primaryBase64,
           primaryMimeType,
           promptToUse,
@@ -298,6 +345,12 @@ export default function GenerationPage() {
           secondaryImagePayload
         )
 
+        if (!actionResult.success) {
+          setError(actionResult.error || '生成失败')
+          return
+        }
+
+        const result = actionResult.data
         if (result.imageUrl) result.imageUrl = await embedWatermark(result.imageUrl, 'Banana Shop')
 
         setGeneratedContent(result)
@@ -423,18 +476,6 @@ export default function GenerationPage() {
                       </button>
                     ))}
                   </div>
-                </div>
-                <div className="mt-4">
-                  <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-2">
-                    {t('transformations.effects.customPrompt.uploader2Title')}
-                  </h3>
-                  <ImageEditorCanvas
-                    onImageSelect={handlePrimaryImageSelect}
-                    initialImageUrl={primaryImageUrl}
-                    onMaskChange={() => {}}
-                    onClearImage={handleClearPrimaryImage}
-                    isMaskToolActive={false}
-                  />
                 </div>
               </>
             ) : selectedTransformation.isTextToImage ? (

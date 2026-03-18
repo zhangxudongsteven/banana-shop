@@ -5,6 +5,30 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 并遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)（语义化版本）。
 
+## [0.3.0] - 2026-03-18
+
+### 重构
+
+- **迁移至火山引擎 Ark API**：将图像生成、分析、编辑和视频生成功能从 OpenAI 服务迁移至火山引擎 Ark API。
+- **API 路由迁移至 Server Actions**：将图像相关 API 路由（/api/generate-image、/api/edit-image）重构为 Server Actions（actions/image-actions.ts）。
+- **统一结果类型**：所有图像/视频生成操作统一使用 AuthResult<GeneratedContent> 返回类型，提供一致的错误处理机制。
+- **简化 API 路由**：新增 /api/image/edit 路由作为 Server Actions 的补充，保留原有 API 调用接口。
+
+### 新增
+
+- **多图支持**：图像编辑功能现在支持通过增强提示词的方式处理多图输入。
+- **视频生成入口**：新增 generateVideo Server Action 支持视频生成功能。
+
+### 移除
+
+- 移除 OpenAI 服务依赖（services/openaiService.ts）。
+- 移除旧的蒙版编辑 API 路由（/api/edit-image）和图像生成 API 路由（/api/generate-image）。
+
+### 配置
+
+- 更新 .env.example：移除 OpenAI 相关配置，新增 VOLCENGINE_API_KEY 环境变量。
+- 更新 next.config.ts：添加火山引擎域名到图片优化域名白名单。
+
 ## [0.2.0] - 2026-03-18
 
 ### 重构

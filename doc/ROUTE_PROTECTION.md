@@ -292,4 +292,4 @@ A: 删除或重命名 `proxy.ts` 文件。
 
 - [Next.js Proxy 文档](https://nextjs.org/docs/app/building-your-application/routing/middleware)
 - [认证配置指南](./AUTH_SETUP.md)
-- [tale-js-sdk 文档](https://www.npmjs.com/package/tale-js-sdk)
+- [@turinhub/tale-js-sdk 文档](https://www.npmjs.com/package/@turinhub/tale-js-sdk)

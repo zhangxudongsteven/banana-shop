@@ -1,7 +1,13 @@
 'use server'
 
 import { cookies } from 'next/headers'
-import { login, loginWithSms, verifySmsCode, type LoginResponse, type AuthUser } from 'tale-js-sdk'
+import {
+  login,
+  loginWithSms,
+  verifySmsCode,
+  type LoginResponse,
+  type AuthUser,
+} from '@turinhub/tale-js-sdk'
 
 const COOKIE_NAME = 'auth_token'
 const COOKIE_USER = 'auth_user'
@@ -26,7 +32,7 @@ export type AuthResult<T = void> = {
 }
 
 /**
- * Authentication service using tale-js-sdk
+ * Authentication service using @turinhub/tale-js-sdk
  * All functions are server actions that can be called from client components
  */
 

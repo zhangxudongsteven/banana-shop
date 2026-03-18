@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
-import type { AuthUser } from 'tale-js-sdk'
+import type { AuthUser } from '@turinhub/tale-js-sdk'
 import { getCurrentUser } from '@/lib/auth'
 
 interface AuthContextType {

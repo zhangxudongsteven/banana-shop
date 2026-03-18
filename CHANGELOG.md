@@ -5,6 +5,19 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 并遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)（语义化版本）。
 
+## [0.3.2] - 2026-03-18
+
+### 变更
+
+- **迁移至 @turinhub/tale-js-sdk**：将认证 SDK 从已弃用的 `tale-js-sdk` 迁移至 `@turinhub/tale-js-sdk`，确保使用最新的官方包。
+- **更新环境配置**：更新 `.env.example` 中的注释，使用新的包名称。
+- **更新依赖声明**：在 `package.json` 中更新认证 SDK 依赖。
+
+### 修复
+
+- 修复导入路径：将所有 `tale-js-sdk` 导入更新为 `@turinhub/tale-js-sdk`。
+- 更新文档中的 SDK 名称和链接引用。
+
 ## [0.3.1] - 2026-03-18
 
 ### 变更

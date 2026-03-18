@@ -6,18 +6,15 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { Loader2, MessageSquare, User, Lock } from 'lucide-react'
 import { toast } from 'sonner'
-import { useAuth } from '@/components/AuthProvider'
 import { loginWithPassword, sendSmsCode, verifySmsLogin } from '@/lib/auth'
 
 type LoginMethod = 'password' | 'sms'
 
 function LoginForm() {
-  const router = useRouter()
   const searchParams = useSearchParams()
-  const { refresh } = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [loginMethod, setLoginMethod] = useState<LoginMethod>('password')
   const [showSmsVerify, setShowSmsVerify] = useState(false)
@@ -63,8 +60,9 @@ function LoginForm() {
       }
 
       toast.success(`欢迎回来，${result.data?.user.username}！`)
-      await refresh()
-      router.push(redirectTo)
+      // Force full page reload to ensure cookies are properly set server-side
+      // This avoids timing issues in production environments like Vercel
+      window.location.href = redirectTo
     } catch (error) {
       toast.error('登录失败，请检查用户名和密码')
     } finally {
@@ -112,8 +110,9 @@ function LoginForm() {
       }
 
       toast.success('登录成功，欢迎！')
-      await refresh()
-      router.push(redirectTo)
+      // Force full page reload to ensure cookies are properly set server-side
+      // This avoids timing issues in production environments like Vercel
+      window.location.href = redirectTo
     } catch (error) {
       toast.error('验证码错误')
     } finally {

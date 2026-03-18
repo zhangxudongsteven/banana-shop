@@ -4,7 +4,11 @@ import React, { useState, useCallback, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { useParams, useRouter } from 'next/navigation'
 import { TRANSFORMATIONS } from '../../../lib/constants'
-import { generateVideoAction, generateImageAction } from '../../../actions/image-actions'
+import {
+  generateVideoAction,
+  generateImageAction,
+  editImageAction,
+} from '../../../actions/image-actions'
 import type { GeneratedContent, Transformation } from '../../../types'
 import LoadingSpinner from '../../../components/LoadingSpinner'
 import ErrorMessage from '../../../components/ErrorMessage'
@@ -31,44 +35,6 @@ const MultiImageUploader = dynamic(() => import('../../../components/MultiImageU
 })
 
 type ActiveTool = 'mask' | 'none'
-type EditImageResponse = {
-  success: boolean
-  data?: GeneratedContent
-  error?: string
-}
-
-const callEditImageApi = async (
-  base64ImageData: string,
-  mimeType: string,
-  prompt: string,
-  maskBase64: string | null,
-  secondaryImage?: { base64: string; mimeType: string } | null
-): Promise<EditImageResponse> => {
-  const response = await fetch('/api/image/edit', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      base64ImageData,
-      mimeType,
-      prompt,
-      maskBase64,
-      secondaryImage: secondaryImage ?? null,
-    }),
-  })
-
-  const result = (await response.json().catch(() => null)) as EditImageResponse | null
-  if (result) {
-    return result
-  }
-
-  if (!response.ok) {
-    return { success: false, error: `请求失败: ${response.status}` }
-  }
-
-  return { success: false, error: '服务端返回异常' }
-}
 
 export default function GenerationPage() {
   const router = useRouter()
@@ -278,15 +244,14 @@ export default function GenerationPage() {
 
       if (selectedTransformation.isTwoStep) {
         setLoadingMessage(t('app.loading.step1'))
-        const stepOneActionResult = await callEditImageApi(
+        const stepOneActionResult = await editImageAction(
           primaryBase64,
           primaryMimeType,
           promptToUse,
-          null,
           null
         )
 
-        if (!stepOneActionResult.success || !stepOneActionResult.data.imageUrl) {
+        if (!stepOneActionResult.success || !stepOneActionResult.data?.imageUrl) {
           setError(stepOneActionResult.error || 'Step 1 (line art) failed to generate an image.')
           return
         }
@@ -308,12 +273,12 @@ export default function GenerationPage() {
           secondaryImagePayload = { base64: secondaryBase64, mimeType: secondaryMimeType }
         }
 
-        const stepTwoActionResult = await callEditImageApi(
+        const stepTwoActionResult = await editImageAction(
           stepOneImageBase64,
           stepOneImageMimeType,
           selectedTransformation.stepTwoPrompt!,
           null,
-          secondaryImagePayload
+          secondaryImagePayload ?? null
         )
 
         if (!stepTwoActionResult.success) {
@@ -337,12 +302,12 @@ export default function GenerationPage() {
           secondaryImagePayload = { base64: secondaryBase64, mimeType: secondaryMimeType }
         }
         setLoadingMessage(t('app.loading.default'))
-        const actionResult = await callEditImageApi(
+        const actionResult = await editImageAction(
           primaryBase64,
           primaryMimeType,
           promptToUse,
           maskBase64,
-          secondaryImagePayload
+          secondaryImagePayload ?? null
         )
 
         if (!actionResult.success) {

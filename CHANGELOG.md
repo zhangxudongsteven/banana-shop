@@ -5,6 +5,18 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 并遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)（语义化版本）。
 
+## [0.3.1] - 2026-03-18
+
+### 变更
+
+- **迁移至 Seedream 5.0 模型**：将图像编辑功能从已弃用的 `doubao-seededit-3-0-i2i-250628` 模型迁移至 `doubao-seedream-5-0-260128` 模型，使用 `reference_images` 参数实现图像到图像生成。
+- **更新环境配置**：更新 `.env.example` 和 `.env.local` 中的图像编辑模型配置，确保使用最新的 Seedream 5.0 模型。
+- **类型安全改进**：为火山引擎自定义 API 参数添加类型断言，确保 TypeScript 类型检查通过。
+
+### 移除
+
+- 删除 `app/api/image/edit/route.ts` 路由文件，图像编辑功能已完全迁移至 Server Actions。
+
 ## [0.3.0] - 2026-03-18
 
 ### 重构

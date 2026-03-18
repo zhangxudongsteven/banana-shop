@@ -22,7 +22,7 @@
     "react-dom": "^19.1.1",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
-    "tale-js-sdk": "^1.1.1"
+    "tale-js-sdk": "^1.3.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

@@ -7,7 +7,7 @@ const VOLCENGINE_CONFIG = {
   defaultImageModel: process.env.VOLCENGINE_IMAGE_MODEL || 'doubao-seed-2-0-lite-260215',
   defaultChatModel: process.env.VOLCENGINE_CHAT_MODEL || 'doubao-seed-2-0-lite-260215',
   defaultVideoModel: process.env.VOLCENGINE_VIDEO_MODEL || 'doubao-video-1',
-  defaultEditModel: process.env.VOLCENGINE_EDIT_MODEL || 'doubao-seededit-3-0',
+  defaultEditModel: process.env.VOLCENGINE_EDIT_MODEL || 'doubao-seedream-5-0-260128',
 }
 
 // Create OpenAI client (pointing to Volcengine Ark)
@@ -103,8 +103,8 @@ export async function analyzeImage(
 }
 
 /**
- * Edit image with instruction-based editing (SeedEdit)
- * This replaces the mask-based editing from OpenAI DALL-E 2
+ * Edit image with instruction-based editing using Seedream image-to-image generation
+ * This uses the standard /images/generations endpoint with reference_images parameter
  * Returns base64 data URL for compatibility with watermarking and multi-step flows
  */
 export async function editImageWithInstruction(
@@ -116,30 +116,15 @@ export async function editImageWithInstruction(
     throw new Error('VOLCENGINE_API_KEY is not configured')
   }
 
-  // Use Volcengine's SeedEdit API for instruction-based image editing
-  const response = await fetch(`${VOLCENGINE_CONFIG.baseURL}/images/edits`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${VOLCENGINE_CONFIG.apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: VOLCENGINE_CONFIG.defaultEditModel,
-      image: `data:${mimeType};base64,${base64Image}`,
-      prompt: instruction,
-      response_format: 'b64_json',
-    }),
-  })
+  // Use Volcengine's Seedream 5.0 model with reference_images for image-to-image generation
+  const response = await client.images.generate({
+    model: VOLCENGINE_CONFIG.defaultEditModel,
+    prompt: instruction,
+    response_format: 'b64_json',
+    reference_images: [`data:${mimeType};base64,${base64Image}`], // Input image as reference
+  } as any)
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}))
-    console.error('Volcengine SeedEdit API Error:', errorData)
-    throw new Error(`Failed to edit image: ${response.statusText}`)
-  }
-
-  const data = await response.json()
-  const b64Json = data.data?.[0]?.b64_json
-
+  const b64Json = response.data[0].b64_json
   if (!b64Json) {
     throw new Error('Failed to edit image: No base64 data in response')
   }

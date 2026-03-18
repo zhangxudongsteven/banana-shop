@@ -10,6 +10,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Loader2, MessageSquare, User, Lock } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuth } from '@/components/AuthProvider'
+import { loginWithPassword, sendSmsCode, verifySmsLogin } from '@/lib/auth'
 
 type LoginMethod = 'password' | 'sms'
 
@@ -54,23 +55,18 @@ function LoginForm() {
     setIsSubmitting(true)
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      })
+      const result = await loginWithPassword(username, password)
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || '登录失败')
+      if (!result.success) {
+        toast.error(result.error || '登录失败')
+        return
       }
 
-      toast.success(`欢迎回来，${data.user.username}！`)
+      toast.success(`欢迎回来，${result.data?.user.username}！`)
       await refresh()
       router.push(redirectTo)
-    } catch (error: any) {
-      toast.error(error?.message || '登录失败，请检查用户名和密码')
+    } catch (error) {
+      toast.error('登录失败，请检查用户名和密码')
     } finally {
       setIsSubmitting(false)
     }
@@ -84,25 +80,20 @@ function LoginForm() {
 
     setIsSubmitting(true)
     try {
-      const response = await fetch('/api/auth/sms/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone }),
-      })
+      const result = await sendSmsCode(phone)
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || '发送验证码失败')
+      if (!result.success) {
+        toast.error(result.error || '发送验证码失败')
+        return
       }
 
-      setSmsId(data.sms_id)
-      setSmsType(data.type)
+      setSmsId(result.data?.sms_id || '')
+      setSmsType(result.data?.type || 'login')
       setShowSmsVerify(true)
       startCountdown()
       toast.success('验证码已发送')
-    } catch (error: any) {
-      toast.error(error?.message || '发送验证码失败')
+    } catch (error) {
+      toast.error('发送验证码失败')
     } finally {
       setIsSubmitting(false)
     }
@@ -113,23 +104,18 @@ function LoginForm() {
     setIsSubmitting(true)
 
     try {
-      const response = await fetch('/api/auth/sms/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ smsId, smsType, verificationCode: smsCode }),
-      })
+      const result = await verifySmsLogin(smsId, smsType, smsCode)
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || '验证码错误')
+      if (!result.success) {
+        toast.error(result.error || '验证码错误')
+        return
       }
 
-      toast.success(`登录成功，欢迎！`)
+      toast.success('登录成功，欢迎！')
       await refresh()
       router.push(redirectTo)
-    } catch (error: any) {
-      toast.error(error?.message || '验证码错误')
+    } catch (error) {
+      toast.error('验证码错误')
     } finally {
       setIsSubmitting(false)
     }

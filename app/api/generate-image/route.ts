@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.GLM_API_KEY || process.env.OPENAI_API_KEY // Fallback or distinct
+  // Only use GLM API key for GLM image generation
+  const apiKey = process.env.GLM_API_KEY
 
   if (!apiKey) {
-    return NextResponse.json(
-      { error: 'Server configuration error: Missing API Key' },
-      { status: 500 }
-    )
+    console.error('GLM_API_KEY is not configured')
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
   }
 
   try {
@@ -34,8 +33,9 @@ export async function POST(req: NextRequest) {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
       console.error('GLM API Error:', errorData)
+      // Don't expose detailed error messages to client
       return NextResponse.json(
-        { error: errorData.error?.message || `GLM API Error: ${response.statusText}` },
+        { error: 'Failed to generate image. Please try again.' },
         { status: response.status }
       )
     }
@@ -53,8 +53,12 @@ export async function POST(req: NextRequest) {
       imageUrl: imageUrl,
       text: null,
     })
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error calling GLM API:', error)
-    return NextResponse.json({ error: error.message || 'An error occurred' }, { status: 500 })
+    // Don't expose detailed error messages to client for security
+    return NextResponse.json(
+      { error: 'An error occurred while processing your request' },
+      { status: 500 }
+    )
   }
 }

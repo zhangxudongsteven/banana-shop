@@ -2,11 +2,23 @@ import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { toFile } from 'openai/uploads'
 
+// Validate required environment variables at startup
 if (!process.env.OPENAI_API_KEY) {
-  // We can't really throw here as it might crash the server startup if env is missing in some envs
-  // Better to check in handler
   console.error('OPENAI_API_KEY environment variable is not set.')
 }
+
+// Validate and set the image model
+const VALID_IMAGE_MODELS = ['gpt-4o', 'gpt-4-vision-preview', 'gpt-4o-mini'] as const
+type ValidImageModel = (typeof VALID_IMAGE_MODELS)[number]
+
+function isValidImageModel(model: string): model is ValidImageModel {
+  return VALID_IMAGE_MODELS.includes(model as ValidImageModel)
+}
+
+const imageModel =
+  process.env.IMAGE_MODEL && isValidImageModel(process.env.IMAGE_MODEL)
+    ? process.env.IMAGE_MODEL
+    : 'gpt-4o'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -21,10 +33,8 @@ async function base64ToFile(base64Data: string, filename: string, mimeType: stri
 
 export async function POST(req: NextRequest) {
   if (!process.env.OPENAI_API_KEY) {
-    return NextResponse.json(
-      { error: 'Server configuration error: Missing API Key' },
-      { status: 500 }
-    )
+    console.error('OPENAI_API_KEY is not configured')
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
   }
 
   try {
@@ -86,7 +96,7 @@ export async function POST(req: NextRequest) {
     }
 
     const completion = await openai.chat.completions.create({
-      model: process.env.IMAGE_MODEL || 'gpt-4o',
+      model: imageModel,
       messages: messages,
     })
 
@@ -96,8 +106,12 @@ export async function POST(req: NextRequest) {
       imageUrl: null,
       text: textResponse,
     })
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error calling OpenAI API:', error)
-    return NextResponse.json({ error: error.message || 'An error occurred' }, { status: 500 })
+    // Don't expose detailed error messages to client for security
+    return NextResponse.json(
+      { error: 'An error occurred while processing your request' },
+      { status: 500 }
+    )
   }
 }

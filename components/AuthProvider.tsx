@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import type { AuthUser } from 'tale-js-sdk'
+import { getCurrentUser } from '@/lib/auth'
 
 interface AuthContextType {
   user: AuthUser | null
@@ -23,10 +24,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch('/api/auth/me')
-      if (response.ok) {
-        const data = await response.json()
-        setUser(data.user)
+      const result = await getCurrentUser()
+      if (result.success && result.data) {
+        setUser(result.data)
       } else {
         setUser(null)
       }

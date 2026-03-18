@@ -10,25 +10,25 @@ import { useAuth } from './AuthProvider'
 import LanguageSwitcher from './LanguageSwitcher'
 import ThemeSwitcher from './ThemeSwitcher'
 import { useHistory } from '../contexts/HistoryContext'
+import { logoutUser } from '@/lib/auth'
 
 const DashboardHeader: React.FC = () => {
   const { t } = useTranslation()
-  const { user } = useAuth()
+  const { user, refresh } = useAuth()
   const router = useRouter()
   const { toggleHistoryPanel } = useHistory()
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('/api/auth/logout', {
-        method: 'POST',
-      })
+      const result = await logoutUser()
 
-      if (response.ok) {
+      if (result.success) {
         toast.success('已退出登录')
+        await refresh()
         router.push('/home')
       } else {
-        throw new Error('退出登录失败')
+        toast.error(result.error || '退出登录失败')
       }
     } catch (error) {
       console.error('Logout error:', error)

@@ -85,7 +85,7 @@ function LoginForm() {
         return
       }
 
-      setSmsId(result.data?.sms_id || '')
+      setSmsId(result.data?.smsId || '')
       setSmsType(result.data?.type || 'login')
       setShowSmsVerify(true)
       startCountdown()

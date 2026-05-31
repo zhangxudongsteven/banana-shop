@@ -2,10 +2,13 @@
 
 import { cookies } from 'next/headers'
 import {
+  getAppToken,
   login,
   loginWithSms,
   verifySmsCode,
   type LoginResponse,
+  type SendSmsResponse,
+  type SmsLoginResponse,
   type AuthUser,
 } from '@turinhub/tale-js-sdk'
 
@@ -23,6 +26,15 @@ const getCookieOptions = (expiresAt: string) => ({
   expires: new Date(expiresAt),
   path: '/',
 })
+
+const getTaleBaseUrl = () => process.env.TALE_BASE_URL
+
+const getTaleAppToken = () =>
+  getAppToken({
+    baseUrl: process.env.TALE_BASE_URL,
+    appKey: process.env.TALE_APP_KEY,
+    appSecret: process.env.TALE_APP_SECRET,
+  })
 
 // Result types for server actions
 export type AuthResult<T = void> = {
@@ -49,11 +61,11 @@ export async function loginWithPassword(
       return { success: false, error: '用户名和密码不能为空' }
     }
 
-    const result = await login({ username, password })
+    const result = await login({ username, password }, { baseUrl: getTaleBaseUrl() })
 
     // Store token and user info in cookies
     const cookieStore = await cookies()
-    const cookieOptions = getCookieOptions(result.token.expired_at)
+    const cookieOptions = getCookieOptions(result.token.expiredAt)
 
     cookieStore.set(COOKIE_NAME, result.token.token, cookieOptions)
     cookieStore.set(COOKIE_USER, JSON.stringify(result.user), cookieOptions)
@@ -69,15 +81,14 @@ export async function loginWithPassword(
  * Initiate SMS login by sending verification code
  * Server action that can be called directly from client components
  */
-export async function sendSmsCode(
-  phone: string
-): Promise<AuthResult<{ sms_id: string; type: 'login' | 'register' }>> {
+export async function sendSmsCode(phone: string): Promise<AuthResult<SendSmsResponse>> {
   try {
     if (!phone) {
       return { success: false, error: '手机号码不能为空' }
     }
 
-    const result = await loginWithSms(phone)
+    const appToken = await getTaleAppToken()
+    const result = await loginWithSms(phone, { appToken })
     return { success: true, data: result }
   } catch (error) {
     console.error('Send SMS error:', error)
@@ -93,21 +104,27 @@ export async function verifySmsLogin(
   smsId: string,
   smsType: 'login' | 'register',
   verificationCode: string
-): Promise<AuthResult<LoginResponse>> {
+): Promise<AuthResult<SmsLoginResponse>> {
   try {
     if (!smsId || !smsType || !verificationCode) {
       return { success: false, error: '参数不完整' }
     }
 
-    const result = await verifySmsCode({
-      sms_id: smsId,
-      sms_type: smsType,
-      verification_code: verificationCode,
-    })
+    const result = await verifySmsCode(
+      {
+        smsId,
+        smsType,
+        verificationCode,
+      },
+      {
+        baseUrl: getTaleBaseUrl(),
+        appToken: await getTaleAppToken(),
+      }
+    )
 
     // Store token and user info in cookies
     const cookieStore = await cookies()
-    const cookieOptions = getCookieOptions(result.token.expired_at)
+    const cookieOptions = getCookieOptions(result.token.expiredAt)
 
     cookieStore.set(COOKIE_NAME, result.token.token, cookieOptions)
     cookieStore.set(COOKIE_USER, JSON.stringify(result.user), cookieOptions)

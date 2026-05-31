@@ -5,6 +5,18 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 并遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)（语义化版本）。
 
+## [0.4.0] - 2026-05-31
+
+### 变更
+
+- **升级 Tale JS SDK 至 2.3.0**：将 `@turinhub/tale-js-sdk` 从 1.3.0 升级到 2.3.0。
+- **适配 SDK 2.x 认证响应字段**：认证集成改用 `expiredAt`、`smsId`、`smsType`、`verificationCode` 等 camelCase 字段。
+- **显式处理短信登录 App Token**：短信验证码发送与验证流程通过 `getAppToken()` 获取应用 Token 后调用 SDK 认证接口。
+
+### 文档
+
+- 更新认证配置、路由保护和环境变量示例中的 SDK 版本与响应字段说明。
+
 ## [0.3.2] - 2026-03-18
 
 ### 变更

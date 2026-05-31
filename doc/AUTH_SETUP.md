@@ -7,7 +7,7 @@ Banana Shop 已集成完整的用户认证系统，支持以下登录方式：
 - 账号密码登录
 - 短信验证码登录
 
-认证系统使用 `@turinhub/tale-js-sdk` (v1.3.0) 实现。
+认证系统使用 `@turinhub/tale-js-sdk` (v2.3.0) 实现。
 
 ## 环境配置
 
@@ -22,7 +22,7 @@ cp .env.example .env.local
 在 `.env.local` 文件中配置以下参数：
 
 ```env
-# Tale Authentication Configuration (@turinhub/tale-js-sdk v1.3.0)
+# Tale Authentication Configuration (@turinhub/tale-js-sdk v2.3.0)
 # Get your credentials from your Tale admin panel
 TALE_BASE_URL=https://your-tale-api-url.com
 TALE_APP_KEY=your_app_key_here
@@ -138,7 +138,7 @@ await logout()
   },
   "token": {
     "token": "jwt_token_here",
-    "expired_at": "2026-01-22T12:00:00Z"
+    "expiredAt": "2026-01-22T12:00:00Z"
   }
 }
 ```
@@ -159,7 +159,7 @@ await logout()
 
 ```json
 {
-  "sms_id": "sms_123",
+  "smsId": "sms_123",
   "type": "login"
 }
 ```
@@ -289,7 +289,7 @@ export default function Nav() {
 
 ## 依赖
 
-- `@turinhub/tale-js-sdk`: v1.3.0 - Tale 认证 SDK
+- `@turinhub/tale-js-sdk`: v2.3.0 - Tale 认证 SDK
 - `sonner`: v2.0.7 - Toast 通知库
 
 ## 故障排查

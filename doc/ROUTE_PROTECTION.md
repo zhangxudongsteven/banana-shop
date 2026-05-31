@@ -205,7 +205,7 @@ cookieStore.set('auth_token', token, {
   httpOnly: true, // 防止 XSS 攻击
   secure: process.env.NODE_ENV === 'production', // 仅 HTTPS
   sameSite: 'lax', // 防止 CSRF 攻击
-  expires: new Date(expired_at),
+  expires: new Date(expiredAt),
   path: '/',
 })
 ```

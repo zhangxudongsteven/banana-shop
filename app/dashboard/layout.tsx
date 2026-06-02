@@ -15,8 +15,10 @@ const HistoryPanel = dynamic(() => import('../../components/HistoryPanel'), { ss
 const DashboardContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const {
     history,
+    isLoadingHistory,
+    historyError,
+    refreshHistory,
     isHistoryPanelOpen,
-    toggleHistoryPanel,
     closeHistoryPanel,
     setSelectedImageToEdit,
   } = useHistory()
@@ -29,6 +31,12 @@ const DashboardContent: React.FC<{ children: React.ReactNode }> = ({ children })
       router.push('/login?redirect=/dashboard')
     }
   }, [isAuthenticated, authLoading, router])
+
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      refreshHistory()
+    }
+  }, [isAuthenticated, authLoading, refreshHistory])
 
   // Show loading while checking auth
   if (authLoading) {
@@ -76,6 +84,9 @@ const DashboardContent: React.FC<{ children: React.ReactNode }> = ({ children })
         isOpen={isHistoryPanelOpen}
         onClose={closeHistoryPanel}
         history={history}
+        isLoading={isLoadingHistory}
+        error={historyError}
+        onRefresh={refreshHistory}
         onUseImage={handleUseHistoryImageAsInput}
         onDownload={handleDownloadFromHistory}
       />

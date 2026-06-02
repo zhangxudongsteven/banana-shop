@@ -27,13 +27,19 @@ cp .env.example .env.local
 TALE_BASE_URL=https://your-tale-api-url.com
 TALE_APP_KEY=your_app_key_here
 TALE_APP_SECRET=your_app_secret_here
+
+# Tale UserTask Generation History
+TALE_GENERATION_TASK_TYPE_ID=
 ```
 
 **参数说明：**
 
 - `TALE_BASE_URL`: Tale API 服务地址
-- `TALE_APP_KEY`: 应用密钥
+- `TALE_APP_KEY`: 应用 Key
 - `TALE_APP_SECRET`: 应用密钥
+- `TALE_GENERATION_TASK_TYPE_ID`: 可选，Banana Shop 生成历史使用的 Tale UserTask 类型 ID；留空时应用会在当前 Tale 应用下自动复用或创建 `Banana Shop Generation`
+
+同一组 Tale 应用凭证也用于生成历史的 UserTask 与 Attachment API。输入图、参考图、蒙版、过程图、输出图和输出视频会保存为任务附件；附件类型默认由应用自动复用或创建，也可通过 `.env.example` 中的可选附件类型 ID 环境变量固定。
 
 **获取凭证：**
 

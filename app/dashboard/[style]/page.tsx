@@ -9,7 +9,7 @@ import {
   generateImageAction,
   editImageAction,
 } from '../../../actions/image-actions'
-import type { GeneratedContent, Transformation } from '../../../types'
+import type { GeneratedContent, RecordGenerationHistoryInput, Transformation } from '../../../types'
 import LoadingSpinner from '../../../components/LoadingSpinner'
 import ErrorMessage from '../../../components/ErrorMessage'
 import ProviderSelector from '../../../components/ProviderSelector'
@@ -54,7 +54,7 @@ export default function GenerationPage() {
   const router = useRouter()
   const params = useParams()
   const { t } = useTranslation()
-  const { addHistoryItem, selectedImageToEdit, setSelectedImageToEdit } = useHistory()
+  const { recordHistoryItem, selectedImageToEdit, setSelectedImageToEdit } = useHistory()
 
   const styleKey = params.style as string
   const selectedTransformation = TRANSFORMATIONS.find((t) => t.key === styleKey)
@@ -109,6 +109,36 @@ export default function GenerationPage() {
       providerProfileOptions.some((option) => option.key === current) ? current : defaultProfileKey
     )
   }, [providerProfileOptions, selectedTransformation])
+
+  const createHistoryInput = useCallback(
+    (
+      kind: RecordGenerationHistoryInput['kind'],
+      prompt: string,
+      outputs: RecordGenerationHistoryInput['outputs'],
+      inputs?: RecordGenerationHistoryInput['inputs']
+    ): RecordGenerationHistoryInput | null => {
+      if (!selectedTransformation) return null
+
+      return {
+        transformationKey: selectedTransformation.key,
+        transformationTitle: t(selectedTransformation.titleKey),
+        prompt,
+        providerProfileKey: selectedProviderProfileKey || undefined,
+        kind,
+        inputs,
+        outputs,
+      }
+    },
+    [selectedTransformation, selectedProviderProfileKey, t]
+  )
+
+  const saveHistoryItem = useCallback(
+    (item: GeneratedContent, historyInput: RecordGenerationHistoryInput | null) => {
+      if (!historyInput) return
+      void recordHistoryItem(item, historyInput)
+    },
+    [recordHistoryItem]
+  )
 
   const handleUseImageAsInput = useCallback(
     async (imageUrl: string) => {
@@ -208,7 +238,15 @@ export default function GenerationPage() {
       }
 
       setGeneratedContent(result)
-      addHistoryItem(result)
+      saveHistoryItem(
+        result,
+        createHistoryInput(
+          'video',
+          promptToUse,
+          { videoUrl: videoDownloadUrl, imageUrl: null, text: null },
+          { aspectRatio }
+        )
+      )
     } catch (err) {
       console.error(err)
       setError(err instanceof Error ? err.message : t('app.error.unknown'))
@@ -216,7 +254,7 @@ export default function GenerationPage() {
       setIsLoading(false)
       setLoadingMessage('')
     }
-  }, [selectedTransformation, customPrompt, aspectRatio, t, addHistoryItem])
+  }, [selectedTransformation, customPrompt, aspectRatio, t, createHistoryInput, saveHistoryItem])
 
   const handleGenerateImage = useCallback(async () => {
     if (selectedTransformation?.isTextToImage) {
@@ -242,7 +280,13 @@ export default function GenerationPage() {
           return
         }
         setGeneratedContent(actionResult.data)
-        addHistoryItem(actionResult.data)
+        saveHistoryItem(
+          actionResult.data,
+          createHistoryInput('text-to-image', promptToUse, {
+            imageUrl: actionResult.data.imageUrl,
+            text: actionResult.data.text,
+          })
+        )
       } catch (err) {
         console.error(err)
         setError(err instanceof Error ? err.message : t('app.error.unknown'))
@@ -337,7 +381,22 @@ export default function GenerationPage() {
 
         const finalResult = { ...stepTwoResult, secondaryImageUrl: stepOneResult.imageUrl }
         setGeneratedContent(finalResult)
-        addHistoryItem(finalResult)
+        saveHistoryItem(
+          finalResult,
+          createHistoryInput(
+            'two-step-image-edit',
+            promptToUse,
+            {
+              imageUrl: finalResult.imageUrl,
+              secondaryImageUrl: finalResult.secondaryImageUrl,
+              text: finalResult.text,
+            },
+            {
+              primaryImageUrl,
+              referenceImageUrl: secondaryImageUrl,
+            }
+          )
+        )
       } else {
         let secondaryImagePayload = null
         if (selectedTransformation.isMultiImage && secondaryImageUrl) {
@@ -364,7 +423,22 @@ export default function GenerationPage() {
         if (result.imageUrl) result.imageUrl = await embedWatermark(result.imageUrl, 'Banana Shop')
 
         setGeneratedContent(result)
-        addHistoryItem(result)
+        saveHistoryItem(
+          result,
+          createHistoryInput(
+            selectedTransformation.isMultiImage ? 'multi-image-edit' : 'image-edit',
+            promptToUse,
+            {
+              imageUrl: result.imageUrl,
+              text: result.text,
+            },
+            {
+              primaryImageUrl,
+              referenceImageUrl: secondaryImageUrl,
+              maskImageUrl: maskDataUrl,
+            }
+          )
+        )
       }
     } catch (err) {
       console.error(err)
@@ -381,7 +455,8 @@ export default function GenerationPage() {
     customPrompt,
     selectedProviderProfileKey,
     t,
-    addHistoryItem,
+    createHistoryInput,
+    saveHistoryItem,
   ])
 
   const handleGenerate = useCallback(() => {

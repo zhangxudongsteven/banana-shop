@@ -38,6 +38,31 @@ export default {
     descriptionWithResult:
       '真有趣！你上一个创作已经准备好进行下一轮了。选择一个新的效果来继续这个创作链吧。',
   },
+  providerSelector: {
+    title: '生成 Provider',
+    profiles: {
+      glmImage: {
+        title: 'GLM Image',
+        description: '适合中文长文本、海报和指令型文本生图。',
+      },
+      volcengineTextToImage: {
+        title: '火山 Seedream',
+        description: '通用文本生图，速度和稳定性均衡。',
+      },
+      aliyunTextToImage: {
+        title: '阿里 Qwen Image',
+        description: '高分辨率文本生图，适合细节丰富的画面。',
+      },
+      volcengineImageEdit: {
+        title: '火山 Seedream 编辑',
+        description: '默认图片编辑 Provider，兼容现有工作流。',
+      },
+      aliyunImageEdit: {
+        title: '阿里 Qwen Image 编辑',
+        description: '支持多参考图的图片编辑 Provider。',
+      },
+    },
+  },
   imageEditor: {
     upload: '点击上传',
     dragAndDrop: '或拖放文件',

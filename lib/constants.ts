@@ -23,7 +23,23 @@ export const TRANSFORMATIONS: Transformation[] = [
     emoji: '🎨',
     descriptionKey: 'transformations.effects.glmImage.description',
     isTextToImage: true,
-    model: 'glm-image',
+    providerProfiles: [
+      {
+        key: 'glmImage',
+        titleKey: 'providerSelector.profiles.glmImage.title',
+        descriptionKey: 'providerSelector.profiles.glmImage.description',
+      },
+      {
+        key: 'defaultTextToImage',
+        titleKey: 'providerSelector.profiles.volcengineTextToImage.title',
+        descriptionKey: 'providerSelector.profiles.volcengineTextToImage.description',
+      },
+      {
+        key: 'aliyunTextToImage',
+        titleKey: 'providerSelector.profiles.aliyunTextToImage.title',
+        descriptionKey: 'providerSelector.profiles.aliyunTextToImage.description',
+      },
+    ],
     exampleImage: '/examples/glmImage.jpg',
   },
   // Viral & Fun (Flattened)

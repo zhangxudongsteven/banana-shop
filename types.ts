@@ -1,3 +1,9 @@
+export interface ProviderProfileOption {
+  key: string
+  titleKey: string
+  descriptionKey?: string
+}
+
 export interface Transformation {
   key: string
   titleKey: string
@@ -16,7 +22,7 @@ export interface Transformation {
   isVideo?: boolean
   exampleImage?: string
   isTextToImage?: boolean
-  model?: string
+  providerProfiles?: ProviderProfileOption[]
 }
 
 export interface GeneratedContent {

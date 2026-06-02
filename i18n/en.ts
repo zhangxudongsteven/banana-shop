@@ -38,6 +38,31 @@ export default {
     descriptionWithResult:
       'That was fun! Your last creation is ready for another round. Select a new effect to keep the chain going.',
   },
+  providerSelector: {
+    title: 'Generation Provider',
+    profiles: {
+      glmImage: {
+        title: 'GLM Image',
+        description: 'Best for Chinese long text, posters, and instruction-heavy image prompts.',
+      },
+      volcengineTextToImage: {
+        title: 'Volcengine Seedream',
+        description: 'Balanced general text-to-image generation.',
+      },
+      aliyunTextToImage: {
+        title: 'Aliyun Qwen Image',
+        description: 'High-resolution text-to-image generation for detailed scenes.',
+      },
+      volcengineImageEdit: {
+        title: 'Volcengine Seedream Edit',
+        description: 'Default image editing provider for the current workflow.',
+      },
+      aliyunImageEdit: {
+        title: 'Aliyun Qwen Image Edit',
+        description: 'Image editing provider with multi-reference support.',
+      },
+    },
+  },
   imageEditor: {
     upload: 'Click to upload',
     dragAndDrop: 'or drag and drop',

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import { useParams, useRouter } from 'next/navigation'
 import { TRANSFORMATIONS } from '../../../lib/constants'
@@ -12,6 +12,7 @@ import {
 import type { GeneratedContent, Transformation } from '../../../types'
 import LoadingSpinner from '../../../components/LoadingSpinner'
 import ErrorMessage from '../../../components/ErrorMessage'
+import ProviderSelector from '../../../components/ProviderSelector'
 import {
   dataUrlToFile,
   embedWatermark,
@@ -36,6 +37,19 @@ const MultiImageUploader = dynamic(() => import('../../../components/MultiImageU
 
 type ActiveTool = 'mask' | 'none'
 
+const IMAGE_EDIT_PROVIDER_PROFILES = [
+  {
+    key: 'defaultImageEdit',
+    titleKey: 'providerSelector.profiles.volcengineImageEdit.title',
+    descriptionKey: 'providerSelector.profiles.volcengineImageEdit.description',
+  },
+  {
+    key: 'aliyunImageEdit',
+    titleKey: 'providerSelector.profiles.aliyunImageEdit.title',
+    descriptionKey: 'providerSelector.profiles.aliyunImageEdit.description',
+  },
+]
+
 export default function GenerationPage() {
   const router = useRouter()
   const params = useParams()
@@ -58,6 +72,7 @@ export default function GenerationPage() {
   const [customPrompt, setCustomPrompt] = useState<string>('')
   const [aspectRatio, setAspectRatio] = useState<'16:9' | '9:16'>('16:9')
   const [activeTool, setActiveTool] = useState<ActiveTool>('none')
+  const [selectedProviderProfileKey, setSelectedProviderProfileKey] = useState<string>('')
 
   // Redirect if invalid style
   useEffect(() => {
@@ -72,6 +87,28 @@ export default function GenerationPage() {
       setCustomPrompt('')
     }
   }, [selectedTransformation])
+
+  const providerProfileOptions = useMemo(() => {
+    if (!selectedTransformation || selectedTransformation.isVideo) return []
+
+    if (selectedTransformation.isTextToImage) {
+      return selectedTransformation.providerProfiles || []
+    }
+
+    return IMAGE_EDIT_PROVIDER_PROFILES
+  }, [selectedTransformation])
+
+  useEffect(() => {
+    if (!selectedTransformation) return
+
+    const defaultProfileKey =
+      providerProfileOptions[0]?.key ||
+      (selectedTransformation.isTextToImage ? selectedTransformation.key : 'defaultImageEdit')
+
+    setSelectedProviderProfileKey((current) =>
+      providerProfileOptions.some((option) => option.key === current) ? current : defaultProfileKey
+    )
+  }, [providerProfileOptions, selectedTransformation])
 
   const handleUseImageAsInput = useCallback(
     async (imageUrl: string) => {
@@ -195,7 +232,11 @@ export default function GenerationPage() {
       setLoadingMessage('')
 
       try {
-        const actionResult = await generateImageAction(promptToUse, selectedTransformation.model)
+        const actionResult = await generateImageAction({
+          prompt: promptToUse,
+          transformationKey: selectedTransformation.key,
+          profileKey: selectedProviderProfileKey || undefined,
+        })
         if (!actionResult.success) {
           setError(actionResult.error || '生成失败')
           return
@@ -248,7 +289,9 @@ export default function GenerationPage() {
           primaryBase64,
           primaryMimeType,
           promptToUse,
-          null
+          null,
+          null,
+          selectedProviderProfileKey || undefined
         )
 
         if (!stepOneActionResult.success || !stepOneActionResult.data?.imageUrl) {
@@ -278,7 +321,8 @@ export default function GenerationPage() {
           stepOneImageMimeType,
           selectedTransformation.stepTwoPrompt!,
           null,
-          secondaryImagePayload ?? null
+          secondaryImagePayload ?? null,
+          selectedProviderProfileKey || undefined
         )
 
         if (!stepTwoActionResult.success) {
@@ -307,7 +351,8 @@ export default function GenerationPage() {
           primaryMimeType,
           promptToUse,
           maskBase64,
-          secondaryImagePayload ?? null
+          secondaryImagePayload ?? null,
+          selectedProviderProfileKey || undefined
         )
 
         if (!actionResult.success) {
@@ -334,6 +379,7 @@ export default function GenerationPage() {
     selectedTransformation,
     maskDataUrl,
     customPrompt,
+    selectedProviderProfileKey,
     t,
     addHistoryItem,
   ])
@@ -408,6 +454,16 @@ export default function GenerationPage() {
             <h3 className="text-lg font-semibold mb-4 text-[var(--text-primary)]">
               {t('app.input')}
             </h3>
+
+            {providerProfileOptions.length > 1 && (
+              <div className="mb-5">
+                <ProviderSelector
+                  options={providerProfileOptions}
+                  selectedKey={selectedProviderProfileKey}
+                  onSelect={setSelectedProviderProfileKey}
+                />
+              </div>
+            )}
 
             {selectedTransformation.isVideo ? (
               <>

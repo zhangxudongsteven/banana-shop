@@ -17,8 +17,8 @@ interface HistoryContextType {
   isHistoryPanelOpen: boolean
   toggleHistoryPanel: () => void
   closeHistoryPanel: () => void
-  selectedImageToEdit: string | null
-  setSelectedImageToEdit: (url: string | null) => void
+  pendingImageInput: string | null
+  setPendingImageInput: (url: string | null) => void
 }
 
 const HistoryContext = createContext<HistoryContextType | undefined>(undefined)
@@ -28,7 +28,7 @@ export const HistoryProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [isLoadingHistory, setIsLoadingHistory] = useState(false)
   const [historyError, setHistoryError] = useState<string | null>(null)
   const [isHistoryPanelOpen, setIsHistoryPanelOpen] = useState(false)
-  const [selectedImageToEdit, setSelectedImageToEdit] = useState<string | null>(null)
+  const [pendingImageInput, setPendingImageInput] = useState<string | null>(null)
 
   // Clean up blob URLs when history items are removed or component unmounts
   useEffect(() => {
@@ -142,8 +142,8 @@ export const HistoryProvider: React.FC<{ children: ReactNode }> = ({ children })
         isHistoryPanelOpen,
         toggleHistoryPanel,
         closeHistoryPanel,
-        selectedImageToEdit,
-        setSelectedImageToEdit,
+        pendingImageInput,
+        setPendingImageInput,
       }}
     >
       {children}

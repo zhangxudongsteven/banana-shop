@@ -5,10 +5,14 @@ export default {
     back: '返回',
     chooseAnotherEffect: '选择其他效果',
     prompt: '提示词',
+    input: '输入',
+    generate: '生成',
     generateImage: '生成图像',
     generating: '生成中...',
-    result: '效果图',
+    result: '结果',
     resultPlaceholder: '生成结果将显示在这里',
+    exampleResult: '效果参考',
+    emptyResultHint: '准备好输入后，生成结果会显示在这里。',
     yourImageWillAppear: '您生成的图像将显示在这里。',
     error: {
       uploadAndSelect: '请上传图像并选择一个效果。',
@@ -33,10 +37,11 @@ export default {
   },
   transformationSelector: {
     title: '开始“蕉”虑吧！',
-    description:
-      '准备好重塑你的现实了吗？选择一个类别开始施展魔法。你也可以拖放来重新排序你最喜欢的类别。',
+    description: '准备好重塑你的现实了吗？选择一个分类开始创作。',
     descriptionWithResult:
       '真有趣！你上一个创作已经准备好进行下一轮了。选择一个新的效果来继续这个创作链吧。',
+    organize: '整理顺序',
+    doneOrganizing: '完成整理',
   },
   providerSelector: {
     title: '生成 Provider',
@@ -88,9 +93,10 @@ export default {
     },
     actions: {
       download: '下载',
+      preview: '放大查看',
       downloadBoth: '下载全部',
       downloadComparison: '下载对比图',
-      useAsInput: '用作输入',
+      useAsInput: '继续编辑',
       useLineArtAsInput: '使用线稿作为输入',
       useFinalAsInput: '使用最终结果作为输入',
       copyText: '复制文本',
@@ -107,7 +113,7 @@ export default {
     loading: '正在加载生成任务...',
     refresh: '刷新历史记录',
     close: '关闭历史记录',
-    use: '使用',
+    use: '继续编辑',
     save: '保存',
     lineArt: '线稿',
     finalResult: '最终结果',
@@ -131,12 +137,25 @@ export default {
       video: '视频生成',
       unknown: '生成任务',
     },
+    attachments: {
+      title: '任务附件',
+      browse: '查看',
+      roles: {
+        input: '输入图',
+        reference: '参考图',
+        mask: '蒙版',
+        intermediate: '中间图',
+        output: '输出图',
+        video: '视频',
+      },
+    },
   },
   error: {
     title: '发生错误',
   },
   transformations: {
     categories: {
+      generate: { title: 'AI 生成' },
       viral: { title: '网红玩法' },
       photo: { title: '专业照片编辑' },
       design: { title: '设计与产品' },
@@ -144,8 +163,8 @@ export default {
       effects: { title: '50+ 艺术效果' },
     },
     video: {
-      title: '视频生成',
-      description: '通过文本提示和可选图像创建短视频。选择您想要的宽高比。',
+      title: '文字生成视频',
+      description: '输入视频创意和镜头描述生成短视频，并选择横版或竖版画面比例。',
       promptPlaceholder: '例如：一只雄伟的狮子在日落时分的岩石上咆哮',
       aspectRatio: '宽高比',
       landscape: '16:9 横向',
@@ -153,9 +172,9 @@ export default {
     },
     effects: {
       customPrompt: {
-        title: '自定义提示',
+        title: '自定义改图',
         description:
-          '描述你能想象到的任何变化。最多可上传两张图片作为参考（例如，角色和风格参考）。你的创造力是唯一的限制！',
+          '上传一张主图，并可添加参考图，用自然语言描述想要调整的画面、风格或细节。',
         uploader1Title: '主图像',
         uploader1Desc: '要编辑的主要图像。',
         uploader2Title: '参考图像（可选）',
@@ -164,8 +183,8 @@ export default {
         promptPlaceholder: '例如：让角色看起来像个超级英雄',
       },
       glmImage: {
-        title: 'GLM 图像生成',
-        description: '使用 GLM 模型根据文本描述生成高质量图像。',
+        title: '文字生成图片',
+        description: '直接输入画面描述生成图片，适合海报、插画、场景设定和创意概念图。',
         promptPlaceholder: '例如：一只可爱的小猫咪，坐在阳光明媚的窗台上，背景是蓝天白云',
       },
       figurine: {

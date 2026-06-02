@@ -23,6 +23,7 @@ export interface Transformation {
   exampleImage?: string
   isTextToImage?: boolean
   providerProfiles?: ProviderProfileOption[]
+  supportsMask?: boolean
 }
 
 export interface GeneratedContent {

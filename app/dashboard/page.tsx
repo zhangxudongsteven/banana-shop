@@ -9,7 +9,7 @@ import { useHistory } from '../../contexts/HistoryContext'
 
 const DashboardPage: React.FC = () => {
   const router = useRouter()
-  const { selectedImageToEdit } = useHistory()
+  const { pendingImageInput } = useHistory()
 
   const [transformations, setTransformations] = useState<Transformation[]>(() => {
     try {
@@ -54,7 +54,7 @@ const DashboardPage: React.FC = () => {
     <TransformationSelector
       transformations={transformations}
       onSelect={handleSelectTransformation}
-      hasPreviousResult={!!selectedImageToEdit}
+      hasPreviousResult={!!pendingImageInput}
       onOrderChange={setTransformations}
       activeCategory={activeCategory}
       setActiveCategory={setActiveCategory}

@@ -8,7 +8,6 @@ interface ResultDisplayProps {
   onUseImageAsInput: (imageUrl: string) => void
   onImageClick: (imageUrl: string) => void
   originalImageUrl: string | null
-  exampleImage?: string
 }
 
 type ViewMode = 'result' | 'side-by-side' | 'slider'
@@ -20,7 +19,6 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
   onUseImageAsInput,
   onImageClick,
   originalImageUrl,
-  exampleImage,
 }) => {
   const { t } = useTranslation()
   const [viewMode, setViewMode] = useState<ViewMode>('result')
@@ -126,7 +124,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
   }> = ({ onClick, children, isPrimary, className }) => (
     <button
       onClick={onClick}
-      className={`flex-1 py-2 px-4 font-semibold rounded-lg shadow-sm transition-all duration-200 flex items-center justify-center gap-2 ${
+      className={`flex-1 min-w-[150px] py-2 px-4 font-semibold rounded-lg shadow-sm transition-all duration-200 flex items-center justify-center gap-2 ${
         isPrimary
           ? 'bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-[var(--text-on-accent)] shadow-[var(--accent-shadow)] hover:from-[var(--accent-primary-hover)] hover:to-[var(--accent-secondary-hover)]'
           : 'bg-[rgba(107,114,128,0.2)] hover:bg-[rgba(107,114,128,0.4)] text-[var(--text-primary)]'
@@ -269,7 +267,24 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 </div>
               ))}
             </div>
-            <div className="w-full flex flex-col md:flex-row gap-3 mt-auto">
+            <div className="w-full flex flex-col md:flex-row flex-wrap gap-3 mt-auto">
+              <ActionButton onClick={() => onImageClick(content.imageUrl!)}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
+                  />
+                </svg>
+                {t('resultDisplay.actions.preview')}
+              </ActionButton>
               <ActionButton onClick={handleDownloadBoth}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -284,6 +299,21 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                   />
                 </svg>
                 {t('resultDisplay.actions.downloadBoth')}
+              </ActionButton>
+              <ActionButton onClick={handleDownload}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                {t('resultDisplay.actions.download')}
               </ActionButton>
               <ActionButton onClick={() => onUseImageAsInput(content.secondaryImageUrl!)}>
                 <svg
@@ -424,7 +454,24 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
         )}
 
         {twoStepViewMode !== 'result' && (
-          <div className="w-full flex flex-col md:flex-row gap-3 mt-auto">
+          <div className="w-full flex flex-col md:flex-row flex-wrap gap-3 mt-auto">
+            <ActionButton onClick={() => onImageClick(content.imageUrl!)}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
+                />
+              </svg>
+              <span>{t('resultDisplay.actions.preview')}</span>
+            </ActionButton>
             <ActionButton onClick={handleDownloadComparison}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -435,6 +482,37 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 <path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM15 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1z" />
               </svg>
               <span>{t('resultDisplay.actions.downloadComparison')}</span>
+            </ActionButton>
+            <ActionButton onClick={handleDownload}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span>{t('resultDisplay.actions.download')}</span>
+            </ActionButton>
+            <ActionButton onClick={() => onUseImageAsInput(content.secondaryImageUrl!)}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+                <path
+                  fillRule="evenodd"
+                  d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2-2H4a2 2 0 01-2-2V6z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span>{t('resultDisplay.actions.useLineArtAsInput')}</span>
             </ActionButton>
             <ActionButton onClick={() => onUseImageAsInput(content.imageUrl!)} isPrimary>
               <svg
@@ -477,42 +555,37 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
     </div>
   )
 
-  // 当没有生成结果时，显示效果图
-  const showExampleImage = !content.imageUrl && exampleImage
-
   return (
     <div className="w-full h-full flex flex-col items-center gap-4 animate-fade-in">
       {content.imageUrl && originalImageUrl && <ViewSwitcher />}
 
       <div className="w-full flex-grow relative">
-        {viewMode === 'result' && (content.imageUrl || showExampleImage) && (
+        {viewMode === 'result' && content.imageUrl && (
           <div
             className="w-full h-full relative bg-[var(--bg-primary)] rounded-lg overflow-hidden shadow-inner cursor-pointer group border border-[var(--border-primary)] flex items-center justify-center"
-            onClick={() => content.imageUrl && onImageClick(content.imageUrl!)}
+            onClick={() => onImageClick(content.imageUrl!)}
           >
             <img
-              src={content.imageUrl || exampleImage}
-              alt={content.imageUrl ? 'Generated result' : 'Example result'}
+              src={content.imageUrl}
+              alt="Generated result"
               className="max-w-full max-h-full object-contain"
             />
-            {content.imageUrl && (
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-10 w-10 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
-                  />
-                </svg>
-              </div>
-            )}
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-10 w-10 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
+                />
+              </svg>
+            </div>
           </div>
         )}
 
@@ -589,10 +662,27 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
         )}
       </div>
 
-      <div className="w-full flex flex-col md:flex-row gap-3 mt-2">
+      <div className="w-full flex flex-col md:flex-row flex-wrap gap-3 mt-2">
         {content.imageUrl && (
           <>
-            {viewMode === 'side-by-side' && (
+            <ActionButton onClick={() => onImageClick(content.imageUrl!)}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
+                />
+              </svg>
+              <span>{t('resultDisplay.actions.preview')}</span>
+            </ActionButton>
+            {originalImageUrl && (
               <ActionButton onClick={handleDownloadComparison}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -605,10 +695,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 <span>{t('resultDisplay.actions.downloadComparison')}</span>
               </ActionButton>
             )}
-            <ActionButton
-              onClick={handleDownload}
-              className={viewMode === 'side-by-side' ? 'hidden md:flex' : ''}
-            >
+            <ActionButton onClick={handleDownload}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5"

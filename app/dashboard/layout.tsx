@@ -2,13 +2,14 @@
 
 import React, { useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { HistoryProvider, useHistory } from '../../contexts/HistoryContext'
 import DashboardHeader from '../../components/DashboardHeader'
 import { downloadImage } from '../../utils/fileUtils'
 import { useAuth } from '../../components/AuthProvider'
 import LoadingSpinner from '../../components/LoadingSpinner'
+import { findTransformationByKey } from '../../lib/constants'
 
 const HistoryPanel = dynamic(() => import('../../components/HistoryPanel'), { ssr: false })
 
@@ -20,10 +21,11 @@ const DashboardContent: React.FC<{ children: React.ReactNode }> = ({ children })
     refreshHistory,
     isHistoryPanelOpen,
     closeHistoryPanel,
-    setSelectedImageToEdit,
+    setPendingImageInput,
   } = useHistory()
   const { isAuthenticated, isLoading: authLoading } = useAuth()
   const router = useRouter()
+  const pathname = usePathname()
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -72,8 +74,21 @@ const DashboardContent: React.FC<{ children: React.ReactNode }> = ({ children })
   }
 
   const handleUseHistoryImageAsInput = (imageUrl: string) => {
-    setSelectedImageToEdit(imageUrl)
+    setPendingImageInput(imageUrl)
     closeHistoryPanel()
+
+    const currentStyleKey = pathname.match(/^\/dashboard\/([^/]+)$/)?.[1]
+    const currentTransformation = currentStyleKey
+      ? findTransformationByKey(currentStyleKey)
+      : undefined
+    const canUseCurrentRoute =
+      currentTransformation &&
+      !currentTransformation.isVideo &&
+      !currentTransformation.isTextToImage
+
+    if (!canUseCurrentRoute) {
+      router.push('/dashboard/customPrompt')
+    }
   }
 
   return (

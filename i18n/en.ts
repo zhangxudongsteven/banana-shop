@@ -5,10 +5,14 @@ export default {
     back: 'Back',
     chooseAnotherEffect: 'Choose Another Effect',
     prompt: 'Prompt',
+    input: 'Input',
+    generate: 'Generate',
     generateImage: 'Generate Image',
     generating: 'Generating...',
-    result: 'Example',
+    result: 'Result',
     resultPlaceholder: 'Generated result will appear here',
+    exampleResult: 'Effect reference',
+    emptyResultHint: 'Once your inputs are ready, the generated result will appear here.',
     yourImageWillAppear: 'Your generated image will appear here.',
     error: {
       uploadAndSelect: 'Please upload an image and select an effect.',
@@ -33,10 +37,11 @@ export default {
   },
   transformationSelector: {
     title: "Let's Go Bananas!",
-    description:
-      'Ready to remix your reality? Pick a category to start the magic. You can also drag and drop to reorder your favorite categories.',
+    description: 'Ready to remix your reality? Pick a category to start creating.',
     descriptionWithResult:
       'That was fun! Your last creation is ready for another round. Select a new effect to keep the chain going.',
+    organize: 'Organize order',
+    doneOrganizing: 'Done organizing',
   },
   providerSelector: {
     title: 'Generation Provider',
@@ -88,9 +93,10 @@ export default {
     },
     actions: {
       download: 'Download',
+      preview: 'Preview',
       downloadBoth: 'Download Both',
       downloadComparison: 'Download Comparison',
-      useAsInput: 'Use as Input',
+      useAsInput: 'Continue Editing',
       useLineArtAsInput: 'Use Line Art as Input',
       useFinalAsInput: 'Use Final as Input',
       copyText: 'Copy Text',
@@ -107,7 +113,7 @@ export default {
     loading: 'Loading generation tasks...',
     refresh: 'Refresh history',
     close: 'Close history',
-    use: 'Use',
+    use: 'Continue Editing',
     save: 'Save',
     lineArt: 'Line Art',
     finalResult: 'Final Result',
@@ -131,12 +137,25 @@ export default {
       video: 'Video generation',
       unknown: 'Generation task',
     },
+    attachments: {
+      title: 'Task attachments',
+      browse: 'View',
+      roles: {
+        input: 'Input',
+        reference: 'Reference',
+        mask: 'Mask',
+        intermediate: 'Intermediate',
+        output: 'Output',
+        video: 'Video',
+      },
+    },
   },
   error: {
     title: 'An Error Occurred',
   },
   transformations: {
     categories: {
+      generate: { title: 'AI Generation' },
       viral: { title: 'Viral & Fun' },
       photo: { title: 'Photo & Pro Edits' },
       design: { title: 'Design & Product' },
@@ -144,9 +163,9 @@ export default {
       effects: { title: '50+ Artistic Effects' },
     },
     video: {
-      title: 'Video Generation',
+      title: 'Text to Video',
       description:
-        'Create a short video from a text prompt and an optional image. Choose your desired aspect ratio.',
+        'Turn a video idea and shot description into a short clip, with landscape or portrait framing.',
       promptPlaceholder: 'e.g., A majestic lion roaring on a rocky outcrop at sunset',
       aspectRatio: 'Aspect Ratio',
       landscape: '16:9 Landscape',
@@ -154,9 +173,9 @@ export default {
     },
     effects: {
       customPrompt: {
-        title: 'Custom Prompt',
+        title: 'Custom Image Edit',
         description:
-          'Describe any change you can imagine. Upload up to two images for context (e.g., character and style reference). Your creativity is the only limit!',
+          'Upload a main image, optionally add a reference, then describe the visual change, style, or details in plain language.',
         uploader1Title: 'Primary Image',
         uploader1Desc: 'The main image to edit.',
         uploader2Title: 'Reference Image (Optional)',
@@ -165,8 +184,9 @@ export default {
         promptPlaceholder: 'e.g., Make the character look like a superhero',
       },
       glmImage: {
-        title: 'GLM Image Generation',
-        description: 'Generate high-quality images from text descriptions using the GLM model.',
+        title: 'Text to Image',
+        description:
+          'Generate an image directly from a scene description, ideal for posters, illustrations, concepts, and visual ideas.',
         promptPlaceholder:
           'e.g., A cute little cat sitting on a sunny windowsill with a blue sky background',
       },

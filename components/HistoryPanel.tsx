@@ -1,16 +1,18 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   CheckCircle2,
   CloudOff,
   Download,
   Edit3,
+  Eye,
   ImageIcon,
   Loader2,
+  Paperclip,
   RefreshCw,
   Video,
   X,
 } from 'lucide-react'
-import type { GenerationHistoryItem, HistorySyncStatus } from '../types'
+import type { GenerationHistoryAttachment, GenerationHistoryItem, HistorySyncStatus } from '../types'
 import { useTranslation } from '../i18n/context'
 
 interface HistoryPanelProps {
@@ -65,6 +67,15 @@ const getKindLabelKey = (kind: GenerationHistoryItem['kind']) => {
   return `history.kind.${kind}`
 }
 
+const getAttachmentRoleLabelKey = (role: GenerationHistoryAttachment['role']) =>
+  `history.attachments.roles.${role}`
+
+const isImageAttachment = (attachment: GenerationHistoryAttachment) =>
+  attachment.mimeType?.startsWith('image/') || attachment.role !== 'video'
+
+const isVideoAttachment = (attachment: GenerationHistoryAttachment) =>
+  attachment.mimeType?.startsWith('video/') || attachment.role === 'video'
+
 const formatCreatedAt = (createdAt: string) => {
   const date = new Date(createdAt)
   if (Number.isNaN(date.getTime())) return ''
@@ -95,6 +106,102 @@ const ActionButton: React.FC<{
   </button>
 )
 
+const AttachmentPreviewModal: React.FC<{
+  attachment: GenerationHistoryAttachment | null
+  onClose: () => void
+}> = ({ attachment, onClose }) => {
+  if (!attachment?.url) return null
+
+  const isVideo = isVideoAttachment(attachment)
+  const title = attachment.fileName || attachment.role
+
+  return (
+    <div
+      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center p-4 animate-fade-in-fast"
+      onClick={onClose}
+    >
+      <div
+        className="relative max-w-4xl max-h-[85vh] w-full h-full flex-grow flex items-center justify-center"
+        onClick={(event) => event.stopPropagation()}
+      >
+        {isVideo ? (
+          <video src={attachment.url} controls className="max-h-full max-w-full rounded-lg shadow-2xl" />
+        ) : (
+          <img
+            src={attachment.url}
+            alt={title}
+            className="h-full w-full object-contain rounded-lg shadow-2xl"
+          />
+        )}
+        <button
+          onClick={onClose}
+          className="absolute -top-2 -right-2 z-10 p-2 bg-black/50 backdrop-blur-sm rounded-full text-white hover:bg-red-600 transition-colors"
+          aria-label="Close preview"
+        >
+          <X className="h-6 w-6" />
+        </button>
+      </div>
+      <div className="mt-4 max-w-4xl text-center text-sm font-medium text-white/90 truncate">
+        {title}
+      </div>
+    </div>
+  )
+}
+
+const AttachmentList: React.FC<{
+  attachments?: GenerationHistoryAttachment[]
+  onPreview: (attachment: GenerationHistoryAttachment) => void
+}> = ({ attachments, onPreview }) => {
+  const { t } = useTranslation()
+  const visibleAttachments = attachments?.filter((attachment) => attachment.url) || []
+
+  if (visibleAttachments.length === 0) return null
+
+  const handleBrowse = (attachment: GenerationHistoryAttachment) => {
+    if (!attachment.url) return
+
+    if (isImageAttachment(attachment) || isVideoAttachment(attachment)) {
+      onPreview(attachment)
+      return
+    }
+
+    window.open(attachment.url, '_blank', 'noopener,noreferrer')
+  }
+
+  return (
+    <div className="mt-3 rounded-md border border-[var(--border-primary)] bg-[var(--bg-primary)] p-2">
+      <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)]">
+        <Paperclip className="h-3.5 w-3.5" />
+        {t('history.attachments.title')}
+      </div>
+      <div className="space-y-1.5">
+        {visibleAttachments.map((attachment) => (
+          <div
+            key={`${attachment.role}-${attachment.attachmentId || attachment.url}`}
+            className="flex items-center justify-between gap-2 rounded-md bg-[var(--bg-secondary)] px-2 py-1.5"
+          >
+            <div className="min-w-0">
+              <div className="text-xs font-medium text-[var(--text-primary)] truncate">
+                {attachment.fileName || t(getAttachmentRoleLabelKey(attachment.role))}
+              </div>
+              <div className="text-[10px] text-[var(--text-tertiary)]">
+                {t(getAttachmentRoleLabelKey(attachment.role))}
+              </div>
+            </div>
+            <button
+              onClick={() => handleBrowse(attachment)}
+              className="flex flex-shrink-0 items-center gap-1 rounded-md bg-[rgba(107,114,128,0.2)] px-2 py-1 text-[11px] font-semibold text-[var(--text-primary)] transition-colors hover:bg-[rgba(107,114,128,0.4)]"
+            >
+              <Eye className="h-3.5 w-3.5" />
+              {t('history.attachments.browse')}
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 const Thumb: React.FC<{ src?: string | null; label: string }> = ({ src, label }) => {
   if (!src) return null
 
@@ -112,7 +219,8 @@ const HistoryItem: React.FC<{
   item: GenerationHistoryItem
   onUseImage: (url: string) => void
   onDownload: (url: string, type: string) => void
-}> = ({ item, onUseImage, onDownload }) => {
+  onPreviewAttachment: (attachment: GenerationHistoryAttachment) => void
+}> = ({ item, onUseImage, onDownload, onPreviewAttachment }) => {
   const { t } = useTranslation()
   const statusConfig = getStatusConfig(item.historyStatus)
   const StatusIcon = statusConfig.icon
@@ -189,6 +297,8 @@ const HistoryItem: React.FC<{
         )}
       </div>
 
+      <AttachmentList attachments={item.attachments} onPreview={onPreviewAttachment} />
+
       <div className="mt-3 grid grid-cols-2 gap-2">
         <ActionButton
           onClick={() => onDownload(outputVideoUrl || outputImageUrl || '', outputVideoUrl ? 'video-result' : 'image-result')}
@@ -217,6 +327,7 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
   onDownload,
 }) => {
   const { t } = useTranslation()
+  const [previewAttachment, setPreviewAttachment] = useState<GenerationHistoryAttachment | null>(null)
 
   return (
     <div
@@ -276,12 +387,14 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
                   item={item}
                   onUseImage={onUseImage}
                   onDownload={onDownload}
+                  onPreviewAttachment={setPreviewAttachment}
                 />
               ))}
             </div>
           )}
         </div>
       </div>
+      <AttachmentPreviewModal attachment={previewAttachment} onClose={() => setPreviewAttachment(null)} />
     </div>
   )
 }

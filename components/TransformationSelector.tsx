@@ -23,6 +23,7 @@ const TransformationSelector: React.FC<TransformationSelectorProps> = ({
   const dragItemIndex = useRef<number | null>(null)
   const dragOverItemIndex = useRef<number | null>(null)
   const [dragging, setDragging] = useState(false)
+  const [isOrganizing, setIsOrganizing] = useState(false)
 
   const handleDragStart = (e: React.DragEvent<HTMLButtonElement>, index: number) => {
     dragItemIndex.current = index
@@ -61,6 +62,8 @@ const TransformationSelector: React.FC<TransformationSelectorProps> = ({
   }
 
   const handleItemClick = (item: Transformation) => {
+    if (isOrganizing) return
+
     if (item.items && item.items.length > 0) {
       setActiveCategory(item)
     } else {
@@ -73,14 +76,14 @@ const TransformationSelector: React.FC<TransformationSelectorProps> = ({
       {items.map((trans, index) => (
         <button
           key={trans.key}
-          draggable={!activeCategory} // Only allow dragging categories
-          onDragStart={(e) => !activeCategory && handleDragStart(e, index)}
-          onDragEnter={(e) => !activeCategory && handleDragEnter(e, index)}
-          onDragEnd={!activeCategory && handleDragEnd}
-          onDragOver={!activeCategory && handleDragOver}
+          draggable={!activeCategory && isOrganizing}
+          onDragStart={(e) => !activeCategory && isOrganizing && handleDragStart(e, index)}
+          onDragEnter={(e) => !activeCategory && isOrganizing && handleDragEnter(e, index)}
+          onDragEnd={(e) => !activeCategory && isOrganizing && handleDragEnd(e)}
+          onDragOver={(e) => !activeCategory && isOrganizing && handleDragOver(e)}
           onClick={() => handleItemClick(trans)}
           className={`group flex flex-col items-center justify-center text-center p-4 aspect-square bg-[var(--bg-card)] rounded-xl border border-[var(--border-primary)] hover:border-[var(--accent-primary)] transition-all duration-200 ease-in-out transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)] focus:ring-[var(--accent-primary)] ${
-            !activeCategory ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'
+            isOrganizing && !activeCategory ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'
           } ${dragging && !activeCategory ? 'border-dashed' : ''}`}
         >
           <span className="text-4xl mb-2 transition-transform duration-200 group-hover:scale-110">
@@ -106,6 +109,20 @@ const TransformationSelector: React.FC<TransformationSelectorProps> = ({
               ? t('transformationSelector.descriptionWithResult')
               : t('transformationSelector.description')}
           </p>
+          <div className="mb-6 flex justify-center">
+            <button
+              onClick={() => setIsOrganizing((current) => !current)}
+              className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors duration-200 ${
+                isOrganizing
+                  ? 'bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-[var(--text-on-accent)]'
+                  : 'bg-[rgba(107,114,128,0.2)] text-[var(--text-primary)] hover:bg-[rgba(107,114,128,0.4)]'
+              }`}
+            >
+              {isOrganizing
+                ? t('transformationSelector.doneOrganizing')
+                : t('transformationSelector.organize')}
+            </button>
+          </div>
           {renderGrid(transformations)}
         </>
       ) : (

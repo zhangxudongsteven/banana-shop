@@ -3,7 +3,7 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import { useParams, useRouter } from 'next/navigation'
-import { TRANSFORMATIONS } from '../../../lib/constants'
+import { findTransformationByKey } from '../../../lib/constants'
 import {
   generateVideoAction,
   generateImageAction,
@@ -36,6 +36,7 @@ const MultiImageUploader = dynamic(() => import('../../../components/MultiImageU
 })
 
 type ActiveTool = 'mask' | 'none'
+type GenerationTaskType = 'video' | 'text-to-image' | 'image-edit' | 'multi-image-edit'
 
 const IMAGE_EDIT_PROVIDER_PROFILES = [
   {
@@ -50,14 +51,34 @@ const IMAGE_EDIT_PROVIDER_PROFILES = [
   },
 ]
 
+const ExamplePreview: React.FC<{ imageUrl: string; label: string }> = ({ imageUrl, label }) => (
+  <div className="w-full h-full flex flex-col items-center gap-4 animate-fade-in">
+    <div className="w-full flex-grow relative bg-[var(--bg-primary)] rounded-lg overflow-hidden shadow-inner border border-[var(--border-primary)] flex items-center justify-center">
+      <img src={imageUrl} alt={label} className="max-w-full max-h-full object-contain" />
+      <div className="absolute bottom-2 right-2 text-xs bg-black/60 text-white px-2 py-1 rounded">
+        {label}
+      </div>
+    </div>
+  </div>
+)
+
 export default function GenerationPage() {
   const router = useRouter()
   const params = useParams()
   const { t } = useTranslation()
-  const { recordHistoryItem, selectedImageToEdit, setSelectedImageToEdit } = useHistory()
+  const { recordHistoryItem, pendingImageInput, setPendingImageInput } = useHistory()
 
   const styleKey = params.style as string
-  const selectedTransformation = TRANSFORMATIONS.find((t) => t.key === styleKey)
+  const selectedTransformation = findTransformationByKey(styleKey)
+  const taskType: GenerationTaskType | null = selectedTransformation?.isVideo
+    ? 'video'
+    : selectedTransformation?.isTextToImage
+      ? 'text-to-image'
+      : selectedTransformation?.isMultiImage
+        ? 'multi-image-edit'
+        : selectedTransformation
+          ? 'image-edit'
+          : null
 
   const [primaryImageUrl, setPrimaryImageUrl] = useState<string | null>(null)
   const [primaryFile, setPrimaryFile] = useState<File | null>(null)
@@ -73,6 +94,7 @@ export default function GenerationPage() {
   const [aspectRatio, setAspectRatio] = useState<'16:9' | '9:16'>('16:9')
   const [activeTool, setActiveTool] = useState<ActiveTool>('none')
   const [selectedProviderProfileKey, setSelectedProviderProfileKey] = useState<string>('')
+  const canAcceptPendingImageInput = taskType === 'image-edit' || taskType === 'multi-image-edit'
 
   // Redirect if invalid style
   useEffect(() => {
@@ -162,13 +184,13 @@ export default function GenerationPage() {
     [t]
   )
 
-  // Handle selectedImageToEdit from history
+  // Handle images selected from history or prior generated results.
   useEffect(() => {
-    if (selectedImageToEdit) {
-      handleUseImageAsInput(selectedImageToEdit)
-      setSelectedImageToEdit(null)
+    if (pendingImageInput && canAcceptPendingImageInput) {
+      handleUseImageAsInput(pendingImageInput)
+      setPendingImageInput(null)
     }
-  }, [selectedImageToEdit, handleUseImageAsInput, setSelectedImageToEdit])
+  }, [pendingImageInput, canAcceptPendingImageInput, handleUseImageAsInput, setPendingImageInput])
 
   const handlePrimaryImageSelect = useCallback((file: File, dataUrl: string) => {
     setPrimaryFile(file)
@@ -325,7 +347,8 @@ export default function GenerationPage() {
     try {
       const primaryMimeType = primaryImageUrl!.split(';')[0].split(':')[1] ?? 'image/png'
       const primaryBase64 = primaryImageUrl!.split(',')[1]
-      const maskBase64 = maskDataUrl ? maskDataUrl.split(',')[1] : null
+      const maskBase64 =
+        selectedTransformation.supportsMask && maskDataUrl ? maskDataUrl.split(',')[1] : null
 
       if (selectedTransformation.isTwoStep) {
         setLoadingMessage(t('app.loading.step1'))
@@ -479,12 +502,22 @@ export default function GenerationPage() {
 
   if (!selectedTransformation) return null
 
+  const promptPlaceholder = selectedTransformation.isVideo
+    ? t('transformations.video.promptPlaceholder')
+    : selectedTransformation.key === 'glmImage'
+      ? t('transformations.effects.glmImage.promptPlaceholder')
+      : t('transformations.effects.customPrompt.promptPlaceholder')
+  const shouldRenderPromptInput =
+    selectedTransformation.isVideo ||
+    selectedTransformation.isTextToImage ||
+    selectedTransformation.prompt === 'CUSTOM'
+
   const isCustomPromptEmpty = selectedTransformation.prompt === 'CUSTOM' && !customPrompt.trim()
 
   let isGenerateDisabled = true
-  if (selectedTransformation.isVideo) {
+  if (taskType === 'video') {
     isGenerateDisabled = isLoading || !customPrompt.trim()
-  } else if (selectedTransformation.isTextToImage) {
+  } else if (taskType === 'text-to-image') {
     isGenerateDisabled = isLoading || !customPrompt.trim()
   } else {
     let imagesReady = false
@@ -540,15 +573,25 @@ export default function GenerationPage() {
               </div>
             )}
 
-            {selectedTransformation.isVideo ? (
-              <>
+            {shouldRenderPromptInput && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
+                  {t('transformations.effects.customPrompt.promptLabel')}
+                </label>
                 <textarea
                   value={customPrompt}
                   onChange={(e) => setCustomPrompt(e.target.value)}
-                  placeholder={t('transformations.video.promptPlaceholder')}
-                  rows={4}
-                  className="w-full mt-2 p-3 bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-lg focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-[var(--accent-primary)] transition-colors placeholder-[var(--text-tertiary)]"
+                  placeholder={promptPlaceholder}
+                  rows={
+                    selectedTransformation.isVideo || selectedTransformation.isTextToImage ? 4 : 3
+                  }
+                  className="w-full p-3 bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-lg focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-[var(--accent-primary)] transition-colors placeholder-[var(--text-tertiary)]"
                 />
+              </div>
+            )}
+
+            {taskType === 'video' ? (
+              <>
                 <div className="mt-4">
                   <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-2">
                     {t('transformations.video.aspectRatio')}
@@ -574,24 +617,7 @@ export default function GenerationPage() {
                   </div>
                 </div>
               </>
-            ) : selectedTransformation.isTextToImage ? (
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-                  {t('transformations.effects.customPrompt.promptLabel')}
-                </label>
-                <textarea
-                  value={customPrompt}
-                  onChange={(e) => setCustomPrompt(e.target.value)}
-                  placeholder={t(
-                    selectedTransformation.key === 'glmImage'
-                      ? 'transformations.effects.glmImage.promptPlaceholder'
-                      : 'transformations.effects.customPrompt.promptPlaceholder'
-                  )}
-                  rows={4}
-                  className="w-full p-3 bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-lg focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-[var(--accent-primary)] transition-colors placeholder-[var(--text-tertiary)]"
-                />
-              </div>
-            ) : selectedTransformation.isMultiImage ? (
+            ) : taskType === 'text-to-image' ? null : taskType === 'multi-image-edit' ? (
               <MultiImageUploader
                 onPrimarySelect={handlePrimaryImageSelect}
                 onSecondarySelect={handleSecondaryImageSelect}
@@ -622,20 +648,6 @@ export default function GenerationPage() {
               />
             ) : (
               <>
-                {selectedTransformation.prompt === 'CUSTOM' && (
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-                      {t('transformations.effects.customPrompt.promptLabel')}
-                    </label>
-                    <textarea
-                      value={customPrompt}
-                      onChange={(e) => setCustomPrompt(e.target.value)}
-                      placeholder={t('transformations.effects.customPrompt.promptPlaceholder')}
-                      rows={3}
-                      className="w-full p-3 bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-lg focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-[var(--accent-primary)] transition-colors placeholder-[var(--text-tertiary)]"
-                    />
-                  </div>
-                )}
                 <ImageEditorCanvas
                   onImageSelect={handlePrimaryImageSelect}
                   initialImageUrl={primaryImageUrl}
@@ -643,7 +655,7 @@ export default function GenerationPage() {
                   onClearImage={handleClearPrimaryImage}
                   isMaskToolActive={activeTool === 'mask'}
                 />
-                {primaryImageUrl && (
+                {primaryImageUrl && selectedTransformation.supportsMask && (
                   <div className="mt-4">
                     <button
                       onClick={toggleMaskTool}
@@ -718,17 +730,23 @@ export default function GenerationPage() {
               {t('app.result')}
             </h3>
             <div className="flex-1 flex flex-col justify-center">
-              {generatedContent || selectedTransformation.exampleImage ? (
+              {isLoading ? (
+                <LoadingSpinner message={loadingMessage || t('app.loading.default')} />
+              ) : generatedContent ? (
                 <ResultDisplay
-                  content={generatedContent || { imageUrl: null, text: null }}
+                  content={generatedContent}
                   onUseImageAsInput={handleUseImageAsInput}
                   onImageClick={handleOpenPreview}
                   originalImageUrl={primaryImageUrl}
-                  exampleImage={selectedTransformation.exampleImage}
+                />
+              ) : selectedTransformation.exampleImage ? (
+                <ExamplePreview
+                  imageUrl={selectedTransformation.exampleImage}
+                  label={t('app.exampleResult')}
                 />
               ) : (
                 <div className="text-center text-[var(--text-tertiary)]">
-                  {t('app.resultPlaceholder') || '生成结果将显示在这里'}
+                  {t('app.emptyResultHint')}
                 </div>
               )}
             </div>

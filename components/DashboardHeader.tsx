@@ -38,12 +38,15 @@ const DashboardHeader: React.FC = () => {
   }
 
   return (
-    <header className="bg-[var(--bg-card-alpha)] backdrop-blur-lg sticky top-0 z-20 p-4 border-b border-[var(--border-primary)]">
+    <header className="sticky top-0 z-20 border-b border-[var(--border-primary)] bg-[var(--bg-card-alpha)] p-4 backdrop-blur-xl">
       <div className="container mx-auto flex justify-between items-center">
         <Link
           href="/"
-          className="text-2xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] cursor-pointer"
+          className="flex items-center gap-3 text-xl font-bold tracking-tight text-[var(--text-primary)]"
         >
+          <span className="film-rail flex size-8 items-center justify-center rounded-md border border-[var(--border-strong)] text-base">
+            🍌
+          </span>
           {t('app.title')}
         </Link>
         <div className="flex items-center gap-2 md:gap-4">
@@ -75,7 +78,7 @@ const DashboardHeader: React.FC = () => {
             {isUserMenuOpen && (
               <div
                 role="menu"
-                className="absolute right-0 mt-2 w-64 bg-[var(--bg-card)] border border-[var(--border-primary)] rounded-xl shadow-xl z-50 overflow-hidden animate-fade-in-fast p-2 flex flex-col gap-1"
+                className="studio-surface absolute right-0 z-50 mt-2 flex w-64 animate-fade-in-fast flex-col gap-1 overflow-hidden rounded-lg p-2"
               >
                 <div className="sm:hidden px-3 py-2 text-sm font-semibold text-[var(--text-primary)] border-b border-[var(--border-primary)] mb-1">
                   {user?.username}

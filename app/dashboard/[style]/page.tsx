@@ -23,7 +23,7 @@ import {
 import { useTranslation } from '../../../i18n/context'
 import { useHistory } from '../../../contexts/HistoryContext'
 import { Button } from '../../../components/ui/button'
-import { Brush, ChevronLeft, Zap } from 'lucide-react'
+import { Brush, ChevronLeft, ImagePlus, Layers3, Sparkles, Zap } from 'lucide-react'
 
 const ImageEditorCanvas = dynamic(() => import('../../../components/ImageEditorCanvas'), {
   ssr: false,
@@ -536,38 +536,51 @@ export default function GenerationPage() {
   }
 
   return (
-    <div className="container mx-auto p-4 max-w-7xl pb-24">
-      <div className="mb-6 flex items-center gap-4">
-        <Button
-          type="button"
-          size="icon"
-          variant="ghost"
-          onClick={() => router.push('/dashboard')}
-          className="rounded-full"
-          aria-label={t('app.back')}
-        >
-          <ChevronLeft data-icon="inline-start" />
-        </Button>
-        <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)]">
-          {t(selectedTransformation.titleKey)}
-        </h2>
+    <div className="container mx-auto max-w-7xl p-4 pb-24">
+      <div className="studio-surface mb-6 rounded-lg p-5">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div className="flex items-start gap-4">
+            <Button
+              type="button"
+              size="icon"
+              variant="secondary"
+              onClick={() => router.push('/dashboard')}
+              className="rounded-full"
+              aria-label={t('app.back')}
+            >
+              <ChevronLeft data-icon="inline-start" />
+            </Button>
+            <div>
+              <div className="process-pill mb-2 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold">
+                <Sparkles className="size-3.5" />
+                <span>{t('app.studioWorkflow')}</span>
+              </div>
+              <h2 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">
+                {t(selectedTransformation.titleKey)}
+              </h2>
+              {selectedTransformation.descriptionKey && (
+                <p className="mt-2 max-w-3xl text-[var(--text-secondary)]">
+                  {t(selectedTransformation.descriptionKey)}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="film-rail rounded-md border border-[var(--border-primary)] px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--text-tertiary)]">
+            {t('app.workflowRail')}
+          </div>
+        </div>
       </div>
 
-      {selectedTransformation.descriptionKey && (
-        <div className="mb-8">
-          <p className="text-[var(--text-secondary)] text-lg">
-            {t(selectedTransformation.descriptionKey)}
-          </p>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[0.82fr_1.18fr]">
         {/* Input Column */}
-        <div className="space-y-6">
-          <div className="bg-[var(--bg-card)] rounded-xl shadow-lg border border-[var(--border-primary)] p-6">
-            <h3 className="text-lg font-semibold mb-4 text-[var(--text-primary)]">
-              {t('app.input')}
-            </h3>
+        <div className="flex flex-col gap-6">
+          <div className="studio-surface rounded-lg p-5">
+            <div className="mb-5 flex items-center gap-2">
+              <Layers3 className="size-5 text-[var(--accent-primary)]" />
+              <h3 className="text-lg font-semibold text-[var(--text-primary)]">
+                {t('app.input')}
+              </h3>
+            </div>
 
             {providerProfileOptions.length > 1 && (
               <div className="mb-5">
@@ -596,7 +609,7 @@ export default function GenerationPage() {
                   rows={
                     selectedTransformation.isVideo || selectedTransformation.isTextToImage ? 4 : 3
                   }
-                  className="w-full p-3 bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-lg focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-[var(--accent-primary)] transition-colors placeholder-[var(--text-tertiary)]"
+                  className="w-full rounded-lg border border-[var(--border-primary)] bg-[var(--bg-secondary)]/80 p-3 transition-colors placeholder-[var(--text-tertiary)] focus:border-[var(--accent-primary)] focus:ring-2 focus:ring-[var(--accent-primary)]"
                 />
               </div>
             )}
@@ -686,7 +699,7 @@ export default function GenerationPage() {
               onClick={handleGenerate}
               disabled={isGenerateDisabled}
               size="lg"
-              className="mt-6 w-full text-lg font-bold"
+              className="mt-6 h-12 w-full text-base font-bold"
             >
               {isLoading ? (
                 <LoadingSpinner message={loadingMessage || t('app.loading.default')} />
@@ -702,12 +715,20 @@ export default function GenerationPage() {
         </div>
 
         {/* Output Column */}
-        <div className="space-y-6">
-          <div className="bg-[var(--bg-card)] rounded-xl shadow-lg border border-[var(--border-primary)] p-6 h-full flex flex-col">
-            <h3 className="text-lg font-semibold mb-4 text-[var(--text-primary)]">
-              {t('app.result')}
-            </h3>
-            <div className="flex-1 flex flex-col justify-center">
+        <div className="flex flex-col gap-6">
+          <div className="studio-surface flex min-h-[680px] flex-col rounded-lg p-5">
+            <div className="mb-5 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <ImagePlus className="size-5 text-[var(--accent-secondary)]" />
+                <h3 className="text-lg font-semibold text-[var(--text-primary)]">
+                  {t('app.result')}
+                </h3>
+              </div>
+              <span className="cyan-pill rounded-full px-3 py-1 text-xs font-medium">
+                {t('app.compareReady')}
+              </span>
+            </div>
+            <div className="flex flex-1 flex-col justify-center">
               {isLoading ? (
                 <LoadingSpinner message={loadingMessage || t('app.loading.default')} />
               ) : generatedContent ? (
@@ -723,8 +744,12 @@ export default function GenerationPage() {
                   label={t('app.exampleResult')}
                 />
               ) : (
-                <div className="text-center text-[var(--text-tertiary)]">
-                  {t('app.emptyResultHint')}
+                <div className="film-rail flex min-h-[360px] flex-col items-center justify-center rounded-lg border border-dashed border-[var(--border-primary)] p-8 text-center text-[var(--text-tertiary)]">
+                  <Sparkles className="mb-4 size-9 text-[var(--accent-primary)]" />
+                  <div className="text-base font-semibold text-[var(--text-secondary)]">
+                    {t('app.emptyResultHint')}
+                  </div>
+                  <div className="mt-2 max-w-sm text-sm">{t('app.emptyResultActionHint')}</div>
                 </div>
               )}
             </div>
@@ -732,11 +757,14 @@ export default function GenerationPage() {
         </div>
       </div>
 
-      <div className="mt-8 bg-[var(--bg-card)] rounded-xl shadow-lg border border-[var(--border-primary)] p-6">
-        <h3 className="text-lg font-semibold mb-4 text-[var(--text-primary)]">{t('app.prompt')}</h3>
-        <div className="space-y-4">
+      <details className="studio-surface mt-6 rounded-lg">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 text-sm font-semibold text-[var(--text-secondary)]">
+          <span>{t('app.prompt')}</span>
+          <span className="text-[var(--text-tertiary)]">{t('app.promptDetails')}</span>
+        </summary>
+        <div className="flex flex-col gap-4 border-t border-[var(--border-primary)] p-5">
           <div>
-            <p className="p-4 bg-[var(--bg-secondary)] rounded-lg text-[var(--text-primary)] font-mono text-sm whitespace-pre-wrap border border-[var(--border-primary)]">
+            <p className="whitespace-pre-wrap rounded-lg border border-[var(--border-primary)] bg-[var(--bg-secondary)]/75 p-4 font-mono text-sm text-[var(--text-primary)]">
               {selectedTransformation.prompt === 'CUSTOM'
                 ? customPrompt || t('transformations.effects.customPrompt.promptPlaceholder')
                 : selectedTransformation.prompt}
@@ -747,13 +775,13 @@ export default function GenerationPage() {
               <span className="block mb-2 font-medium text-[var(--text-secondary)] text-sm">
                 {t('app.loading.step2').replace('...', '')}
               </span>
-              <p className="p-4 bg-[var(--bg-secondary)] rounded-lg text-[var(--text-primary)] font-mono text-sm whitespace-pre-wrap border border-[var(--border-primary)]">
+              <p className="whitespace-pre-wrap rounded-lg border border-[var(--border-primary)] bg-[var(--bg-secondary)]/75 p-4 font-mono text-sm text-[var(--text-primary)]">
                 {selectedTransformation.stepTwoPrompt}
               </p>
             </div>
           )}
         </div>
-      </div>
+      </details>
 
       <ImagePreviewModal onClose={handleClosePreview} imageUrl={previewImageUrl || ''} />
     </div>

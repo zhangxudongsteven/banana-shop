@@ -5,6 +5,7 @@ export default {
     back: 'Back',
     chooseAnotherEffect: 'Choose Another Effect',
     prompt: 'Prompt',
+    promptDetails: 'View generation prompt',
     input: 'Input',
     generate: 'Generate',
     generateImage: 'Generate Image',
@@ -13,6 +14,11 @@ export default {
     resultPlaceholder: 'Generated result will appear here',
     exampleResult: 'Effect reference',
     emptyResultHint: 'Once your inputs are ready, the generated result will appear here.',
+    emptyResultActionHint:
+      'Upload the required assets and complete the inputs to enable generation. The result will open here in compare view.',
+    studioWorkflow: 'Studio workflow',
+    workflowRail: 'Input / generate / compare',
+    compareReady: 'Compare ready',
     yourImageWillAppear: 'Your generated image will appear here.',
     error: {
       uploadAndSelect: 'Please upload an image and select an effect.',
@@ -42,6 +48,18 @@ export default {
       'That was fun! Your last creation is ready for another round. Select a new effect to keep the chain going.',
     organize: 'Organize order',
     doneOrganizing: 'Done organizing',
+    shelf: 'Transformation shelf',
+    categoryLabel: 'Effect category',
+    tags: {
+      category: 'Category',
+      textToImage: 'Text to image',
+      video: 'Video',
+      twoStep: 'Two-step',
+      mask: 'Mask',
+      optionalReference: 'Optional reference',
+      doubleImage: 'Two images',
+      singleImage: 'Single image',
+    },
   },
   providerSelector: {
     title: 'Generation Provider',

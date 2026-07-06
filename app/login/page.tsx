@@ -139,25 +139,32 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-orange-950/20 flex items-center justify-center p-4">
+    <div className="darkroom-page flex min-h-screen items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <Link href="/" className="flex items-center justify-center gap-2 mb-8">
-          <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-orange-500 to-yellow-500 flex items-center justify-center">
+          <div className="film-rail flex size-10 items-center justify-center rounded-md border border-[var(--border-strong)]">
             <span className="text-2xl">🍌</span>
           </div>
           <span className="font-bold text-2xl">Banana Shop</span>
         </Link>
 
         {/* Login Card */}
-        <Card className="p-8 bg-card/50 backdrop-blur border-border/50">
+        <Card className="overflow-hidden p-0">
+          <div className="film-rail border-b border-[var(--border-primary)] px-8 py-4">
+            <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-tertiary)]">
+              <span>Studio access</span>
+              <span className="cyan-pill rounded-full px-2 py-1">protected</span>
+            </div>
+          </div>
+          <div className="p-8">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold mb-2">欢迎回来</h1>
-            <p className="text-muted-foreground">选择登录方式以访问 AI 图片编辑功能</p>
+            <h1 className="text-2xl font-bold mb-2">进入创作暗房</h1>
+            <p className="text-muted-foreground">验证身份后继续管理图片生成、历史记录和 API 能力</p>
           </div>
 
           {/* Login Method Toggle */}
-          <div className="flex gap-2 mb-6 bg-muted/50 p-1 rounded-lg">
+          <div className="mb-6 flex gap-2 rounded-lg border border-[var(--border-primary)] bg-[var(--bg-secondary)]/70 p-1">
             <Button
               type="button"
               variant={loginMethod === 'password' ? 'default' : 'ghost'}
@@ -182,8 +189,8 @@ function LoginForm() {
 
           {/* Password Login Form */}
           {loginMethod === 'password' && (
-            <form onSubmit={handlePasswordLogin} className="space-y-4">
-              <div className="space-y-2">
+            <form onSubmit={handlePasswordLogin} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="username" className="text-sm font-medium">
                   用户名 <span className="text-destructive">*</span>
                 </Label>
@@ -201,7 +208,7 @@ function LoginForm() {
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="password" className="text-sm font-medium">
                   密码 <span className="text-destructive">*</span>
                 </Label>
@@ -244,8 +251,8 @@ function LoginForm() {
 
           {/* SMS Login Form - Phone Input */}
           {loginMethod === 'sms' && !showSmsVerify && (
-            <div className="space-y-4">
-              <div className="space-y-2">
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="phone" className="text-sm font-medium">
                   手机号码 <span className="text-destructive">*</span>
                 </Label>
@@ -290,8 +297,8 @@ function LoginForm() {
 
           {/* SMS Login Form - Code Verification */}
           {loginMethod === 'sms' && showSmsVerify && (
-            <form onSubmit={handleSmsVerify} className="space-y-4">
-              <div className="space-y-2">
+            <form onSubmit={handleSmsVerify} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="smsCode" className="text-sm font-medium">
                   验证码 <span className="text-destructive">*</span>
                 </Label>
@@ -356,10 +363,11 @@ function LoginForm() {
             <button
               type="button"
               onClick={() => toast.info('系统暂不开放注册，请联系管理员开通账户')}
-              className="text-orange-400 hover:text-orange-300 font-medium cursor-pointer underline-offset-4 hover:underline"
+              className="font-medium text-[var(--accent-primary)] underline-offset-4 hover:text-[var(--accent-primary-hover)] hover:underline"
             >
               立即注册
             </button>
+          </div>
           </div>
         </Card>
 
@@ -378,7 +386,7 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gradient-to-br from-background via-background to-orange-950/20 flex items-center justify-center">
+        <div className="darkroom-page flex min-h-screen items-center justify-center">
           加载中...
         </div>
       }

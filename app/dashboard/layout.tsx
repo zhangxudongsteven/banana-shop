@@ -92,7 +92,7 @@ const DashboardContent: React.FC<{ children: React.ReactNode }> = ({ children })
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans">
+    <div className="darkroom-page min-h-screen text-[var(--text-primary)] font-sans">
       <DashboardHeader />
       <main>{children}</main>
       <HistoryPanel

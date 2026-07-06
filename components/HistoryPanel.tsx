@@ -420,11 +420,11 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       <div
-        className={`absolute top-0 right-0 h-full w-full max-w-lg bg-[var(--bg-card)] border-l border-[var(--border-primary)] shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        className={`studio-surface absolute right-0 top-0 flex h-full w-full max-w-lg transform flex-col border-l border-[var(--border-primary)] shadow-2xl transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
       >
         <div className="p-4 border-b border-[var(--border-primary)] flex justify-between items-center flex-shrink-0">
           <div>
-            <h2 id="history-panel-title" className="text-xl font-semibold text-[var(--accent-primary)]">
+            <h2 id="history-panel-title" className="text-xl font-semibold text-[var(--text-primary)]">
               {t('history.title')}
             </h2>
             <p className="text-xs text-[var(--text-tertiary)]">{t('history.subtitle')}</p>

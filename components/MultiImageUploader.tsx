@@ -62,11 +62,11 @@ const UploaderBox: React.FC<UploaderBoxProps> = ({
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
-        className={`relative w-full aspect-square bg-[var(--bg-secondary)] rounded-lg flex items-center justify-center transition-colors duration-200 select-none ${
+        className={`relative flex aspect-square w-full items-center justify-center rounded-lg bg-[var(--bg-secondary)] transition-colors duration-200 select-none ${
           isDragging
             ? 'outline-dashed outline-2 outline-[var(--accent-primary)] bg-[rgba(249,115,22,0.1)]'
             : ''
-        } ${imageUrl ? 'p-0' : 'p-4 border-2 border-dashed border-[var(--border-primary)]'}`}
+        } ${imageUrl ? 'p-0' : 'film-rail border-2 border-dashed border-[var(--border-primary)] p-4'}`}
       >
         {!imageUrl ? (
           <label

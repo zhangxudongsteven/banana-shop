@@ -136,7 +136,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
       type="button"
       onClick={onClick}
       variant={isPrimary ? 'default' : 'secondary'}
-      className={`flex-1 min-w-[150px] ${className || ''}`}
+      className={`min-w-[150px] flex-1 ${className || ''}`}
     >
       {children}
     </Button>
@@ -154,7 +154,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
       variant={currentMode === mode ? 'default' : 'ghost'}
       onClick={onClick}
       aria-pressed={currentMode === mode}
-      className="h-7 px-3 text-xs"
+      className="h-8 px-3 text-xs"
     >
       {children}
     </Button>
@@ -167,11 +167,11 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
     }
 
     return (
-      <div className="w-full h-full flex flex-col items-center gap-4 animate-fade-in">
-        <div className="w-full flex-grow relative bg-[var(--bg-primary)] rounded-lg overflow-hidden shadow-inner border border-[var(--border-primary)] flex items-center justify-center">
+      <div className="flex h-full w-full animate-fade-in flex-col items-center gap-4">
+        <div className="relative flex w-full flex-grow items-center justify-center overflow-hidden rounded-lg border border-[var(--border-primary)] bg-[var(--bg-primary)] shadow-inner">
           <video src={content.videoUrl} controls className="max-w-full max-h-full object-contain" />
         </div>
-        <div className="w-full flex flex-col md:flex-row gap-3 mt-2">
+        <div className="mt-2 flex w-full flex-col gap-3 md:flex-row">
           <ActionButton onClick={handleDownloadVideo} isPrimary>
             <Download data-icon="inline-start" />
             <span>{t('resultDisplay.actions.download')}</span>
@@ -184,8 +184,8 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
   // Special view for text results (e.g. Vision API analysis)
   if (!content.imageUrl && content.text) {
     return (
-      <div className="w-full h-full flex flex-col items-center gap-4 animate-fade-in">
-        <div className="w-full flex-grow bg-[var(--bg-primary)] rounded-lg shadow-inner border border-[var(--border-primary)] p-6 overflow-auto">
+      <div className="flex h-full w-full animate-fade-in flex-col items-center gap-4">
+        <div className="w-full flex-grow overflow-auto rounded-lg border border-[var(--border-primary)] bg-[var(--bg-primary)] p-6 shadow-inner">
           <div className="prose prose-invert max-w-none">
             <h3 className="text-lg font-semibold mb-4 text-[var(--text-primary)]">
               {t('resultDisplay.labels.analysisResult')}
@@ -195,7 +195,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
             </p>
           </div>
         </div>
-        <div className="w-full flex flex-col md:flex-row gap-3 mt-2">
+        <div className="mt-2 flex w-full flex-col gap-3 md:flex-row">
           <ActionButton onClick={() => navigator.clipboard.writeText(content.text!)} isPrimary>
             <Copy data-icon="inline-start" />
             <span>{t('resultDisplay.actions.copyText')}</span>
@@ -217,9 +217,9 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
     const rightImageSrc = imageMap[sliderRight]
 
     return (
-      <div className="w-full h-full flex flex-col items-center gap-4 animate-fade-in">
+      <div className="flex h-full w-full animate-fade-in flex-col items-center gap-4">
         <div className="w-full flex justify-center">
-          <div className="p-1 bg-[var(--bg-secondary)] rounded-lg flex items-center gap-1">
+          <div className="flex items-center gap-1 rounded-lg border border-[var(--border-primary)] bg-[var(--bg-secondary)] p-1">
             {(['result', 'grid', 'slider'] as TwoStepViewMode[]).map((mode) => (
               <ViewSwitcherButton
                 key={mode}
@@ -234,8 +234,8 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
         </div>
 
         {twoStepViewMode === 'result' && (
-          <div className="w-full h-full flex flex-col items-center gap-4 flex-grow">
-            <div className="w-full h-full grid grid-cols-1 md:grid-cols-2 gap-2 flex-grow">
+          <div className="flex h-full w-full flex-grow flex-col items-center gap-4">
+            <div className="grid h-full w-full flex-grow grid-cols-1 gap-2 md:grid-cols-2">
               {[
                 { src: content.secondaryImageUrl, label: t('resultDisplay.labels.lineArt') },
                 { src: content.imageUrl, label: t('resultDisplay.labels.finalResult') },
@@ -243,7 +243,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 <button
                   type="button"
                   key={label}
-                  className="relative rounded-lg overflow-hidden border border-[var(--border-primary)] bg-[var(--bg-primary)] flex items-center justify-center flex-col p-1 aspect-square md:aspect-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
+                  className="relative flex aspect-square flex-col items-center justify-center overflow-hidden rounded-lg border border-[var(--border-primary)] bg-[var(--bg-primary)] p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] md:aspect-auto"
                   onClick={() => onImageClick(src!)}
                   aria-label={`${t('resultDisplay.actions.preview')} ${label}`}
                 >
@@ -252,13 +252,13 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                     alt={label}
                     className="max-w-full max-h-full object-contain"
                   />
-                  <div className="absolute bottom-1 right-1 text-xs bg-black/50 text-white px-2 py-1 rounded">
+                  <div className="absolute bottom-1 right-1 rounded bg-black/60 px-2 py-1 text-xs text-white">
                     {label}
                   </div>
                 </button>
               ))}
             </div>
-            <div className="w-full flex flex-col md:flex-row flex-wrap gap-3 mt-auto">
+            <div className="mt-auto flex w-full flex-col flex-wrap gap-3 md:flex-row">
               <ActionButton onClick={() => onImageClick(content.imageUrl!)}>
                 <Eye data-icon="inline-start" />
                 {t('resultDisplay.actions.preview')}
@@ -284,7 +284,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
         )}
 
         {twoStepViewMode === 'grid' && (
-          <div className="w-full h-full grid grid-cols-1 md:grid-cols-3 gap-2 flex-grow">
+          <div className="grid h-full w-full flex-grow grid-cols-1 gap-2 md:grid-cols-3">
             {[
               { src: originalImageUrl, label: t('resultDisplay.labels.original') },
               { src: content.secondaryImageUrl, label: t('resultDisplay.labels.lineArt') },
@@ -292,10 +292,10 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
             ].map(({ src, label }) => (
               <div
                 key={label}
-                className="relative rounded-lg overflow-hidden border border-[var(--border-primary)] bg-[var(--bg-primary)] flex items-center justify-center flex-col p-1 aspect-square md:aspect-auto"
+                className="relative flex aspect-square flex-col items-center justify-center overflow-hidden rounded-lg border border-[var(--border-primary)] bg-[var(--bg-primary)] p-1 md:aspect-auto"
               >
                 <img src={src} alt={label} className="max-w-full max-h-full object-contain" />
-                <div className="absolute bottom-1 right-1 text-xs bg-black/50 text-white px-2 py-1 rounded">
+                <div className="absolute bottom-1 right-1 rounded bg-black/60 px-2 py-1 text-xs text-white">
                   {label}
                 </div>
               </div>
@@ -304,12 +304,12 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
         )}
 
         {twoStepViewMode === 'slider' && (
-          <div className="w-full flex-grow flex flex-col gap-4">
+          <div className="flex w-full flex-grow flex-col gap-4">
             <div className="flex items-center justify-center gap-4 text-sm">
               <select
                 value={sliderLeft}
                 onChange={(e) => setSliderLeft(e.target.value as ImageSelection)}
-                className="bg-[var(--bg-secondary)] border-[var(--border-primary)] border text-[var(--text-primary)] rounded p-1"
+                className="rounded border border-[var(--border-primary)] bg-[var(--bg-secondary)] p-1 text-[var(--text-primary)]"
               >
                 {imageOptions
                   .filter((o) => o !== sliderRight)
@@ -325,7 +325,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
               <select
                 value={sliderRight}
                 onChange={(e) => setSliderRight(e.target.value as ImageSelection)}
-                className="bg-[var(--bg-secondary)] border-[var(--border-primary)] border text-[var(--text-primary)] rounded p-1"
+                className="rounded border border-[var(--border-primary)] bg-[var(--bg-secondary)] p-1 text-[var(--text-primary)]"
               >
                 {imageOptions
                   .filter((o) => o !== sliderLeft)
@@ -341,7 +341,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
             <div
               ref={sliderContainerRef}
               onMouseDown={handleMouseDown}
-              className="relative w-full h-full overflow-hidden rounded-lg cursor-ew-resize border border-[var(--border-primary)] select-none bg-[var(--bg-primary)]"
+              className="relative h-full w-full cursor-ew-resize select-none overflow-hidden rounded-lg border border-[var(--border-strong)] bg-[var(--bg-primary)]"
             >
               <div className="absolute inset-0 flex items-center justify-center">
                 <img
@@ -361,10 +361,10 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 />
               </div>
               <div
-                className="absolute top-0 bottom-0 bg-[var(--accent-primary)] w-1 cursor-ew-resize"
+                className="absolute bottom-0 top-0 w-1 cursor-ew-resize bg-[var(--accent-primary)] shadow-[0_0_24px_var(--accent-shadow)]"
                 style={{ left: `calc(${sliderPosition}% - 2px)` }}
               >
-                <div className="absolute top-1/2 -translate-y-1/2 -left-3.5 bg-[var(--accent-primary)] h-8 w-8 rounded-full border-2 border-[var(--bg-primary)] flex items-center justify-center text-[var(--text-on-accent)]">
+                <div className="absolute -left-3.5 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full border-2 border-[var(--bg-primary)] bg-[var(--accent-primary)] text-[var(--text-on-accent)]">
                   <ChevronsLeftRight className="h-4 w-4" strokeWidth={3} />
                 </div>
               </div>
@@ -382,7 +382,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
         )}
 
         {twoStepViewMode !== 'result' && (
-          <div className="w-full flex flex-col md:flex-row flex-wrap gap-3 mt-auto">
+          <div className="mt-auto flex w-full flex-col flex-wrap gap-3 md:flex-row">
             <ActionButton onClick={() => onImageClick(content.imageUrl!)}>
               <Eye data-icon="inline-start" />
               <span>{t('resultDisplay.actions.preview')}</span>
@@ -411,7 +411,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
 
   const ViewSwitcher = () => (
     <div className="w-full flex justify-center">
-      <div className="p-1 bg-[var(--bg-secondary)] rounded-lg flex items-center gap-1">
+      <div className="flex items-center gap-1 rounded-lg border border-[var(--border-primary)] bg-[var(--bg-secondary)] p-1">
         {(['result', 'side-by-side', 'slider'] as ViewMode[]).map((mode) => (
           <ViewSwitcherButton
             key={mode}
@@ -429,14 +429,14 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
   )
 
   return (
-    <div className="w-full h-full flex flex-col items-center gap-4 animate-fade-in">
+    <div className="flex h-full w-full animate-fade-in flex-col items-center gap-4">
       {content.imageUrl && originalImageUrl && <ViewSwitcher />}
 
       <div className="w-full flex-grow relative">
         {viewMode === 'result' && content.imageUrl && (
           <button
             type="button"
-            className="w-full h-full relative bg-[var(--bg-primary)] rounded-lg overflow-hidden shadow-inner cursor-pointer group border border-[var(--border-primary)] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
+            className="group relative flex h-full w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-[var(--border-primary)] bg-[var(--bg-primary)] shadow-inner focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
             onClick={() => onImageClick(content.imageUrl!)}
             aria-label={t('resultDisplay.actions.preview')}
           >
@@ -445,31 +445,31 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
               alt="Generated result"
               className="max-w-full max-h-full object-contain"
             />
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
               <ZoomIn className="h-10 w-10 text-white" />
             </div>
           </button>
         )}
 
         {viewMode === 'side-by-side' && content.imageUrl && originalImageUrl && (
-          <div className="w-full h-full grid grid-cols-2 gap-2">
-            <div className="relative rounded-lg overflow-hidden border border-[var(--border-primary)] bg-[var(--bg-primary)] flex items-center justify-center">
+          <div className="grid h-full w-full grid-cols-2 gap-2">
+            <div className="relative flex items-center justify-center overflow-hidden rounded-lg border border-[var(--border-primary)] bg-[var(--bg-primary)]">
               <img
                 src={originalImageUrl}
                 alt="Original"
                 className="max-w-full max-h-full object-contain"
               />
-              <div className="absolute bottom-1 right-1 text-xs bg-black/50 text-white px-2 py-1 rounded">
+              <div className="absolute bottom-1 right-1 rounded bg-black/60 px-2 py-1 text-xs text-white">
                 {t('resultDisplay.labels.original')}
               </div>
             </div>
-            <div className="relative rounded-lg overflow-hidden border border-[var(--border-primary)] bg-[var(--bg-primary)] flex items-center justify-center">
+            <div className="relative flex items-center justify-center overflow-hidden rounded-lg border border-[var(--border-primary)] bg-[var(--bg-primary)]">
               <img
                 src={content.imageUrl}
                 alt="Generated"
                 className="max-w-full max-h-full object-contain"
               />
-              <div className="absolute bottom-1 right-1 text-xs bg-black/50 text-white px-2 py-1 rounded">
+              <div className="absolute bottom-1 right-1 rounded bg-black/60 px-2 py-1 text-xs text-white">
                 {t('resultDisplay.labels.generated')}
               </div>
             </div>
@@ -480,7 +480,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
           <div
             ref={sliderContainerRef}
             onMouseDown={handleMouseDown}
-            className="relative w-full h-full overflow-hidden rounded-lg cursor-ew-resize border border-[var(--border-primary)] select-none bg-[var(--bg-primary)]"
+            className="relative h-full w-full cursor-ew-resize select-none overflow-hidden rounded-lg border border-[var(--border-strong)] bg-[var(--bg-primary)]"
           >
             <div className="absolute inset-0 flex items-center justify-center">
               <img
@@ -500,10 +500,10 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
               />
             </div>
             <div
-              className="absolute top-0 bottom-0 bg-[var(--accent-primary)] w-1 cursor-ew-resize"
+              className="absolute bottom-0 top-0 w-1 cursor-ew-resize bg-[var(--accent-primary)] shadow-[0_0_24px_var(--accent-shadow)]"
               style={{ left: `calc(${sliderPosition}% - 2px)` }}
             >
-              <div className="absolute top-1/2 -translate-y-1/2 -left-3.5 bg-[var(--accent-primary)] h-8 w-8 rounded-full border-2 border-[var(--bg-primary)] flex items-center justify-center text-[var(--text-on-accent)]">
+              <div className="absolute -left-3.5 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full border-2 border-[var(--bg-primary)] bg-[var(--accent-primary)] text-[var(--text-on-accent)]">
                 <ChevronsLeftRight className="h-4 w-4" strokeWidth={3} />
               </div>
             </div>
@@ -520,7 +520,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
         )}
       </div>
 
-      <div className="w-full flex flex-col md:flex-row flex-wrap gap-3 mt-2">
+      <div className="mt-2 flex w-full flex-col flex-wrap gap-3 md:flex-row">
         {content.imageUrl && (
           <>
             <ActionButton onClick={() => onImageClick(content.imageUrl!)}>
@@ -546,7 +546,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
       </div>
 
       {content.text && (
-        <p className="w-full text-center text-[var(--text-secondary)] bg-[var(--bg-secondary)] p-3 rounded-md italic mt-4">
+        <p className="mt-4 w-full rounded-md border border-[var(--border-primary)] bg-[var(--bg-secondary)] p-3 text-center italic text-[var(--text-secondary)]">
           "{content.text}"
         </p>
       )}

@@ -5,44 +5,47 @@
 @layer base {
   :root {
     /* Default Dark Theme */
-    --background: 0 0% 0%;
-    --foreground: 0 0% 90%;
-    --card: 0 0% 7%;
-    --card-foreground: 0 0% 90%;
-    --popover: 0 0% 7%;
-    --popover-foreground: 0 0% 90%;
-    --primary: 25 95% 53%;
-    --primary-foreground: 0 0% 0%;
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 90%;
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 45%;
-    --accent: 25 95% 53%;
-    --accent-foreground: 0 0% 0%;
+    --background: 45 28% 4%;
+    --foreground: 45 35% 92%;
+    --card: 40 16% 8%;
+    --card-foreground: 45 35% 92%;
+    --popover: 40 16% 8%;
+    --popover-foreground: 45 35% 92%;
+    --primary: 39 96% 56%;
+    --primary-foreground: 40 35% 8%;
+    --secondary: 42 12% 14%;
+    --secondary-foreground: 45 30% 88%;
+    --muted: 42 10% 15%;
+    --muted-foreground: 43 10% 62%;
+    --accent: 187 76% 54%;
+    --accent-foreground: 40 35% 8%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 25 95% 53%;
+    --border: 42 14% 20%;
+    --input: 42 14% 20%;
+    --ring: 39 96% 56%;
     --radius: 0.5rem;
 
     /* Banana Shop Custom Variables */
-    --bg-primary: #000000;
-    --bg-secondary: #1a1a1a;
-    --bg-card: #111111;
-    --bg-card-alpha: rgba(17, 17, 17, 0.6);
-    --text-primary: #e5e7eb;
-    --text-secondary: #9ca3af;
-    --text-tertiary: #6b7280;
-    --border-primary: rgba(255, 255, 255, 0.1);
-    --accent-primary: #f97316;
-    --accent-secondary: #facc15;
-    --accent-primary-hover: #ea580c;
-    --accent-secondary-hover: #eab308;
-    --accent-shadow: rgba(249, 115, 22, 0.2);
-    --text-on-accent: #000000;
-    --bg-disabled: #374151;
-    --text-disabled: #6b7280;
+    --bg-primary: #070603;
+    --bg-secondary: #17130d;
+    --bg-card: #11100c;
+    --bg-card-alpha: rgba(17, 16, 12, 0.78);
+    --bg-elevated: #211a10;
+    --text-primary: #f4efe2;
+    --text-secondary: #b9ad98;
+    --text-tertiary: #7e7362;
+    --border-primary: rgba(244, 239, 226, 0.14);
+    --border-strong: rgba(245, 183, 66, 0.42);
+    --accent-primary: #f5b742;
+    --accent-secondary: #43d5df;
+    --accent-primary-hover: #f8c765;
+    --accent-secondary-hover: #65e5ec;
+    --accent-shadow: rgba(245, 183, 66, 0.24);
+    --cyan-shadow: rgba(67, 213, 223, 0.18);
+    --text-on-accent: #1c1305;
+    --bg-disabled: #332d23;
+    --text-disabled: #6f6555;
     --bg-error: rgba(153, 27, 27, 0.5);
     --border-error: #b91c1c;
     --text-error: #fca5a5;
@@ -50,43 +53,46 @@
 }
 
 html[data-theme='light'] {
-  --background: 0 0% 100%;
-  --foreground: 0 0% 10%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 10%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 10%;
-  --primary: 25 95% 70%;
-  --primary-foreground: 0 0% 0%;
-  --secondary: 0 0% 96%;
-  --secondary-foreground: 0 0% 10%;
-  --muted: 0 0% 96%;
-  --muted-foreground: 0 0% 45%;
-  --accent: 25 95% 70%;
-  --accent-foreground: 0 0% 0%;
+  --background: 42 55% 96%;
+  --foreground: 38 32% 12%;
+  --card: 42 45% 98%;
+  --card-foreground: 38 32% 12%;
+  --popover: 42 45% 98%;
+  --popover-foreground: 38 32% 12%;
+  --primary: 40 92% 50%;
+  --primary-foreground: 38 32% 9%;
+  --secondary: 42 35% 90%;
+  --secondary-foreground: 38 32% 12%;
+  --muted: 42 32% 91%;
+  --muted-foreground: 38 12% 42%;
+  --accent: 188 65% 42%;
+  --accent-foreground: 42 55% 98%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-  --border: 0 0% 90%;
-  --input: 0 0% 90%;
-  --ring: 25 95% 70%;
+  --border: 39 28% 80%;
+  --input: 39 28% 80%;
+  --ring: 40 92% 50%;
 
   /* Banana Shop Custom Variables - Light */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f3f4f6;
-  --bg-card: #ffffff;
-  --bg-card-alpha: rgba(255, 255, 255, 0.6);
-  --text-primary: #111827;
-  --text-secondary: #4b5563;
-  --text-tertiary: #6b7280;
-  --border-primary: rgba(0, 0, 0, 0.1);
-  --accent-primary: #ff96ac;
-  --accent-secondary: #f87171;
-  --accent-primary-hover: #f472b6;
-  --accent-secondary-hover: #ef4444;
-  --accent-shadow: rgba(255, 150, 172, 0.25);
-  --text-on-accent: #ffffff;
-  --bg-disabled: #e5e7eb;
-  --text-disabled: #9ca3af;
+  --bg-primary: #fbf6e8;
+  --bg-secondary: #f0e7d2;
+  --bg-card: #fffaf0;
+  --bg-card-alpha: rgba(255, 250, 240, 0.82);
+  --bg-elevated: #eadbbd;
+  --text-primary: #241909;
+  --text-secondary: #695738;
+  --text-tertiary: #957f55;
+  --border-primary: rgba(83, 61, 24, 0.16);
+  --border-strong: rgba(199, 132, 15, 0.42);
+  --accent-primary: #d98a11;
+  --accent-secondary: #168a96;
+  --accent-primary-hover: #b76f05;
+  --accent-secondary-hover: #0f717b;
+  --accent-shadow: rgba(217, 138, 17, 0.22);
+  --cyan-shadow: rgba(22, 138, 150, 0.14);
+  --text-on-accent: #201506;
+  --bg-disabled: #e8ddc6;
+  --text-disabled: #a28f70;
   --bg-error: rgba(255, 235, 238, 1);
   --border-error: #ef4444;
   --text-error: #dc2626;
@@ -98,6 +104,64 @@ body {
   transition:
     background-color 0.3s ease,
     color 0.3s ease;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(245, 183, 66, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(67, 213, 223, 0.04) 1px, transparent 1px),
+    radial-gradient(circle at 18% 12%, var(--accent-shadow), transparent 28rem),
+    radial-gradient(circle at 82% 18%, var(--cyan-shadow), transparent 30rem);
+  background-size:
+    44px 44px,
+    44px 44px,
+    auto,
+    auto;
+  opacity: 0.75;
+}
+
+@layer components {
+  .darkroom-page {
+    background:
+      radial-gradient(circle at 16% 10%, var(--accent-shadow), transparent 28rem),
+      radial-gradient(circle at 84% 6%, var(--cyan-shadow), transparent 30rem),
+      var(--bg-primary);
+  }
+
+  .studio-surface {
+    border: 1px solid var(--border-primary);
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.045), transparent 40%),
+      var(--bg-card-alpha);
+    box-shadow:
+      0 22px 70px rgba(0, 0, 0, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(18px);
+  }
+
+  .film-rail {
+    background:
+      linear-gradient(90deg, transparent 0 10px, rgba(245, 183, 66, 0.22) 10px 14px, transparent 14px 28px),
+      var(--bg-secondary);
+    background-size: 28px 100%;
+  }
+
+  .process-pill {
+    border: 1px solid var(--border-strong);
+    background: color-mix(in srgb, var(--accent-primary) 13%, transparent);
+    color: var(--accent-primary);
+  }
+
+  .cyan-pill {
+    border: 1px solid color-mix(in srgb, var(--accent-secondary) 42%, transparent);
+    background: color-mix(in srgb, var(--accent-secondary) 13%, transparent);
+    color: var(--accent-secondary);
+  }
 }
 
 @keyframes fadeIn {

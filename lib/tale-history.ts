@@ -1,8 +1,4 @@
-import {
-  type Attachment,
-  type AttachmentType,
-  type UserTask,
-} from '@turinhub/tale-js-sdk'
+import { type Attachment, type AttachmentType, type UserTask } from '@turinhub/tale-js-sdk'
 import { createTaleServerAppClient, type TaleServerAppClient } from '@/lib/tale-app-client'
 import type {
   GenerationHistoryAttachment,
@@ -97,6 +93,7 @@ type HistoryInputPayload = {
   prompt: string
   providerProfileKey?: string
   kind: RecordGenerationHistoryInput['kind']
+  source?: RecordGenerationHistoryInput['source']
   aspectRatio?: '16:9' | '9:16'
   hasPrimaryImage: boolean
   hasReferenceImage: boolean
@@ -321,6 +318,7 @@ const normalizeHistoryItem = async (
     prompt: safeString(input.prompt),
     providerProfileKey: safeString(input.providerProfileKey),
     kind: input.kind,
+    source: input.source,
     imageUrl,
     secondaryImageUrl,
     videoUrl,
@@ -332,7 +330,10 @@ const normalizeHistoryItem = async (
   }
 }
 
-export const recordGenerationHistory = async (userId: string, input: RecordGenerationHistoryInput) => {
+export const recordGenerationHistory = async (
+  userId: string,
+  input: RecordGenerationHistoryInput
+) => {
   const app = await getTaleAppClient()
   const taskType = await getTaskType(app)
   const attachmentTypes = await ensureAttachmentTypes(app, taskType.typeId)
@@ -344,6 +345,7 @@ export const recordGenerationHistory = async (userId: string, input: RecordGener
     prompt: input.prompt,
     providerProfileKey: input.providerProfileKey,
     kind: input.kind,
+    source: input.source,
     aspectRatio: input.inputs?.aspectRatio,
     hasPrimaryImage: Boolean(input.inputs?.primaryImageUrl),
     hasReferenceImage: Boolean(input.inputs?.referenceImageUrl),
@@ -365,7 +367,13 @@ export const recordGenerationHistory = async (userId: string, input: RecordGener
 
   try {
     const uploadedAttachments = await Promise.all([
-      uploadHistoryAttachment(app, task.taskId, attachmentTypes, 'input', input.inputs?.primaryImageUrl),
+      uploadHistoryAttachment(
+        app,
+        task.taskId,
+        attachmentTypes,
+        'input',
+        input.inputs?.primaryImageUrl
+      ),
       uploadHistoryAttachment(
         app,
         task.taskId,
@@ -373,7 +381,13 @@ export const recordGenerationHistory = async (userId: string, input: RecordGener
         'reference',
         input.inputs?.referenceImageUrl
       ),
-      uploadHistoryAttachment(app, task.taskId, attachmentTypes, 'mask', input.inputs?.maskImageUrl),
+      uploadHistoryAttachment(
+        app,
+        task.taskId,
+        attachmentTypes,
+        'mask',
+        input.inputs?.maskImageUrl
+      ),
       uploadHistoryAttachment(
         app,
         task.taskId,

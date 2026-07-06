@@ -2,6 +2,10 @@
 
 Banana Shop uses Tale `UserTask` records to persist generation history beyond the current browser session.
 
+History writes are shared by the Dashboard workflow, REST API generation endpoints, and the local
+MCP server. `/api/v1/history` and `banana_list_history` both read the same Tale `UserTask` records
+for the current user.
+
 ## Task Type
 
 The generation history task type is created per Tale app:
@@ -45,6 +49,7 @@ If these variables are empty, no manual setup is required. Image attachment type
 - `prompt`
 - `providerProfileKey`
 - `kind`
+- `source` (`dashboard`, `api`, or `mcp`)
 - `aspectRatio`
 - flags for primary, reference, and mask images
 - `schemaVersion`

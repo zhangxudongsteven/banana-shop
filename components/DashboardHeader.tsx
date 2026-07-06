@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { LogOut, User, ChevronDown } from 'lucide-react'
+import { BookOpen, ChevronDown, KeyRound, LogOut, Plug, User } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from '../i18n/context'
 import { useAuth } from './AuthProvider'
@@ -93,6 +93,33 @@ const DashboardHeader: React.FC = () => {
                 </div>
 
                 <div className="h-px bg-[var(--border-primary)] my-1" />
+
+                <Link
+                  href="/dashboard/settings/api-keys"
+                  onClick={() => setIsUserMenuOpen(false)}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-lg transition-colors duration-200"
+                >
+                  <KeyRound className="h-4 w-4" />
+                  <span>{t('apiKeys.menu')}</span>
+                </Link>
+
+                <Link
+                  href="/dashboard/settings/api-docs"
+                  onClick={() => setIsUserMenuOpen(false)}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-lg transition-colors duration-200"
+                >
+                  <BookOpen className="h-4 w-4" />
+                  <span>{t('apiDocs.menu')}</span>
+                </Link>
+
+                <Link
+                  href="/dashboard/settings/mcp-docs"
+                  onClick={() => setIsUserMenuOpen(false)}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-lg transition-colors duration-200"
+                >
+                  <Plug className="h-4 w-4" />
+                  <span>{t('mcpDocs.menu')}</span>
+                </Link>
 
                 <button
                   onClick={handleLogout}

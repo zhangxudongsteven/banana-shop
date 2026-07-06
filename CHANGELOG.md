@@ -5,6 +5,26 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 并遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)（语义化版本）。
 
+## [0.6.0] - 2026-07-06
+
+### 新增
+
+- **开放个人 API Key 管理**：新增 Dashboard API Key 设置页，支持创建、复制、查看状态、撤销个人 Key，并通过 Tale 用户属性保存 Key 元数据和密钥哈希。
+- **新增 REST API v1**：提供图片生成、图片编辑、视频生成和历史读取接口，统一使用 Bearer API Key 鉴权和权限范围校验。
+- **新增本地 MCP Server**：新增 `pnpm mcp` 启动入口，提供 Banana Shop 图片生成、图片编辑、视频生成和历史读取 MCP tools。
+- **补充 API 与 MCP 文档页**：Dashboard 新增 REST API 文档和 MCP 文档入口，并补充 `doc/MCP_SERVER.md`。
+
+### 变更
+
+- **抽取生成服务层**：将图片生成、图片分析、图片编辑和视频生成的 Provider 调用统一封装到 `lib/generation-service.ts`，供 Server Actions、REST API 和 MCP 复用。
+- **增强历史记录来源标记**：生成历史新增 `source` 字段，用于区分 Dashboard、REST API 和 MCP 产生的记录，并在历史面板中展示。
+
+### 修复
+
+- **修复 API 请求体错误码**：REST API 对非法 JSON 或非对象请求体返回 400，不再误报为服务端 500。
+- **修复空 Provider Profile 处理**：REST API 和 MCP 会将空白 `profileKey` 归一为默认配置，避免空字符串触发 profile 查找失败。
+- **修复 API Key 使用时间写入风险**：`lastUsedAt` 更新改为非阻断写入，Tale 元数据临时写入失败不会影响有效 API Key 的业务请求。
+
 ## [0.5.2] - 2026-07-06
 
 ### 变更

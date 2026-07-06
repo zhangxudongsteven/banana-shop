@@ -12,7 +12,11 @@ import {
   Video,
   X,
 } from 'lucide-react'
-import type { GenerationHistoryAttachment, GenerationHistoryItem, HistorySyncStatus } from '../types'
+import type {
+  GenerationHistoryAttachment,
+  GenerationHistoryItem,
+  HistorySyncStatus,
+} from '../types'
 import { useTranslation } from '../i18n/context'
 
 interface HistoryPanelProps {
@@ -56,7 +60,8 @@ const getStatusConfig = (status: HistorySyncStatus) => {
 
   return {
     key: 'history.status.local',
-    className: 'text-[var(--text-secondary)] bg-[rgba(107,114,128,0.16)] border-[var(--border-primary)]',
+    className:
+      'text-[var(--text-secondary)] bg-[rgba(107,114,128,0.16)] border-[var(--border-primary)]',
     icon: ImageIcon,
     spin: false,
   }
@@ -65,6 +70,11 @@ const getStatusConfig = (status: HistorySyncStatus) => {
 const getKindLabelKey = (kind: GenerationHistoryItem['kind']) => {
   if (!kind) return 'history.kind.unknown'
   return `history.kind.${kind}`
+}
+
+const getSourceLabelKey = (source: GenerationHistoryItem['source']) => {
+  if (!source) return null
+  return `history.source.${source}`
 }
 
 const getAttachmentRoleLabelKey = (role: GenerationHistoryAttachment['role']) =>
@@ -125,7 +135,11 @@ const AttachmentPreviewModal: React.FC<{
         onClick={(event) => event.stopPropagation()}
       >
         {isVideo ? (
-          <video src={attachment.url} controls className="max-h-full max-w-full rounded-lg shadow-2xl" />
+          <video
+            src={attachment.url}
+            controls
+            className="max-h-full max-w-full rounded-lg shadow-2xl"
+          />
         ) : (
           <img
             src={attachment.url}
@@ -210,7 +224,9 @@ const Thumb: React.FC<{ src?: string | null; label: string }> = ({ src, label })
       <div className="aspect-square rounded-md overflow-hidden border border-[var(--border-primary)] bg-[var(--bg-primary)] flex items-center justify-center">
         <img src={src} alt={label} className="w-full h-full object-cover" />
       </div>
-      <div className="mt-1 text-[10px] text-center text-[var(--text-tertiary)] truncate">{label}</div>
+      <div className="mt-1 text-[10px] text-center text-[var(--text-tertiary)] truncate">
+        {label}
+      </div>
     </div>
   )
 }
@@ -230,6 +246,7 @@ const HistoryItem: React.FC<{
   const outputVideoUrl = item.videoUrl
   const canUseImage = Boolean(outputImageUrl)
   const canDownload = Boolean(outputImageUrl || outputVideoUrl)
+  const sourceLabelKey = getSourceLabelKey(item.source)
 
   return (
     <div className="bg-[var(--bg-secondary)] p-3 rounded-lg border border-[var(--border-primary)]">
@@ -240,6 +257,11 @@ const HistoryItem: React.FC<{
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-[var(--text-tertiary)]">
             <span>{t(getKindLabelKey(item.kind))}</span>
+            {sourceLabelKey && (
+              <span className="rounded-full border border-[var(--border-primary)] bg-[rgba(107,114,128,0.16)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-secondary)]">
+                {t(sourceLabelKey)}
+              </span>
+            )}
             {createdAt && <span>{createdAt}</span>}
           </div>
         </div>
@@ -301,13 +323,22 @@ const HistoryItem: React.FC<{
 
       <div className="mt-3 grid grid-cols-2 gap-2">
         <ActionButton
-          onClick={() => onDownload(outputVideoUrl || outputImageUrl || '', outputVideoUrl ? 'video-result' : 'image-result')}
+          onClick={() =>
+            onDownload(
+              outputVideoUrl || outputImageUrl || '',
+              outputVideoUrl ? 'video-result' : 'image-result'
+            )
+          }
           disabled={!canDownload}
         >
           <Download className="h-4 w-4" />
           {t('history.save')}
         </ActionButton>
-        <ActionButton onClick={() => outputImageUrl && onUseImage(outputImageUrl)} isPrimary disabled={!canUseImage}>
+        <ActionButton
+          onClick={() => outputImageUrl && onUseImage(outputImageUrl)}
+          isPrimary
+          disabled={!canUseImage}
+        >
           <Edit3 className="h-4 w-4" />
           {t('history.use')}
         </ActionButton>
@@ -327,7 +358,9 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
   onDownload,
 }) => {
   const { t } = useTranslation()
-  const [previewAttachment, setPreviewAttachment] = useState<GenerationHistoryAttachment | null>(null)
+  const [previewAttachment, setPreviewAttachment] = useState<GenerationHistoryAttachment | null>(
+    null
+  )
 
   return (
     <div
@@ -340,7 +373,9 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
       >
         <div className="p-4 border-b border-[var(--border-primary)] flex justify-between items-center flex-shrink-0">
           <div>
-            <h2 className="text-xl font-semibold text-[var(--accent-primary)]">{t('history.title')}</h2>
+            <h2 className="text-xl font-semibold text-[var(--accent-primary)]">
+              {t('history.title')}
+            </h2>
             <p className="text-xs text-[var(--text-tertiary)]">{t('history.subtitle')}</p>
           </div>
           <div className="flex items-center gap-2">
@@ -394,7 +429,10 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
           )}
         </div>
       </div>
-      <AttachmentPreviewModal attachment={previewAttachment} onClose={() => setPreviewAttachment(null)} />
+      <AttachmentPreviewModal
+        attachment={previewAttachment}
+        onClose={() => setPreviewAttachment(null)}
+      />
     </div>
   )
 }

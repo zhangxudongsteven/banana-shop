@@ -38,6 +38,7 @@ export interface GeneratedContent {
   transformationTitle?: string
   prompt?: string
   kind?: GenerationHistoryKind
+  source?: GenerationHistorySource
 }
 
 export type HistorySyncStatus = 'local' | 'syncing' | 'synced' | 'sync_failed'
@@ -48,6 +49,8 @@ export type GenerationHistoryKind =
   | 'multi-image-edit'
   | 'two-step-image-edit'
   | 'video'
+
+export type GenerationHistorySource = 'dashboard' | 'api' | 'mcp'
 
 export type GenerationHistoryAttachmentRole =
   | 'input'
@@ -75,6 +78,7 @@ export interface GenerationHistoryItem extends GeneratedContent {
   prompt?: string
   providerProfileKey?: string
   kind?: GenerationHistoryKind
+  source?: GenerationHistorySource
   inputImageUrl?: string | null
   referenceImageUrl?: string | null
   maskImageUrl?: string | null
@@ -87,6 +91,7 @@ export interface RecordGenerationHistoryInput {
   prompt: string
   providerProfileKey?: string
   kind: GenerationHistoryKind
+  source: GenerationHistorySource
   inputs?: {
     primaryImageUrl?: string | null
     referenceImageUrl?: string | null

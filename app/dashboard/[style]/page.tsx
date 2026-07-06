@@ -147,6 +147,7 @@ export default function GenerationPage() {
         prompt,
         providerProfileKey: selectedProviderProfileKey || undefined,
         kind,
+        source: 'dashboard',
         inputs,
         outputs,
       }

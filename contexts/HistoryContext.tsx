@@ -1,8 +1,22 @@
 'use client'
 
-import React, { createContext, useCallback, useContext, useState, useEffect, ReactNode } from 'react'
-import { listGenerationHistoryAction, recordGenerationHistoryAction } from '../actions/history-actions'
-import type { GeneratedContent, GenerationHistoryItem, RecordGenerationHistoryInput } from '../types'
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from 'react'
+import {
+  listGenerationHistoryAction,
+  recordGenerationHistoryAction,
+} from '../actions/history-actions'
+import type {
+  GeneratedContent,
+  GenerationHistoryItem,
+  RecordGenerationHistoryInput,
+} from '../types'
 
 interface HistoryContextType {
   history: GenerationHistoryItem[]
@@ -56,6 +70,7 @@ export const HistoryProvider: React.FC<{ children: ReactNode }> = ({ children })
       prompt: historyInput?.prompt || item.prompt,
       providerProfileKey: historyInput?.providerProfileKey,
       kind: historyInput?.kind || item.kind,
+      source: historyInput?.source || item.source,
       inputImageUrl: historyInput?.inputs?.primaryImageUrl || null,
       referenceImageUrl: historyInput?.inputs?.referenceImageUrl || null,
       maskImageUrl: historyInput?.inputs?.maskImageUrl || null,

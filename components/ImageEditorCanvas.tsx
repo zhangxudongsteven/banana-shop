@@ -1,5 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react'
+import { Eraser, ImagePlus, Undo2, X } from 'lucide-react'
 import { useTranslation } from '../i18n/context'
+import { Button } from '@/components/ui/button'
 
 interface ImageEditorCanvasProps {
   onImageSelect: (file: File, dataUrl: string) => void
@@ -229,20 +231,7 @@ const ImageEditorCanvas: React.FC<ImageEditorCanvasProps> = ({
             htmlFor="file-upload"
             className="flex flex-col items-center justify-center text-[var(--text-tertiary)] cursor-pointer w-full h-full"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-10 w-10 mb-3"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.158 0h.008v.008h-.008V8.25z"
-              />
-            </svg>
+            <ImagePlus className="mb-3 h-10 w-10" strokeWidth={1.5} />
             <p className="mb-2 text-sm">
               <span className="font-semibold text-[var(--text-secondary)]">
                 {t('imageEditor.upload')}
@@ -259,24 +248,16 @@ const ImageEditorCanvas: React.FC<ImageEditorCanvasProps> = ({
           </label>
         ) : (
           <>
-            <button
+            <Button
+              type="button"
+              size="icon"
+              variant="secondary"
               onClick={onClearImage}
-              className="absolute top-2 right-2 z-30 p-1 bg-black/50 backdrop-blur-sm rounded-full text-white hover:bg-red-600 transition-colors"
+              className="absolute top-2 right-2 z-30 size-8 rounded-full bg-black/50 text-white hover:bg-red-600"
               aria-label="Remove image"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
+              <X data-icon="inline-start" />
+            </Button>
             <canvas ref={imageCanvasRef} className="absolute top-0 left-0" style={{ zIndex: 1 }} />
             <canvas
               ref={maskCanvasRef}
@@ -320,20 +301,24 @@ const ImageEditorCanvas: React.FC<ImageEditorCanvasProps> = ({
             />
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <button
+            <Button
+              type="button"
               onClick={handleUndo}
               disabled={history.length === 0}
-              className="px-4 py-2 text-sm font-semibold text-[var(--text-primary)] bg-[rgba(107,114,128,0.2)] rounded-md hover:bg-[rgba(107,114,128,0.4)] disabled:bg-[var(--bg-disabled)] disabled:text-[var(--text-disabled)] disabled:cursor-not-allowed transition-colors"
+              variant="secondary"
             >
+              <Undo2 data-icon="inline-start" />
               {t('imageEditor.undo')}
-            </button>
-            <button
+            </Button>
+            <Button
+              type="button"
               onClick={clearMask}
               disabled={history.length === 0}
-              className="px-4 py-2 text-sm font-semibold text-[var(--text-primary)] bg-[rgba(107,114,128,0.2)] rounded-md hover:bg-[rgba(107,114,128,0.4)] disabled:bg-[var(--bg-disabled)] disabled:text-[var(--text-disabled)] disabled:cursor-not-allowed transition-colors"
+              variant="secondary"
             >
+              <Eraser data-icon="inline-start" />
               {t('imageEditor.clearMask')}
-            </button>
+            </Button>
           </div>
         </div>
       )}

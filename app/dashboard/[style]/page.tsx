@@ -22,7 +22,8 @@ import {
 } from '../../../utils/fileUtils'
 import { useTranslation } from '../../../i18n/context'
 import { useHistory } from '../../../contexts/HistoryContext'
-import { ChevronLeft } from 'lucide-react'
+import { Button } from '../../../components/ui/button'
+import { Brush, ChevronLeft, Zap } from 'lucide-react'
 
 const ImageEditorCanvas = dynamic(() => import('../../../components/ImageEditorCanvas'), {
   ssr: false,
@@ -537,12 +538,16 @@ export default function GenerationPage() {
   return (
     <div className="container mx-auto p-4 max-w-7xl pb-24">
       <div className="mb-6 flex items-center gap-4">
-        <button
+        <Button
+          type="button"
+          size="icon"
+          variant="ghost"
           onClick={() => router.push('/dashboard')}
-          className="p-2 rounded-full hover:bg-[var(--bg-secondary)] transition-colors"
+          className="rounded-full"
+          aria-label={t('app.back')}
         >
-          <ChevronLeft className="w-6 h-6 text-[var(--text-primary)]" />
-        </button>
+          <ChevronLeft data-icon="inline-start" />
+        </Button>
         <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)]">
           {t(selectedTransformation.titleKey)}
         </h2>
@@ -576,10 +581,15 @@ export default function GenerationPage() {
 
             {shouldRenderPromptInput && (
               <div className="mb-4">
-                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
+                <label
+                  htmlFor="generation-prompt"
+                  className="block text-sm font-medium text-[var(--text-secondary)] mb-2"
+                >
                   {t('transformations.effects.customPrompt.promptLabel')}
                 </label>
                 <textarea
+                  id="generation-prompt"
+                  name="prompt"
                   value={customPrompt}
                   onChange={(e) => setCustomPrompt(e.target.value)}
                   placeholder={promptPlaceholder}
@@ -599,21 +609,19 @@ export default function GenerationPage() {
                   </h3>
                   <div className="grid grid-cols-2 gap-2">
                     {(['16:9', '9:16'] as const).map((ratio) => (
-                      <button
+                      <Button
+                        type="button"
                         key={ratio}
                         onClick={() => setAspectRatio(ratio)}
-                        className={`py-2 px-3 text-sm font-semibold rounded-md transition-colors duration-200 ${
-                          aspectRatio === ratio
-                            ? 'bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-[var(--text-on-accent)]'
-                            : 'bg-[rgba(107,114,128,0.2)] hover:bg-[rgba(107,114,128,0.4)]'
-                        }`}
+                        variant={aspectRatio === ratio ? 'default' : 'secondary'}
+                        aria-pressed={aspectRatio === ratio}
                       >
                         {t(
                           ratio === '16:9'
                             ? 'transformations.video.landscape'
                             : 'transformations.video.portrait'
                         )}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>
@@ -658,68 +666,37 @@ export default function GenerationPage() {
                 />
                 {primaryImageUrl && selectedTransformation.supportsMask && (
                   <div className="mt-4">
-                    <button
+                    <Button
+                      type="button"
                       onClick={toggleMaskTool}
-                      className={`w-full flex items-center justify-center gap-2 py-2 px-3 text-sm font-semibold rounded-md transition-colors duration-200 ${
-                        activeTool === 'mask'
-                          ? 'bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-[var(--text-on-accent)]'
-                          : 'bg-[rgba(107,114,128,0.2)] hover:bg-[rgba(107,114,128,0.4)]'
-                      }`}
+                      className="w-full"
+                      variant={activeTool === 'mask' ? 'default' : 'secondary'}
+                      aria-pressed={activeTool === 'mask'}
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z"
-                        />
-                      </svg>
+                      <Brush data-icon="inline-start" />
                       <span>{t('imageEditor.drawMask')}</span>
-                    </button>
+                    </Button>
                   </div>
                 )}
               </>
             )}
 
-            <button
+            <Button
+              type="button"
               onClick={handleGenerate}
               disabled={isGenerateDisabled}
-              className={`w-full mt-6 py-4 px-6 rounded-xl font-bold text-lg shadow-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 ${
-                isGenerateDisabled
-                  ? 'bg-[var(--bg-secondary)] text-[var(--text-disabled)] cursor-not-allowed'
-                  : 'bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-[var(--text-on-accent)] hover:shadow-[0_0_20px_rgba(255,215,0,0.3)]'
-              }`}
+              size="lg"
+              className="mt-6 w-full text-lg font-bold"
             >
               {isLoading ? (
-                <>
-                  <LoadingSpinner message={loadingMessage || t('app.loading.default')} />
-                </>
+                <LoadingSpinner message={loadingMessage || t('app.loading.default')} />
               ) : (
                 <>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M13 10V3L4 14h7v7l9-11h-7z"
-                    />
-                  </svg>
+                  <Zap data-icon="inline-start" />
                   <span>{t('app.generate')}</span>
                 </>
               )}
-            </button>
+            </Button>
             {error && <ErrorMessage message={error} />}
           </div>
         </div>

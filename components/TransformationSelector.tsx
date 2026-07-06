@@ -1,6 +1,8 @@
 import React, { useRef, useState } from 'react'
+import { ArrowLeft } from 'lucide-react'
 import type { Transformation } from '../types'
 import { useTranslation } from '../i18n/context'
+import { Button } from '@/components/ui/button'
 
 interface TransformationSelectorProps {
   transformations: Transformation[]
@@ -74,15 +76,17 @@ const TransformationSelector: React.FC<TransformationSelectorProps> = ({
   const renderGrid = (items: Transformation[]) => (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
       {items.map((trans, index) => (
-        <button
+        <Button
+          type="button"
           key={trans.key}
+          variant="ghost"
           draggable={!activeCategory && isOrganizing}
           onDragStart={(e) => !activeCategory && isOrganizing && handleDragStart(e, index)}
           onDragEnter={(e) => !activeCategory && isOrganizing && handleDragEnter(e, index)}
           onDragEnd={(e) => !activeCategory && isOrganizing && handleDragEnd(e)}
           onDragOver={(e) => !activeCategory && isOrganizing && handleDragOver(e)}
           onClick={() => handleItemClick(trans)}
-          className={`group flex flex-col items-center justify-center text-center p-4 aspect-square bg-[var(--bg-card)] rounded-xl border border-[var(--border-primary)] hover:border-[var(--accent-primary)] transition-all duration-200 ease-in-out transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)] focus:ring-[var(--accent-primary)] ${
+          className={`group h-auto flex-col text-center p-4 aspect-square bg-[var(--bg-card)] rounded-xl border border-[var(--border-primary)] hover:border-[var(--accent-primary)] transition-all duration-200 ease-in-out transform hover:-translate-y-1 ${
             isOrganizing && !activeCategory ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'
           } ${dragging && !activeCategory ? 'border-dashed' : ''}`}
         >
@@ -92,7 +96,7 @@ const TransformationSelector: React.FC<TransformationSelectorProps> = ({
           <span className="font-semibold text-sm text-[var(--text-primary)]">
             {t(trans.titleKey)}
           </span>
-        </button>
+        </Button>
       ))}
     </div>
   )
@@ -110,42 +114,31 @@ const TransformationSelector: React.FC<TransformationSelectorProps> = ({
               : t('transformationSelector.description')}
           </p>
           <div className="mb-6 flex justify-center">
-            <button
+            <Button
+              type="button"
               onClick={() => setIsOrganizing((current) => !current)}
-              className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors duration-200 ${
-                isOrganizing
-                  ? 'bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-[var(--text-on-accent)]'
-                  : 'bg-[rgba(107,114,128,0.2)] text-[var(--text-primary)] hover:bg-[rgba(107,114,128,0.4)]'
-              }`}
+              variant={isOrganizing ? 'default' : 'secondary'}
+              aria-pressed={isOrganizing}
             >
               {isOrganizing
                 ? t('transformationSelector.doneOrganizing')
                 : t('transformationSelector.organize')}
-            </button>
+            </Button>
           </div>
           {renderGrid(transformations)}
         </>
       ) : (
         <div>
           <div className="mb-8 flex items-center gap-4">
-            <button
+            <Button
+              type="button"
+              variant="ghost"
               onClick={() => setActiveCategory(null)}
-              className="flex items-center gap-2 text-[var(--accent-primary)] hover:text-[var(--accent-primary-hover)] transition-colors duration-200 py-2 px-4 rounded-lg hover:bg-[rgba(107,114,128,0.1)]"
+              className="text-[var(--accent-primary)] hover:text-[var(--accent-primary-hover)]"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <ArrowLeft data-icon="inline-start" />
               {t('app.back')}
-            </button>
+            </Button>
             <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center gap-3">
               <span className="text-4xl">{activeCategory.emoji}</span>
               {t(activeCategory.titleKey)}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   CheckCircle2,
   CloudOff,
@@ -18,6 +18,7 @@ import type {
   HistorySyncStatus,
 } from '../types'
 import { useTranslation } from '../i18n/context'
+import { Button } from '@/components/ui/button'
 
 interface HistoryPanelProps {
   isOpen: boolean
@@ -103,23 +104,40 @@ const ActionButton: React.FC<{
   isPrimary?: boolean
   disabled?: boolean
 }> = ({ onClick, children, isPrimary, disabled }) => (
-  <button
+  <Button
     onClick={onClick}
     disabled={disabled}
-    className={`w-full flex items-center justify-center gap-1.5 py-1.5 px-2 text-xs font-semibold rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
-      isPrimary
-        ? 'bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-[var(--text-on-accent)] shadow-sm shadow-[var(--accent-shadow)] hover:from-[var(--accent-primary-hover)] hover:to-[var(--accent-secondary-hover)]'
-        : 'bg-[rgba(107,114,128,0.2)] hover:bg-[rgba(107,114,128,0.4)] text-[var(--text-primary)]'
-    }`}
+    variant={isPrimary ? 'default' : 'secondary'}
+    size="sm"
+    className="w-full"
   >
     {children}
-  </button>
+  </Button>
 )
 
 const AttachmentPreviewModal: React.FC<{
   attachment: GenerationHistoryAttachment | null
   onClose: () => void
 }> = ({ attachment, onClose }) => {
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (!attachment?.url) return
+
+    const previousActiveElement = document.activeElement
+    closeButtonRef.current?.focus()
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      if (previousActiveElement instanceof HTMLElement) previousActiveElement.focus()
+    }
+  }, [attachment?.url, onClose])
+
   if (!attachment?.url) return null
 
   const isVideo = isVideoAttachment(attachment)
@@ -127,6 +145,9 @@ const AttachmentPreviewModal: React.FC<{
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="history-attachment-preview-title"
       className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center p-4 animate-fade-in-fast"
       onClick={onClose}
     >
@@ -147,15 +168,22 @@ const AttachmentPreviewModal: React.FC<{
             className="h-full w-full object-contain rounded-lg shadow-2xl"
           />
         )}
-        <button
+        <Button
+          ref={closeButtonRef}
+          type="button"
+          size="icon"
+          variant="secondary"
           onClick={onClose}
-          className="absolute -top-2 -right-2 z-10 p-2 bg-black/50 backdrop-blur-sm rounded-full text-white hover:bg-red-600 transition-colors"
+          className="absolute -top-2 -right-2 z-10 rounded-full bg-black/70 text-white hover:bg-red-600"
           aria-label="Close preview"
         >
-          <X className="h-6 w-6" />
-        </button>
+          <X data-icon="inline-start" />
+        </Button>
       </div>
-      <div className="mt-4 max-w-4xl text-center text-sm font-medium text-white/90 truncate">
+      <div
+        id="history-attachment-preview-title"
+        className="mt-4 max-w-4xl text-center text-sm font-medium text-white/90 truncate"
+      >
         {title}
       </div>
     </div>
@@ -358,12 +386,35 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
   onDownload,
 }) => {
   const { t } = useTranslation()
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
   const [previewAttachment, setPreviewAttachment] = useState<GenerationHistoryAttachment | null>(
     null
   )
 
+  useEffect(() => {
+    if (!isOpen) return
+
+    const previousActiveElement = document.activeElement
+    closeButtonRef.current?.focus()
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      if (previousActiveElement instanceof HTMLElement) previousActiveElement.focus()
+    }
+  }, [isOpen, onClose])
+
   return (
     <div
+      role={isOpen ? 'dialog' : undefined}
+      aria-modal={isOpen ? 'true' : undefined}
+      aria-labelledby={isOpen ? 'history-panel-title' : undefined}
+      aria-hidden={!isOpen ? true : undefined}
+      inert={!isOpen ? true : undefined}
       className={`fixed inset-0 z-40 transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
     >
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
@@ -373,27 +424,34 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
       >
         <div className="p-4 border-b border-[var(--border-primary)] flex justify-between items-center flex-shrink-0">
           <div>
-            <h2 className="text-xl font-semibold text-[var(--accent-primary)]">
+            <h2 id="history-panel-title" className="text-xl font-semibold text-[var(--accent-primary)]">
               {t('history.title')}
             </h2>
             <p className="text-xs text-[var(--text-tertiary)]">{t('history.subtitle')}</p>
           </div>
           <div className="flex items-center gap-2">
-            <button
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
               onClick={onRefresh}
               disabled={isLoading}
-              className="p-1.5 rounded-full text-[var(--text-secondary)] hover:bg-[rgba(107,114,128,0.2)] hover:text-[var(--text-primary)] transition-colors disabled:opacity-50"
+              className="rounded-full text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
               aria-label={t('history.refresh')}
             >
-              <RefreshCw className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
-            </button>
-            <button
+              <RefreshCw className={isLoading ? 'animate-spin' : ''} data-icon="inline-start" />
+            </Button>
+            <Button
+              ref={closeButtonRef}
+              type="button"
+              size="icon"
+              variant="ghost"
               onClick={onClose}
-              className="p-1.5 rounded-full text-[var(--text-secondary)] hover:bg-[rgba(107,114,128,0.2)] hover:text-[var(--text-primary)] transition-colors"
+              className="rounded-full text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
               aria-label={t('history.close')}
             >
-              <X className="h-5 w-5" />
-            </button>
+              <X data-icon="inline-start" />
+            </Button>
           </div>
         </div>
 

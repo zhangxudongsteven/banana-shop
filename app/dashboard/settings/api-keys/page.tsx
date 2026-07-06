@@ -57,6 +57,7 @@ export default function ApiKeysPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [revokeTarget, setRevokeTarget] = useState<string | null>(null)
+  const [pendingRevokeKid, setPendingRevokeKid] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const activeKeys = keys.filter((item) => item.status === 'active')
@@ -110,10 +111,11 @@ export default function ApiKeysPage() {
     toast.success(t('apiKeys.copied'))
   }
 
-  const handleRevoke = async (kid: string) => {
+  const handleRevokeConfirmed = async (kid: string) => {
     setRevokeTarget(kid)
     const result = await revokeApiKeyAction({ kid })
     setRevokeTarget(null)
+    setPendingRevokeKid(null)
 
     if (!result.success || !result.data) {
       toast.error(result.error || t('apiKeys.errors.revoke'))
@@ -269,19 +271,50 @@ export default function ApiKeysPage() {
                     </div>
                   </div>
                   <div className="flex justify-end">
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      disabled={item.status === 'revoked' || revokeTarget === item.kid}
-                      onClick={() => handleRevoke(item.kid)}
-                    >
-                      {revokeTarget === item.kid ? (
-                        <Loader2 className="animate-spin" data-icon="inline-start" />
-                      ) : (
+                    {pendingRevokeKid === item.kid ? (
+                      <div className="flex flex-col gap-2 rounded-md border border-destructive/30 bg-destructive/10 p-2 md:min-w-56">
+                        <div className="text-xs text-destructive">
+                          {t('apiKeys.confirmRevoke')}
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => setPendingRevokeKid(null)}
+                            disabled={revokeTarget === item.kid}
+                          >
+                            {t('apiKeys.cancel')}
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            className="flex-1"
+                            disabled={revokeTarget === item.kid}
+                            onClick={() => handleRevokeConfirmed(item.kid)}
+                          >
+                            {revokeTarget === item.kid ? (
+                              <Loader2 className="animate-spin" data-icon="inline-start" />
+                            ) : (
+                              <Trash2 data-icon="inline-start" />
+                            )}
+                            {t('apiKeys.confirm')}
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        disabled={item.status === 'revoked' || revokeTarget === item.kid}
+                        onClick={() => setPendingRevokeKid(item.kid)}
+                      >
                         <Trash2 data-icon="inline-start" />
-                      )}
-                      {t('apiKeys.revoke')}
-                    </Button>
+                        {t('apiKeys.revoke')}
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}

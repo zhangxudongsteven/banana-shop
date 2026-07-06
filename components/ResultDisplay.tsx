@@ -1,7 +1,17 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
+import {
+  ChevronsLeftRight,
+  Copy,
+  Download,
+  Edit3,
+  Eye,
+  SlidersHorizontal,
+  ZoomIn,
+} from 'lucide-react'
 import type { GeneratedContent } from '../types'
 import { useTranslation } from '../i18n/context'
 import { downloadImage } from '../utils/fileUtils'
+import { Button } from '@/components/ui/button'
 
 interface ResultDisplayProps {
   content: GeneratedContent
@@ -122,16 +132,14 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
     isPrimary?: boolean
     className?: string
   }> = ({ onClick, children, isPrimary, className }) => (
-    <button
+    <Button
+      type="button"
       onClick={onClick}
-      className={`flex-1 min-w-[150px] py-2 px-4 font-semibold rounded-lg shadow-sm transition-all duration-200 flex items-center justify-center gap-2 ${
-        isPrimary
-          ? 'bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-[var(--text-on-accent)] shadow-[var(--accent-shadow)] hover:from-[var(--accent-primary-hover)] hover:to-[var(--accent-secondary-hover)]'
-          : 'bg-[rgba(107,114,128,0.2)] hover:bg-[rgba(107,114,128,0.4)] text-[var(--text-primary)]'
-      } ${className}`}
+      variant={isPrimary ? 'default' : 'secondary'}
+      className={`flex-1 min-w-[150px] ${className || ''}`}
     >
       {children}
-    </button>
+    </Button>
   )
 
   const ViewSwitcherButton: React.FC<{
@@ -140,16 +148,16 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
     onClick: () => void
     children: React.ReactNode
   }> = ({ mode, currentMode, onClick, children }) => (
-    <button
+    <Button
+      type="button"
+      size="sm"
+      variant={currentMode === mode ? 'default' : 'ghost'}
       onClick={onClick}
-      className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors duration-200 ${
-        currentMode === mode
-          ? 'bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-[var(--text-on-accent)]'
-          : 'text-[var(--text-primary)] hover:bg-[rgba(107,114,128,0.2)]'
-      }`}
+      aria-pressed={currentMode === mode}
+      className="h-7 px-3 text-xs"
     >
       {children}
-    </button>
+    </Button>
   )
 
   // Special view for video results
@@ -165,18 +173,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
         </div>
         <div className="w-full flex flex-col md:flex-row gap-3 mt-2">
           <ActionButton onClick={handleDownloadVideo} isPrimary>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
+            <Download data-icon="inline-start" />
             <span>{t('resultDisplay.actions.download')}</span>
           </ActionButton>
         </div>
@@ -200,15 +197,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
         </div>
         <div className="w-full flex flex-col md:flex-row gap-3 mt-2">
           <ActionButton onClick={() => navigator.clipboard.writeText(content.text!)} isPrimary>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-              <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-            </svg>
+            <Copy data-icon="inline-start" />
             <span>{t('resultDisplay.actions.copyText')}</span>
           </ActionButton>
         </div>
@@ -251,100 +240,43 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 { src: content.secondaryImageUrl, label: t('resultDisplay.labels.lineArt') },
                 { src: content.imageUrl, label: t('resultDisplay.labels.finalResult') },
               ].map(({ src, label }) => (
-                <div
+                <button
+                  type="button"
                   key={label}
-                  className="relative rounded-lg overflow-hidden border border-[var(--border-primary)] bg-[var(--bg-primary)] flex items-center justify-center flex-col p-1 aspect-square md:aspect-auto"
+                  className="relative rounded-lg overflow-hidden border border-[var(--border-primary)] bg-[var(--bg-primary)] flex items-center justify-center flex-col p-1 aspect-square md:aspect-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
+                  onClick={() => onImageClick(src!)}
+                  aria-label={`${t('resultDisplay.actions.preview')} ${label}`}
                 >
                   <img
                     src={src!}
                     alt={label}
-                    className="max-w-full max-h-full object-contain cursor-pointer"
-                    onClick={() => onImageClick(src!)}
+                    className="max-w-full max-h-full object-contain"
                   />
                   <div className="absolute bottom-1 right-1 text-xs bg-black/50 text-white px-2 py-1 rounded">
                     {label}
                   </div>
-                </div>
+                </button>
               ))}
             </div>
             <div className="w-full flex flex-col md:flex-row flex-wrap gap-3 mt-auto">
               <ActionButton onClick={() => onImageClick(content.imageUrl!)}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
-                  />
-                </svg>
+                <Eye data-icon="inline-start" />
                 {t('resultDisplay.actions.preview')}
               </ActionButton>
               <ActionButton onClick={handleDownloadBoth}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+                <Download data-icon="inline-start" />
                 {t('resultDisplay.actions.downloadBoth')}
               </ActionButton>
               <ActionButton onClick={handleDownload}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+                <Download data-icon="inline-start" />
                 {t('resultDisplay.actions.download')}
               </ActionButton>
               <ActionButton onClick={() => onUseImageAsInput(content.secondaryImageUrl!)}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
-                  <path
-                    fillRule="evenodd"
-                    d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2-2H4a2 2 0 01-2-2V6z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+                <Edit3 data-icon="inline-start" />
                 {t('resultDisplay.actions.useLineArtAsInput')}
               </ActionButton>
               <ActionButton onClick={() => onUseImageAsInput(content.imageUrl!)} isPrimary>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
-                  <path
-                    fillRule="evenodd"
-                    d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2-2H4a2 2 0 01-2-2V6z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+                <Edit3 data-icon="inline-start" />
                 {t('resultDisplay.actions.useFinalAsInput')}
               </ActionButton>
             </div>
@@ -433,22 +365,18 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 style={{ left: `calc(${sliderPosition}% - 2px)` }}
               >
                 <div className="absolute top-1/2 -translate-y-1/2 -left-3.5 bg-[var(--accent-primary)] h-8 w-8 rounded-full border-2 border-[var(--bg-primary)] flex items-center justify-center text-[var(--text-on-accent)]">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M8 9l4-4 4 4m0 6l-4 4-4-4"
-                    />
-                  </svg>
+                  <ChevronsLeftRight className="h-4 w-4" strokeWidth={3} />
                 </div>
               </div>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={sliderPosition}
+                onChange={(event) => setSliderPosition(Number(event.target.value))}
+                aria-label={`${sliderLeft} ${t('resultDisplay.sliderPicker.vs')} ${sliderRight}`}
+                className="absolute bottom-4 left-4 right-4 z-10 accent-[var(--accent-primary)]"
+              />
             </div>
           </div>
         )}
@@ -456,78 +384,23 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
         {twoStepViewMode !== 'result' && (
           <div className="w-full flex flex-col md:flex-row flex-wrap gap-3 mt-auto">
             <ActionButton onClick={() => onImageClick(content.imageUrl!)}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
-                />
-              </svg>
+              <Eye data-icon="inline-start" />
               <span>{t('resultDisplay.actions.preview')}</span>
             </ActionButton>
             <ActionButton onClick={handleDownloadComparison}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM15 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1z" />
-              </svg>
+              <SlidersHorizontal data-icon="inline-start" />
               <span>{t('resultDisplay.actions.downloadComparison')}</span>
             </ActionButton>
             <ActionButton onClick={handleDownload}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <Download data-icon="inline-start" />
               <span>{t('resultDisplay.actions.download')}</span>
             </ActionButton>
             <ActionButton onClick={() => onUseImageAsInput(content.secondaryImageUrl!)}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
-                <path
-                  fillRule="evenodd"
-                  d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2-2H4a2 2 0 01-2-2V6z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <Edit3 data-icon="inline-start" />
               <span>{t('resultDisplay.actions.useLineArtAsInput')}</span>
             </ActionButton>
             <ActionButton onClick={() => onUseImageAsInput(content.imageUrl!)} isPrimary>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
-                <path
-                  fillRule="evenodd"
-                  d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2-2H4a2 2 0 01-2-2V6z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <Edit3 data-icon="inline-start" />
               <span>{t('resultDisplay.actions.useFinalAsInput')}</span>
             </ActionButton>
           </div>
@@ -561,9 +434,11 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
 
       <div className="w-full flex-grow relative">
         {viewMode === 'result' && content.imageUrl && (
-          <div
-            className="w-full h-full relative bg-[var(--bg-primary)] rounded-lg overflow-hidden shadow-inner cursor-pointer group border border-[var(--border-primary)] flex items-center justify-center"
+          <button
+            type="button"
+            className="w-full h-full relative bg-[var(--bg-primary)] rounded-lg overflow-hidden shadow-inner cursor-pointer group border border-[var(--border-primary)] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
             onClick={() => onImageClick(content.imageUrl!)}
+            aria-label={t('resultDisplay.actions.preview')}
           >
             <img
               src={content.imageUrl}
@@ -571,22 +446,9 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
               className="max-w-full max-h-full object-contain"
             />
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-10 w-10 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
-                />
-              </svg>
+              <ZoomIn className="h-10 w-10 text-white" />
             </div>
-          </div>
+          </button>
         )}
 
         {viewMode === 'side-by-side' && content.imageUrl && originalImageUrl && (
@@ -642,22 +504,18 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
               style={{ left: `calc(${sliderPosition}% - 2px)` }}
             >
               <div className="absolute top-1/2 -translate-y-1/2 -left-3.5 bg-[var(--accent-primary)] h-8 w-8 rounded-full border-2 border-[var(--bg-primary)] flex items-center justify-center text-[var(--text-on-accent)]">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M8 9l4-4 4 4m0 6l-4 4-4-4"
-                  />
-                </svg>
+                <ChevronsLeftRight className="h-4 w-4" strokeWidth={3} />
               </div>
             </div>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={sliderPosition}
+              onChange={(event) => setSliderPosition(Number(event.target.value))}
+              aria-label={`${t('resultDisplay.labels.original')} ${t('resultDisplay.sliderPicker.vs')} ${t('resultDisplay.labels.generated')}`}
+              className="absolute bottom-4 left-4 right-4 z-10 accent-[var(--accent-primary)]"
+            />
           </div>
         )}
       </div>
@@ -666,64 +524,21 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
         {content.imageUrl && (
           <>
             <ActionButton onClick={() => onImageClick(content.imageUrl!)}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
-                />
-              </svg>
+              <Eye data-icon="inline-start" />
               <span>{t('resultDisplay.actions.preview')}</span>
             </ActionButton>
             {originalImageUrl && (
               <ActionButton onClick={handleDownloadComparison}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM15 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1z" />
-                </svg>
+                <SlidersHorizontal data-icon="inline-start" />
                 <span>{t('resultDisplay.actions.downloadComparison')}</span>
               </ActionButton>
             )}
             <ActionButton onClick={handleDownload}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <Download data-icon="inline-start" />
               <span>{t('resultDisplay.actions.download')}</span>
             </ActionButton>
             <ActionButton onClick={() => onUseImageAsInput(content.imageUrl!)} isPrimary>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
-                <path
-                  fillRule="evenodd"
-                  d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2-2H4a2 2 0 01-2-2V6z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <Edit3 data-icon="inline-start" />
               <span>{t('resultDisplay.actions.useAsInput')}</span>
             </ActionButton>
           </>

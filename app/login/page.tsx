@@ -142,7 +142,7 @@ function LoginForm() {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-orange-950/20 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
-        <Link href="/home" className="flex items-center justify-center gap-2 mb-8">
+        <Link href="/" className="flex items-center justify-center gap-2 mb-8">
           <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-orange-500 to-yellow-500 flex items-center justify-center">
             <span className="text-2xl">🍌</span>
           </div>
@@ -189,7 +189,9 @@ function LoginForm() {
                 </Label>
                 <Input
                   id="username"
+                  name="username"
                   type="text"
+                  autoComplete="username"
                   placeholder="请输入用户名"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -205,7 +207,9 @@ function LoginForm() {
                 </Label>
                 <Input
                   id="password"
+                  name="password"
                   type="password"
+                  autoComplete="current-password"
                   placeholder="请输入密码"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -247,7 +251,10 @@ function LoginForm() {
                 </Label>
                 <Input
                   id="phone"
+                  name="phone"
                   type="tel"
+                  autoComplete="tel"
+                  inputMode="tel"
                   placeholder="+8613800138000"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
@@ -290,7 +297,11 @@ function LoginForm() {
                 </Label>
                 <Input
                   id="smsCode"
+                  name="smsCode"
                   type="text"
+                  autoComplete="one-time-code"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   placeholder="请输入6位验证码"
                   value={smsCode}
                   onChange={(e) => setSmsCode(e.target.value)}
@@ -354,7 +365,7 @@ function LoginForm() {
 
         {/* Back to Home */}
         <div className="mt-6 text-center">
-          <Link href="/home" className="text-sm text-muted-foreground hover:text-foreground">
+          <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">
             返回首页
           </Link>
         </div>

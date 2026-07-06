@@ -227,7 +227,7 @@ await logout()
 
 ## 页面路由
 
-- `/home` - 首页
+- `/` - 首页
 - `/login` - 登录页
 - `/dashboard` - 编辑器（需要登录）
 - `/api/auth/*` - 认证 API

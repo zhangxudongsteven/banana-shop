@@ -1,12 +1,25 @@
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import Link from 'next/link'
-import { Image as ImageIcon, BarChart3, Sparkles, Wand2 } from 'lucide-react'
+import {
+  ArrowRight,
+  CheckCircle2,
+  Clock3,
+  History,
+  ImagePlus,
+  Sparkles,
+  Wand2,
+} from 'lucide-react'
+
+const previewSteps = [
+  { label: '上传图片', detail: '拖入照片或选择历史结果', icon: ImagePlus },
+  { label: '选择风格', detail: 'Funko Pop / LEGO / 写实增强', icon: Wand2 },
+  { label: '生成并复用', detail: '下载、对比、继续编辑', icon: History },
+]
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-orange-950/20">
-      {/* Header */}
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-orange-950/20 text-foreground">
       <header className="border-b border-border/40 backdrop-blur-sm bg-background/80 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between max-w-7xl">
           <Link href="/" className="flex items-center gap-2">
@@ -16,98 +29,150 @@ export default function HomePage() {
             <span className="font-bold text-xl">Banana Shop</span>
           </Link>
           <nav className="flex items-center gap-4">
-            <Link href="/dashboard">
-              <Button>开始使用</Button>
-            </Link>
+            <Button asChild>
+              <Link href="/dashboard">
+                开始使用
+                <ArrowRight data-icon="inline-end" />
+              </Link>
+            </Button>
           </nav>
         </div>
       </header>
 
-      {/* Hero Section */}
       <main className="container mx-auto px-4 max-w-7xl">
-        <section className="py-20 md:py-32">
-          <div className="flex flex-col items-center text-center gap-8 max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-sm">
+        <section className="grid min-h-[calc(100vh-73px)] items-center gap-10 py-10 lg:grid-cols-[0.92fr_1.08fr] lg:py-14">
+          <div className="flex flex-col gap-7">
+            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/10 px-4 py-2 text-sm text-orange-400">
               <Sparkles className="h-4 w-4" />
-              <span>强大的 AI 图片编辑平台</span>
+              <span>AI 图片创作工作台</span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-balance">
-              让每一张图片
-              <br />
-              <span className="bg-gradient-to-r from-orange-400 to-yellow-500 bg-clip-text text-transparent">
-                充满创意
-              </span>
-            </h1>
-            <p className="text-xl text-muted-foreground text-balance max-w-2xl leading-relaxed">
-              使用 AI 技术转换、编辑和创造令人惊叹的图片。支持多种风格，让您的创意无限延伸。
-            </p>
-            <div className="flex items-center gap-4 mt-4">
-              <Link href="/dashboard">
-                <Button size="lg" className="text-base px-8">
+            <div className="flex flex-col gap-5">
+              <h1 className="max-w-3xl text-4xl font-bold tracking-tight text-balance md:text-6xl">
+                上传图片，选择风格，直接生成可继续编辑的结果
+              </h1>
+              <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground">
+                Banana Shop 把图片上传、风格转换、多图参考、结果对比和历史复用放进一个受保护的创作工作流。
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Button asChild size="lg" className="text-base px-8">
+                <Link href="/dashboard">
                   免费开始
-                </Button>
-              </Link>
-              <Button size="lg" variant="outline" className="text-base px-8 bg-transparent">
-                查看演示
+                  <ArrowRight data-icon="inline-end" />
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="text-base px-8 bg-transparent">
+                <Link href="/dashboard">查看演示</Link>
               </Button>
             </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              {previewSteps.map(({ label, detail, icon: Icon }) => (
+                <div
+                  key={label}
+                  className="rounded-lg border border-border/50 bg-card/45 p-4 backdrop-blur"
+                >
+                  <Icon className="mb-3 h-5 w-5 text-orange-400" />
+                  <div className="font-semibold">{label}</div>
+                  <div className="mt-1 text-sm leading-relaxed text-muted-foreground">{detail}</div>
+                </div>
+              ))}
+            </div>
           </div>
-        </section>
 
-        {/* Features Section */}
-        <section className="py-20">
-          <div className="grid md:grid-cols-3 gap-6">
-            <Card className="p-8 bg-card/50 backdrop-blur border-border/50 hover:border-orange-500/50 transition-colors">
-              <div className="h-12 w-12 rounded-lg bg-orange-500/10 flex items-center justify-center mb-6">
-                <Wand2 className="h-6 w-6 text-orange-400" />
+          <Card className="overflow-hidden border-border/60 bg-card/70 p-0 shadow-2xl shadow-orange-950/20 backdrop-blur">
+            <div className="flex items-center justify-between border-b border-border/60 px-5 py-4">
+              <div className="flex items-center gap-2">
+                <div className="h-3 w-3 rounded-full bg-red-400" />
+                <div className="h-3 w-3 rounded-full bg-yellow-400" />
+                <div className="h-3 w-3 rounded-full bg-green-400" />
               </div>
-              <h3 className="text-xl font-bold mb-3">AI 智能转换</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                一键将图片转换为各种风格，Funko Pop、LEGO、动漫风格等数十种效果等你来体验。
-              </p>
-            </Card>
-
-            <Card className="p-8 bg-card/50 backdrop-blur border-border/50 hover:border-orange-500/50 transition-colors">
-              <div className="h-12 w-12 rounded-lg bg-orange-500/10 flex items-center justify-center mb-6">
-                <ImageIcon className="h-6 w-6 text-orange-400" />
+              <div className="text-xs font-medium text-muted-foreground">Dashboard preview</div>
+            </div>
+            <div className="grid gap-0 lg:grid-cols-[0.92fr_1.08fr]">
+              <div className="border-b border-border/60 p-5 lg:border-b-0 lg:border-r">
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-sm font-semibold">输入</h2>
+                  <span className="rounded-full bg-orange-500/10 px-2.5 py-1 text-xs text-orange-400">
+                    已选择 Funko Pop
+                  </span>
+                </div>
+                <div className="rounded-lg border border-dashed border-border bg-background/50 p-3">
+                  <img
+                    src="/examples/fashion.jpg"
+                    alt="上传图片示例"
+                    className="aspect-square w-full rounded-md object-cover"
+                  />
+                  <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+                    <CheckCircle2 className="h-4 w-4 text-orange-400" />
+                    原图已准备
+                  </div>
+                </div>
+                <div className="mt-4 rounded-lg border border-border/70 bg-background/45 p-3">
+                  <div className="mb-2 text-xs font-medium text-muted-foreground">Prompt</div>
+                  <p className="text-sm leading-relaxed">
+                    保留人物姿态，转换成玩具收藏品风格，使用柔和棚拍光线。
+                  </p>
+                </div>
+                <Button asChild className="mt-4 w-full">
+                  <Link href="/dashboard">
+                    进入工作台
+                    <ArrowRight data-icon="inline-end" />
+                  </Link>
+                </Button>
               </div>
-              <h3 className="text-xl font-bold mb-3">精确编辑</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                支持局部编辑和图片融合，使用画笔工具精确控制修改区域，实现完美的创作效果。
-              </p>
-            </Card>
-
-            <Card className="p-8 bg-card/50 backdrop-blur border-border/50 hover:border-orange-500/50 transition-colors">
-              <div className="h-12 w-12 rounded-lg bg-orange-500/10 flex items-center justify-center mb-6">
-                <BarChart3 className="h-6 w-6 text-orange-400" />
+              <div className="p-5">
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-sm font-semibold">结果</h2>
+                  <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Clock3 className="h-3.5 w-3.5" />
+                    自动保存到历史
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="rounded-lg border border-border/70 bg-background/45 p-2">
+                    <img
+                      src="/examples/funko.jpg"
+                      alt="Funko Pop 风格生成示例"
+                      className="aspect-square w-full rounded-md object-cover"
+                    />
+                    <div className="mt-2 text-xs text-muted-foreground">Funko Pop</div>
+                  </div>
+                  <div className="rounded-lg border border-border/70 bg-background/45 p-2">
+                    <img
+                      src="/examples/lego.jpg"
+                      alt="LEGO 风格生成示例"
+                      className="aspect-square w-full rounded-md object-cover"
+                    />
+                    <div className="mt-2 text-xs text-muted-foreground">LEGO</div>
+                  </div>
+                </div>
+                <div className="mt-4 rounded-lg border border-orange-500/20 bg-orange-500/10 p-4">
+                  <div className="mb-1 font-semibold">继续编辑闭环</div>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    生成结果可以预览、下载、对比，也可以作为下一次输入继续改图。
+                  </p>
+                </div>
               </div>
-              <h3 className="text-xl font-bold mb-3">历史记录</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                自动保存创作历史，随时查看和重用之前的生成结果，让创作流程更加高效便捷。
-              </p>
-            </Card>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="py-20">
-          <Card className="p-12 md:p-16 bg-gradient-to-br from-orange-500/10 to-yellow-500/5 border-orange-500/20 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-balance">
-              准备好开始创作了吗？
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8 text-balance">
-              立即体验专业的 AI 图片编辑服务，释放您的创意潜能
-            </p>
-            <Link href="/dashboard">
-              <Button size="lg" className="text-base px-8">
-                免费开始
-              </Button>
-            </Link>
+            </div>
           </Card>
+        </section>
+
+        <section className="pb-20">
+          <div className="rounded-xl border border-orange-500/20 bg-gradient-to-br from-orange-500/10 to-yellow-500/5 p-8 text-center md:p-12">
+            <h2 className="text-3xl font-bold text-balance">准备开始创作了吗？</h2>
+            <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
+              进入受保护的 Dashboard，上传图片并选择一个转换能力开始。
+            </p>
+            <Button asChild size="lg" className="mt-7 text-base px-8">
+              <Link href="/dashboard">
+                免费开始
+                <ArrowRight data-icon="inline-end" />
+              </Link>
+            </Button>
+          </div>
         </section>
       </main>
 
-      {/* Footer */}
       <footer className="border-t border-border/40 mt-20">
         <div className="container mx-auto px-4 py-8 max-w-7xl">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">

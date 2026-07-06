@@ -49,6 +49,14 @@ Banana Shop 是一个 AI 图片/视频生成与编辑应用。当前项目基于
 - 新增转换能力时，优先扩展 `lib/constants.ts` 中的 `TRANSFORMATIONS`，并同步补齐类型、文案和示例资源。
 - 保持错误处理模式一致：服务端动作返回 `AuthResult` 风格的 `{ success, data, error }` 结果，用户可见错误使用中文文案。
 
+## UI 与交互 Skill 使用约定
+
+- 详细规范维护在 `doc/UI_DESIGN_GUIDELINES.md`，避免在本文件继续堆叠过长 UI 说明。
+- 产品 UI 设计方案优先使用 `frontend-design`。
+- 组件实现与项目一致性优先使用 `shadcn` 与 `tailwind-design-system`。
+- React / Next.js 实现质量优先使用 `vercel-react-best-practices`。
+- AI Chat Prompt 输入体验仅在引入聊天式创作时按需使用 `ai-elements`。
+
 ## 认证与路由保护
 
 - 认证能力集中在 `lib/auth.ts`，基于 `@turinhub/tale-js-sdk`。
@@ -78,4 +86,3 @@ Banana Shop 是一个 AI 图片/视频生成与编辑应用。当前项目基于
 - UI 或交互改动：至少运行相关页面的本地验证；有条件时使用浏览器实际检查关键流程。
 - Server Actions、认证、路由保护、环境变量、构建配置或依赖改动：运行 `pnpm build`。
 - 格式化大范围改动前注意工作区状态，避免把无关文件卷入提交。
-

@@ -2,15 +2,13 @@
 
 import { cookies } from 'next/headers'
 import {
-  getAppToken,
   login,
-  loginWithSms,
-  verifySmsCode,
   type LoginResponse,
   type SendSmsResponse,
   type SmsLoginResponse,
   type AuthUser,
 } from '@turinhub/tale-js-sdk'
+import { createTaleServerAppClient } from '@/lib/tale-app-client'
 
 const COOKIE_NAME = 'auth_token'
 const COOKIE_USER = 'auth_user'
@@ -28,13 +26,6 @@ const getCookieOptions = (expiresAt: string) => ({
 })
 
 const getTaleBaseUrl = () => process.env.TALE_BASE_URL
-
-const getTaleAppToken = () =>
-  getAppToken({
-    baseUrl: process.env.TALE_BASE_URL,
-    appKey: process.env.TALE_APP_KEY,
-    appSecret: process.env.TALE_APP_SECRET,
-  })
 
 // Result types for server actions
 export type AuthResult<T = void> = {
@@ -87,8 +78,8 @@ export async function sendSmsCode(phone: string): Promise<AuthResult<SendSmsResp
       return { success: false, error: '手机号码不能为空' }
     }
 
-    const appToken = await getTaleAppToken()
-    const result = await loginWithSms(phone, { appToken })
+    const app = createTaleServerAppClient()
+    const result = await app.auth.loginWithSms(phone)
     return { success: true, data: result }
   } catch (error) {
     console.error('Send SMS error:', error)
@@ -110,17 +101,12 @@ export async function verifySmsLogin(
       return { success: false, error: '参数不完整' }
     }
 
-    const result = await verifySmsCode(
-      {
-        smsId,
-        smsType,
-        verificationCode,
-      },
-      {
-        baseUrl: getTaleBaseUrl(),
-        appToken: await getTaleAppToken(),
-      }
-    )
+    const app = createTaleServerAppClient()
+    const result = await app.auth.verifySmsCode({
+      smsId,
+      smsType,
+      verificationCode,
+    })
 
     // Store token and user info in cookies
     const cookieStore = await cookies()

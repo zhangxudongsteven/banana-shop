@@ -12,6 +12,10 @@ import { toast } from 'sonner'
 import { loginWithPassword, sendSmsCode, verifySmsLogin } from '@/lib/auth'
 
 type LoginMethod = 'password' | 'sms'
+type LoginSmsType = 'login' | 'register'
+
+const normalizeLoginSmsType = (type: string | undefined): LoginSmsType =>
+  type === 'register' ? 'register' : 'login'
 
 function LoginForm() {
   const searchParams = useSearchParams()
@@ -30,7 +34,7 @@ function LoginForm() {
   const [phone, setPhone] = useState('')
   const [smsCode, setSmsCode] = useState('')
   const [smsId, setSmsId] = useState('')
-  const [smsType, setSmsType] = useState<'login' | 'register'>('login')
+  const [smsType, setSmsType] = useState<LoginSmsType>('login')
   const [countdown, setCountdown] = useState(0)
 
   // Countdown timer for SMS
@@ -86,7 +90,7 @@ function LoginForm() {
       }
 
       setSmsId(result.data?.smsId || '')
-      setSmsType(result.data?.type || 'login')
+      setSmsType(normalizeLoginSmsType(result.data?.type))
       setShowSmsVerify(true)
       startCountdown()
       toast.success('验证码已发送')

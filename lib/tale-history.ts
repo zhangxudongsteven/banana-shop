@@ -1,11 +1,9 @@
 import {
-  createTaleAppClient,
-  getAppToken,
   type Attachment,
   type AttachmentType,
-  type TaleAppClient,
   type UserTask,
 } from '@turinhub/tale-js-sdk'
+import { createTaleServerAppClient, type TaleServerAppClient } from '@/lib/tale-app-client'
 import type {
   GenerationHistoryAttachment,
   GenerationHistoryAttachmentRole,
@@ -115,20 +113,9 @@ type HistoryOutputPayload = {
   schemaVersion: 1
 }
 
-const getTaleAppClient = async (): Promise<TaleAppClient> => {
-  const appToken = await getAppToken({
-    baseUrl: process.env.TALE_BASE_URL,
-    appKey: process.env.TALE_APP_KEY,
-    appSecret: process.env.TALE_APP_SECRET,
-  })
+const getTaleAppClient = (): TaleServerAppClient => createTaleServerAppClient()
 
-  return createTaleAppClient({
-    baseUrl: process.env.TALE_BASE_URL,
-    appToken,
-  })
-}
-
-const getTaskType = async (app: TaleAppClient) => {
+const getTaskType = async (app: TaleServerAppClient) => {
   const configuredTypeId = process.env.TALE_GENERATION_TASK_TYPE_ID || DEFAULT_TASK_TYPE_ID
   if (configuredTypeId) {
     try {
@@ -141,7 +128,7 @@ const getTaskType = async (app: TaleAppClient) => {
     }
   }
 
-  const enabledTypes = await app.taskTypes.listEnabled({ size: 100 })
+  const enabledTypes = await app.taskTypes.listEnabled()
   const existing = enabledTypes.find((type) => type.typeName === TASK_TYPE_NAME)
   if (existing) return existing
 
@@ -155,7 +142,7 @@ const getTaskType = async (app: TaleAppClient) => {
   })
 }
 
-const ensureAttachmentTypes = async (app: TaleAppClient, taskTypeId: string) => {
+const ensureAttachmentTypes = async (app: TaleServerAppClient, taskTypeId: string) => {
   const existingByRef = await app.attachmentTypes.listByRef({
     refType: 'task',
     refTypeId: taskTypeId,
@@ -233,7 +220,7 @@ const getExtensionForMimeType = (mimeType: string, fallback: string) => {
 }
 
 const uploadHistoryAttachment = async (
-  app: TaleAppClient,
+  app: TaleServerAppClient,
   taskId: string,
   attachmentTypes: Map<GenerationHistoryAttachmentRole, string>,
   role: GenerationHistoryAttachmentRole,
@@ -278,7 +265,7 @@ const getAttachmentRole = (
   return null
 }
 
-const getDownloadUrl = async (app: TaleAppClient, taskId: string, attachment: Attachment) => {
+const getDownloadUrl = async (app: TaleServerAppClient, taskId: string, attachment: Attachment) => {
   const result = await app.attachments.getDownloadUrl({
     attachmentId: attachment.attachmentId,
     refType: 'task',
@@ -289,7 +276,7 @@ const getDownloadUrl = async (app: TaleAppClient, taskId: string, attachment: At
 }
 
 const normalizeHistoryItem = async (
-  app: TaleAppClient,
+  app: TaleServerAppClient,
   task: UserTask,
   attachmentTypesById: Map<string, AttachmentType>
 ): Promise<GenerationHistoryItem> => {

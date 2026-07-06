@@ -5,6 +5,19 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 并遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)（语义化版本）。
 
+## [0.5.2] - 2026-07-06
+
+### 变更
+
+- **升级 Tale JS SDK 至 2.4.4**：认证与历史记录集成改用 Tale App Client 和动态 `appTokenProvider`，统一服务端 App Token 获取逻辑。
+- **补充 shadcn 项目配置**：新增 `components.json` 与 Tailwind 容器、accordion 动画和 `tailwindcss-animate` 配置，为后续组件扩展提供一致基线。
+- **整理 UI 开发规范**：新增 `doc/UI_DESIGN_GUIDELINES.md`，并在 `AGENTS.md` 中保留 Skill 使用入口说明。
+
+### 修复
+
+- **修复服务端模块依赖缺失**：补充 `server-only` 依赖，确保 Tale 服务端客户端封装可被 TypeScript 与 Next.js 构建正确解析。
+- **修复短信登录类型收窄**：规范短信验证码返回类型，避免非登录/注册类型进入登录验证流程。
+
 ## [0.5.1] - 2026-06-03
 
 ### 新增

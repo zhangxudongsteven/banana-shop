@@ -5,6 +5,25 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 并遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)（语义化版本）。
 
+## [0.7.1] - 2026-09-21
+
+### 变更
+
+- **更新框架与服务端依赖**：Next.js 升级至 16.3.5，React / React DOM 升级至 19.3.0，OpenAI SDK 升级至 6.49.0，MCP SDK 升级至 1.30.0。
+- **更新 UI 与开发工具依赖**：同步更新 Radix Slot、Sonner、tailwind-merge、Zod、类型声明、PostCSS、Autoprefixer、Prettier 和 tsx；TypeScript 升级至 5.9.3。保持现有主版本及 pnpm 10.28.1。
+
+### 安全
+
+- **约束存在漏洞的 ws 版本**：为低于 8.21.0 的 `ws` 添加 `^8.21.3` 覆盖规则，避免重新引入已知内存泄露与拒绝服务漏洞版本；刷新依赖锁文件。
+
+### 修复
+
+- **统一 MCP 版本信息**：MCP Server 从 `package.json` 读取版本，避免握手响应继续报告旧版本。
+
+### 文档
+
+- 补充本地 MCP 进程显式加载 `.env.local` 的启动方式。
+
 ## [0.7.0] - 2026-07-06
 
 ### 变更

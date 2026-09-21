@@ -56,6 +56,16 @@ history features, including:
 - `TALE_API_KEYS_ATTRIBUTE_DEFINITION_ID`
 - Provider keys such as `VOLCENGINE_API_KEY`, `GLM_API_KEY`, or `ALIYUN_DASHSCOPE_API_KEY`
 
+Unlike Next.js, `pnpm mcp` does not automatically load `.env.local`. Export the required variables
+in the parent process, configure them in the MCP client's `env`, or explicitly load the local file
+with Node.js (run from the project root):
+
+```bash
+node --env-file=.env.local --conditions=react-server --import tsx mcp/server.ts
+```
+
+The server reports the version from `package.json` during the MCP handshake.
+
 ## Client Configuration
 
 For MCP clients that spawn stdio servers, use:

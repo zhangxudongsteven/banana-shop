@@ -2,6 +2,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import * as z from 'zod/v4'
 
+import { version } from '@/package.json'
 import { ApiAuthError, authenticateApiKey } from '@/lib/api-auth'
 import type { ApiKeyScope } from '@/lib/api-keys'
 import { optionalTrimmedString } from '@/lib/api-request'
@@ -13,7 +14,7 @@ import type { GeneratedContent } from '@/types'
 
 const server = new McpServer({
   name: 'banana-shop',
-  version: '0.6.0',
+  version,
 })
 
 const imageContentSchema = {

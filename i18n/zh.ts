@@ -1,5 +1,9 @@
 export default {
   app: {
+    inputsLocked: '正在生成，输入已锁定；您仍可查看和下载上次结果。',
+    previousResult: '上次结果',
+    generationComplete: '图片已生成，可下载或继续编辑。',
+    generationFailed: '本次生成失败。请检查提示后重试，上次结果仍可使用。',
     title: '🍌 香蕉超市',
     history: '历史记录',
     back: '返回',
@@ -8,18 +12,19 @@ export default {
     promptDetails: '查看生成提示词',
     input: '输入',
     generate: '生成',
-    generateImage: '生成图像',
+    generateImage: '生成图片',
     generating: '生成中...',
     result: '结果',
     resultPlaceholder: '生成结果将显示在这里',
     exampleResult: '效果参考',
     emptyResultHint: '准备好输入后，生成结果会显示在这里。',
-    emptyResultActionHint: '上传素材并补齐必要输入后，生成按钮会点亮，结果会在这里进入对比视图。',
+    emptyResultActionHint: '填写描述或上传所需图片，然后点击“生成图片”。生成后可下载或继续编辑。',
     studioWorkflow: '创作工作流',
     workflowRail: '输入 / 生成 / 对比',
     compareReady: '可对比',
     yourImageWillAppear: '您生成的图像将显示在这里。',
     error: {
+      downloadFailed: '图片下载失败，请检查网络后重试。',
       uploadAndSelect: '请上传图像并选择一个效果。',
       uploadBoth: '请上传两个所需的图像。',
       enterPrompt: '请输入一个描述您想看到的更改的提示。',
@@ -31,9 +36,6 @@ export default {
       step2: '第2步：应用调色板...',
       default: '正在生成您的杰作...',
       wait: '这有时可能需要一些时间。',
-      videoInit: '正在初始化视频生成...',
-      videoPolling: '正在处理视频，这可能需要几分钟...',
-      videoFetching: '正在完成并获取您的视频...',
     },
     theme: {
       switchToLight: '切换到浅色主题',
@@ -52,16 +54,14 @@ export default {
     tags: {
       category: '分类',
       textToImage: '文生图',
-      video: '视频',
       twoStep: '两步生成',
-      mask: '蒙版',
       optionalReference: '参考图可选',
       doubleImage: '双图',
       singleImage: '单图',
     },
   },
   providerSelector: {
-    title: '生成 Provider',
+    title: '生成模型',
     profiles: {
       glmImage: {
         title: 'GLM Image',
@@ -77,22 +77,27 @@ export default {
       },
       volcengineImageEdit: {
         title: '火山 Seedream 编辑',
-        description: '默认图片编辑 Provider，兼容现有工作流。',
+        description: '适合日常改图与风格转换。',
       },
       aliyunImageEdit: {
         title: '阿里 Qwen Image 编辑',
-        description: '支持多参考图的图片编辑 Provider。',
+        description: '支持结合参考图调整风格和内容。',
       },
     },
   },
   imageEditor: {
+    remove: '移除',
+    reading: '正在读取图片…',
+    limits: 'PNG、JPEG 或 WebP，每张不超过 8 MiB，双图合计不超过 16 MiB。',
+    invalidType: '仅支持 PNG、JPEG 和 WebP 图片。',
+    tooLarge: '图片不能为空且不得超过 8 MiB，请压缩后重试。',
+    totalTooLarge: '两张图片合计不能超过 16 MiB，请压缩后重试。',
+    readFailed: '读取图片失败，请重新选择。',
+    decodeFailed: '无法解码这张图片，请使用有效的 PNG、JPEG 或 WebP。',
+    fetchFailed: '无法读取历史图片，请检查网络后重试。',
+    retryImport: '重新载入图片',
     upload: '点击上传',
     dragAndDrop: '或拖放文件',
-    drawMask: '绘制蒙版',
-    maskPanelInfo: '在图像上绘制以创建用于局部编辑的蒙版。',
-    brushSize: '笔刷大小',
-    undo: '撤销',
-    clearMask: '清除蒙版',
   },
   resultDisplay: {
     viewModes: {
@@ -124,8 +129,11 @@ export default {
     exampleBadge: '效果图',
   },
   history: {
+    unsavedHint: '此结果尚未确认保存，请先下载。刷新或关闭页面可能丢失未保存的图片。',
+    retrySave: '重试保存',
+    checkSave: '检查保存状态',
     title: '生成任务历史',
-    subtitle: '由 Tale UserTask 持久保存',
+    subtitle: '已保存的作品与本次会话的待保存结果',
     empty: '保存在 Tale 的生成任务会显示在这里。',
     loading: '正在加载生成任务...',
     refresh: '刷新历史记录',
@@ -141,6 +149,7 @@ export default {
     noPreview: '暂无预览',
     untitled: '未命名任务',
     status: {
+      unknown: '保存待确认',
       local: '本地',
       syncing: '同步中',
       synced: '已保存',
@@ -151,7 +160,6 @@ export default {
       'image-edit': '图片编辑',
       'multi-image-edit': '多图编辑',
       'two-step-image-edit': '两步生成',
-      video: '视频生成',
       unknown: '生成任务',
     },
     source: {
@@ -168,7 +176,6 @@ export default {
         mask: '蒙版',
         intermediate: '中间图',
         output: '输出图',
-        video: '视频',
       },
     },
   },
@@ -222,7 +229,7 @@ export default {
     authTitle: '认证',
     authDescription: '所有 API 请求都需要在 Authorization header 中携带 Bearer API Key。',
     endpointsTitle: '接口',
-    endpointsDescription: '第一版 API 覆盖图片生成、图片编辑、视频生成和历史读取。',
+    endpointsDescription: '第一版 API 覆盖图片生成、图片编辑和历史读取。',
     method: '方法',
     path: '路径',
     scope: '权限',
@@ -231,7 +238,6 @@ export default {
     examplesDescription: '将示例中的域名和 API Key 替换为你的实际值。',
     textToImageExample: '文字生成图片',
     imageEditExample: '图片编辑',
-    videoExample: '文字生成视频',
     responseExample: '响应格式',
     viewMcpDocs: '查看 MCP 文档',
     errorsTitle: '错误码',
@@ -274,7 +280,7 @@ export default {
       },
       scopes: {
         title: '权限校验',
-        description: '图片、视频和历史读取分别校验 image、video、history scope。',
+        description: '图片和历史读取分别校验 image 和 history scope。',
       },
       history: {
         title: '历史记录',
@@ -297,14 +303,6 @@ export default {
       design: { title: '设计与产品' },
       tools: { title: '创意工具' },
       effects: { title: '50+ 艺术效果' },
-    },
-    video: {
-      title: '文字生成视频',
-      description: '输入视频创意和镜头描述生成短视频，并选择横版或竖版画面比例。',
-      promptPlaceholder: '例如：一只雄伟的狮子在日落时分的岩石上咆哮',
-      aspectRatio: '宽高比',
-      landscape: '16:9 横向',
-      portrait: '9:16 纵向',
     },
     effects: {
       customPrompt: {
@@ -411,10 +409,6 @@ export default {
       vanGogh: {
         title: '梵高风格',
         description: '用梵高《星夜》标志性的、旋转的笔触重绘您的照片。',
-      },
-      isolate: {
-        title: '分离并增强',
-        description: '剪出蒙版中的主体，并创建一个干净、高清的肖像。',
       },
       screen3d: {
         title: '3D屏幕效果',

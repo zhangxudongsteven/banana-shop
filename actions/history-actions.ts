@@ -1,12 +1,17 @@
 'use server'
 
+import { HistorySaveError } from '@/lib/history-save-error'
 import { getCurrentUser, type AuthResult } from '@/lib/auth'
 import {
   getHistoryAttachmentDownloadUrl,
   listGenerationHistory,
   recordGenerationHistory,
 } from '@/lib/tale-history'
-import type { GenerationHistoryItem, RecordGenerationHistoryInput } from '@/types'
+import type {
+  GenerationHistoryItem,
+  RecordGenerationHistoryInput,
+  HistorySaveResult,
+} from '@/types'
 
 const getAuthenticatedUserId = async () => {
   const currentUser = await getCurrentUser()
@@ -37,7 +42,7 @@ export async function listGenerationHistoryAction(): Promise<AuthResult<Generati
 
 export async function recordGenerationHistoryAction(
   input: RecordGenerationHistoryInput
-): Promise<AuthResult<{ taskId: string; createdAt: string }>> {
+): Promise<HistorySaveResult> {
   try {
     const user = await getAuthenticatedUserId()
     if (!user.success) return { success: false, error: user.error }
@@ -46,7 +51,15 @@ export async function recordGenerationHistoryAction(
     return { success: true, data: result }
   } catch (error) {
     console.error('Record generation history error:', error)
-    return { success: false, error: getErrorMessage(error, '保存历史记录失败') }
+    return {
+      success: false,
+      error: getErrorMessage(error, '保存历史记录失败'),
+      taskId: error instanceof HistorySaveError ? error.taskId : input.historyTaskId,
+      recovery:
+        error instanceof HistorySaveError
+          ? error.recovery
+          : input.recovery || (input.historyTaskId ? 'resume' : 'retry'),
+    }
   }
 }
 

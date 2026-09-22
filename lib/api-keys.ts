@@ -8,12 +8,7 @@ const DEFAULT_API_KEY_ATTRIBUTE_DEFINITION_ID = 'uad_dd75a89a1d6a41d799944d952e6
 const API_KEY_PREFIX = 'bns_v1'
 const LAST_USED_AT_UPDATE_INTERVAL_MS = 5 * 60 * 1000
 
-export const API_KEY_SCOPES = [
-  'image:generate',
-  'image:edit',
-  'video:generate',
-  'history:read',
-] as const
+export const API_KEY_SCOPES = ['image:generate', 'image:edit', 'history:read'] as const
 
 export type ApiKeyScope = (typeof API_KEY_SCOPES)[number]
 export type ApiKeyStatus = 'active' | 'revoked'

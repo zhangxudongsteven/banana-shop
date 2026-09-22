@@ -1,3 +1,4 @@
+import { HistorySaveError } from '@/lib/history-save-error'
 import { type Attachment, type AttachmentType, type UserTask } from '@turinhub/tale-js-sdk'
 import { createTaleServerAppClient, type TaleServerAppClient } from '@/lib/tale-app-client'
 import type {
@@ -10,7 +11,6 @@ import type {
 const DEFAULT_TASK_TYPE_ID = '52622b72-159c-4cf9-86f5-52f4fea15d56'
 const TASK_TYPE_NAME = 'Banana Shop Generation'
 const IMAGE_MAX_FILE_SIZE = 25 * 1024 * 1024
-const VIDEO_MAX_FILE_SIZE = 200 * 1024 * 1024
 
 type AttachmentSpec = {
   role: GenerationHistoryAttachmentRole
@@ -74,16 +74,6 @@ const ATTACHMENT_SPECS: AttachmentSpec[] = [
     allowedMimeTypes: ['image/png', 'image/jpeg', 'image/webp', 'image/gif'],
     maxFileSize: IMAGE_MAX_FILE_SIZE,
   },
-  {
-    role: 'video',
-    envKey: 'TALE_OUTPUT_VIDEO_ATTACHMENT_TYPE_ID',
-    typeCode: 'banana_shop_output_video',
-    typeName: 'Banana Shop Output Video',
-    description: 'Final output video for Banana Shop generation tasks.',
-    allowedExtensions: ['mp4', 'webm', 'mov'],
-    allowedMimeTypes: ['video/mp4', 'video/webm', 'video/quicktime'],
-    maxFileSize: VIDEO_MAX_FILE_SIZE,
-  },
 ]
 
 type HistoryInputPayload = {
@@ -94,7 +84,7 @@ type HistoryInputPayload = {
   providerProfileKey?: string
   kind: RecordGenerationHistoryInput['kind']
   source?: RecordGenerationHistoryInput['source']
-  aspectRatio?: '16:9' | '9:16'
+  clientRequestId?: string
   hasPrimaryImage: boolean
   hasReferenceImage: boolean
   hasMaskImage: boolean
@@ -102,9 +92,8 @@ type HistoryInputPayload = {
 }
 
 type HistoryOutputPayload = {
-  resultType: 'image' | 'video' | 'text'
+  resultType: 'image' | 'text'
   imageGenerated: boolean
-  videoGenerated: boolean
   textGenerated: boolean
   attachmentIds: Partial<Record<GenerationHistoryAttachmentRole, string>>
   schemaVersion: 1
@@ -132,14 +121,18 @@ const getTaskType = async (app: TaleServerAppClient) => {
   return await app.taskTypes.create({
     typeName: TASK_TYPE_NAME,
     description:
-      'Banana Shop AI image/video generation history task type. Stores generation inputs, outputs, status, and related media attachments.',
+      'Banana Shop AI image generation history task type. Stores generation inputs, outputs, status, and related media attachments.',
     allowMultiple: true,
     isEnabled: true,
     remark: 'Automatically created by Banana Shop history integration.',
   })
 }
 
-const ensureAttachmentTypes = async (app: TaleServerAppClient, taskTypeId: string) => {
+const ensureAttachmentTypes = async (
+  app: TaleServerAppClient,
+  taskTypeId: string,
+  roles: GenerationHistoryAttachmentRole[]
+) => {
   const existingByRef = await app.attachmentTypes.listByRef({
     refType: 'task',
     refTypeId: taskTypeId,
@@ -149,7 +142,7 @@ const ensureAttachmentTypes = async (app: TaleServerAppClient, taskTypeId: strin
 
   const typeByRole = new Map<GenerationHistoryAttachmentRole, string>()
 
-  for (const spec of ATTACHMENT_SPECS) {
+  for (const spec of ATTACHMENT_SPECS.filter((spec) => roles.includes(spec.role))) {
     const configuredTypeId = process.env[spec.envKey]
     if (configuredTypeId) {
       typeByRole.set(spec.role, configuredTypeId)
@@ -210,9 +203,6 @@ const getExtensionForMimeType = (mimeType: string, fallback: string) => {
   if (mimeType === 'image/png') return 'png'
   if (mimeType === 'image/webp') return 'webp'
   if (mimeType === 'image/gif') return 'gif'
-  if (mimeType === 'video/mp4') return 'mp4'
-  if (mimeType === 'video/webm') return 'webm'
-  if (mimeType === 'video/quicktime') return 'mov'
   return fallback
 }
 
@@ -229,7 +219,7 @@ const uploadHistoryAttachment = async (
   if (!attachmentTypeId) return null
 
   const blob = await urlToBlob(url)
-  const extension = getExtensionForMimeType(blob.type, role === 'video' ? 'mp4' : 'png')
+  const extension = getExtensionForMimeType(blob.type, 'png')
   const filename = `${role}-${Date.now()}.${extension}`
   const file = new File([blob], filename, { type: blob.type || 'application/octet-stream' })
 
@@ -253,8 +243,7 @@ const getAttachmentRole = (
     remark === 'reference' ||
     remark === 'mask' ||
     remark === 'intermediate' ||
-    remark === 'output' ||
-    remark === 'video'
+    remark === 'output'
   ) {
     return remark
   }
@@ -304,14 +293,19 @@ const normalizeHistoryItem = async (
   }
 
   const imageUrl = roleUrls.get('output') || null
-  const videoUrl = roleUrls.get('video')
   const secondaryImageUrl = roleUrls.get('intermediate') || null
-  const resultType = output.resultType || (videoUrl ? 'video' : imageUrl ? 'image' : 'text')
+  const resultType = output.resultType || (imageUrl ? 'image' : 'text')
 
   return {
     id: task.taskId,
     historyTaskId: task.taskId,
-    historyStatus: task.taskStatus === 'failed' ? 'sync_failed' : 'synced',
+    historyStatus:
+      task.taskStatus === 'completed'
+        ? 'synced'
+        : task.taskStatus === 'failed'
+          ? 'sync_failed'
+          : 'syncing',
+    clientRequestId: safeString(input.clientRequestId),
     createdAt: task.createdAt,
     transformationKey: safeString(input.transformationKey),
     transformationTitle: safeString(input.transformationTitle) || task.taskTitle,
@@ -321,7 +315,6 @@ const normalizeHistoryItem = async (
     source: input.source,
     imageUrl,
     secondaryImageUrl,
-    videoUrl,
     text: resultType === 'text' ? safeString(task.taskOutput?.text) || null : null,
     inputImageUrl: roleUrls.get('input') || null,
     referenceImageUrl: roleUrls.get('reference') || null,
@@ -330,112 +323,184 @@ const normalizeHistoryItem = async (
   }
 }
 
-export const recordGenerationHistory = async (
+// Legacy media is recognized only at this read boundary; it is never exposed or migrated.
+const isLegacyVideoTask = (task: UserTask, attachmentTypesById?: Map<string, AttachmentType>) =>
+  task.taskInput?.kind === 'video' ||
+  task.taskInput?.transformationKey === 'videoGeneration' ||
+  task.taskInput?.transformationKey === 'text-to-video' ||
+  task.taskOutput?.resultType === 'video' ||
+  task.taskOutput?.videoGenerated === true ||
+  Boolean(task.taskOutput?.videoUrl) ||
+  task.attachments?.some(
+    (attachment) =>
+      attachment.mimeType?.startsWith('video/') ||
+      attachment.remark === 'video' ||
+      attachmentTypesById?.get(attachment.typeId)?.typeCode === 'banana_shop_output_video'
+  )
+
+async function findRequestTask(
+  app: TaleServerAppClient,
   userId: string,
-  input: RecordGenerationHistoryInput
-) => {
-  const app = await getTaleAppClient()
-  const taskType = await getTaskType(app)
-  const attachmentTypes = await ensureAttachmentTypes(app, taskType.typeId)
-
-  const taskInput: HistoryInputPayload = {
-    app: 'banana-shop',
-    transformationKey: input.transformationKey,
-    transformationTitle: input.transformationTitle,
-    prompt: input.prompt,
-    providerProfileKey: input.providerProfileKey,
-    kind: input.kind,
-    source: input.source,
-    aspectRatio: input.inputs?.aspectRatio,
-    hasPrimaryImage: Boolean(input.inputs?.primaryImageUrl),
-    hasReferenceImage: Boolean(input.inputs?.referenceImageUrl),
-    hasMaskImage: Boolean(input.inputs?.maskImageUrl),
-    schemaVersion: 1,
-  }
-
-  const task = await app.tasks.create({
-    userId,
-    taskTitle: input.transformationTitle || TASK_TYPE_NAME,
-    taskType: taskType.typeName,
-    taskStatus: 'running',
-    taskInput,
-    taskOutput: {
-      schemaVersion: 1,
-    },
-    remark: 'Banana Shop generation history task.',
-  })
-
-  try {
-    const uploadedAttachments = await Promise.all([
-      uploadHistoryAttachment(
-        app,
-        task.taskId,
-        attachmentTypes,
-        'input',
-        input.inputs?.primaryImageUrl
-      ),
-      uploadHistoryAttachment(
-        app,
-        task.taskId,
-        attachmentTypes,
-        'reference',
-        input.inputs?.referenceImageUrl
-      ),
-      uploadHistoryAttachment(
-        app,
-        task.taskId,
-        attachmentTypes,
-        'mask',
-        input.inputs?.maskImageUrl
-      ),
-      uploadHistoryAttachment(
-        app,
-        task.taskId,
-        attachmentTypes,
-        'intermediate',
-        input.outputs.secondaryImageUrl
-      ),
-      uploadHistoryAttachment(app, task.taskId, attachmentTypes, 'output', input.outputs.imageUrl),
-      uploadHistoryAttachment(app, task.taskId, attachmentTypes, 'video', input.outputs.videoUrl),
-    ])
-
-    const attachmentIds: Partial<Record<GenerationHistoryAttachmentRole, string>> = {}
-    uploadedAttachments.forEach((attachment) => {
-      if (!attachment?.remark) return
-      const role = attachment.remark as GenerationHistoryAttachmentRole
-      attachmentIds[role] = attachment.attachmentId
+  taskType: string,
+  requestId: string
+) {
+  for (let page = 0; ; page++) {
+    const result = await app.tasks.list({
+      page,
+      size: 100,
+      userIds: userId,
+      taskType,
+      includeAttachments: true,
+      sort: 'createdAt,desc',
     })
-
-    const resultType = input.outputs.videoUrl ? 'video' : input.outputs.imageUrl ? 'image' : 'text'
-    const taskOutput: HistoryOutputPayload & { text?: string | null } = {
-      resultType,
-      imageGenerated: Boolean(input.outputs.imageUrl),
-      videoGenerated: Boolean(input.outputs.videoUrl),
-      textGenerated: Boolean(input.outputs.text),
-      attachmentIds,
-      schemaVersion: 1,
-      text: input.outputs.text ?? null,
-    }
-
-    await app.tasks.updateOutput(task.taskId, taskOutput)
-    await app.tasks.updateStatus(task.taskId, { taskStatus: 'completed' })
-  } catch (error) {
-    try {
-      await app.tasks.updateStatus(task.taskId, { taskStatus: 'failed' })
-    } catch (statusError) {
-      console.error('Failed to mark history task as failed:', statusError)
-    }
-    throw error
+    const found = result.content.find(
+      (task) =>
+        task.taskInput?.app === 'banana-shop' && task.taskInput?.clientRequestId === requestId
+    )
+    if (found) return found
+    if (result.last || result.content.length === 0 || page + 1 >= result.totalPages)
+      return undefined
   }
+}
 
-  return {
-    taskId: task.taskId,
-    createdAt: task.createdAt,
+const activeSaves = new Map<string, Promise<{ taskId: string; createdAt: string }>>()
+
+export function recordGenerationHistory(userId: string, input: RecordGenerationHistoryInput) {
+  const key = input.clientRequestId ? `${userId}:${input.clientRequestId}` : undefined
+  if (key && activeSaves.has(key)) return activeSaves.get(key)!
+  const operation = saveGenerationHistory(userId, input)
+  if (key) {
+    activeSaves.set(key, operation)
+    void operation
+      .finally(() => {
+        if (activeSaves.get(key) === operation) activeSaves.delete(key)
+      })
+      .catch(() => {})
+  }
+  return operation
+}
+
+async function saveGenerationHistory(userId: string, input: RecordGenerationHistoryInput) {
+  let taskId = input.historyTaskId
+  let recovery = input.recovery || (taskId ? 'resume' : 'retry')
+  try {
+    if (input.kind === ('video' as string) || 'videoUrl' in input.outputs)
+      throw new Error('仅支持图片历史记录')
+    const app = getTaleAppClient()
+    const taskType = await getTaskType(app)
+    let task = taskId
+      ? await app.tasks.get(taskId, { includeAttachments: true })
+      : input.clientRequestId
+        ? await findRequestTask(app, userId, taskType.typeName, input.clientRequestId)
+        : undefined
+    if (task) {
+      if (
+        task.userId !== userId ||
+        task.taskType !== taskType.typeName ||
+        task.taskInput?.app !== 'banana-shop' ||
+        !input.clientRequestId ||
+        task.taskInput.clientRequestId !== input.clientRequestId ||
+        isLegacyVideoTask(task)
+      ) {
+        throw new Error('无法恢复此历史记录')
+      }
+      taskId = task.taskId
+      recovery = 'resume'
+      if (task.taskStatus === 'completed') return { taskId, createdAt: task.createdAt }
+    } else if (input.recovery === 'reconcile' || input.recovery === 'resume') {
+      throw new HistorySaveError(
+        '保存状态待确认，请稍后再次检查；请先下载图片',
+        'reconcile',
+        taskId
+      )
+    }
+
+    const uploads: [GenerationHistoryAttachmentRole, string | null | undefined][] = [
+      ['input', input.inputs?.primaryImageUrl],
+      ['reference', input.inputs?.referenceImageUrl],
+      ['mask', input.inputs?.maskImageUrl],
+      ['intermediate', input.outputs.secondaryImageUrl],
+      ['output', input.outputs.imageUrl],
+    ]
+    const attachmentTypes = await ensureAttachmentTypes(
+      app,
+      taskType.typeId,
+      uploads.filter(([, url]) => url).map(([role]) => role)
+    )
+    if (!task) {
+      // A rejected create may still have reached Tale. Never blindly issue another create after it.
+      recovery = 'reconcile'
+      task = await app.tasks.create({
+        userId,
+        taskTitle: input.transformationTitle || TASK_TYPE_NAME,
+        taskType: taskType.typeName,
+        taskStatus: 'running',
+        taskInput: {
+          app: 'banana-shop',
+          clientRequestId: input.clientRequestId,
+          transformationKey: input.transformationKey,
+          transformationTitle: input.transformationTitle,
+          prompt: input.prompt,
+          providerProfileKey: input.providerProfileKey,
+          kind: input.kind,
+          source: input.source,
+          hasPrimaryImage: Boolean(input.inputs?.primaryImageUrl),
+          hasReferenceImage: Boolean(input.inputs?.referenceImageUrl),
+          hasMaskImage: Boolean(input.inputs?.maskImageUrl),
+          schemaVersion: 1,
+        },
+        taskOutput: { schemaVersion: 1 },
+        remark: 'Banana Shop generation history task.',
+      })
+      taskId = task.taskId
+      recovery = 'resume'
+    }
+    const attachmentIds: Partial<Record<GenerationHistoryAttachmentRole, string>> = {}
+    for (const attachment of task.attachments || []) {
+      const role = uploads.find(
+        ([role]) => attachment.remark === role || attachment.typeId === attachmentTypes.get(role)
+      )?.[0]
+      if (role) attachmentIds[role] = attachment.attachmentId
+    }
+    const settled = await Promise.allSettled(
+      uploads.map(async ([role, url]) => {
+        if (attachmentIds[role] || !url) return
+        const attachment = await uploadHistoryAttachment(app, taskId!, attachmentTypes, role, url)
+        if (attachment) attachmentIds[role] = attachment.attachmentId
+      })
+    )
+    const failed = settled.find((result) => result.status === 'rejected')
+    if (failed?.status === 'rejected') {
+      // All uploads have settled and completion has not been attempted yet.
+      await app.tasks.updateStatus(taskId!, { taskStatus: 'failed' }).catch(() => {})
+      throw failed.reason
+    }
+    await app.tasks.updateOutput(taskId!, {
+      schemaVersion: 1,
+      resultType: input.outputs.imageUrl ? 'image' : 'text',
+      imageGenerated: Boolean(input.outputs.imageUrl),
+      textGenerated: Boolean(input.outputs.text),
+      text: input.outputs.text ?? null,
+      attachmentIds,
+    })
+    await app.tasks.updateStatus(taskId!, { taskStatus: 'completed' })
+    return { taskId: taskId!, createdAt: task.createdAt }
+  } catch (error) {
+    // Do not overwrite a possibly completed remote task with a failed status after a lost response.
+    if (error instanceof HistorySaveError) throw error
+    console.error('History save failed:', error)
+    throw new HistorySaveError(
+      recovery === 'reconcile'
+        ? '保存状态待确认，请先下载图片'
+        : '保存历史失败，请重试或先下载图片',
+      recovery,
+      taskId
+    )
   }
 }
 
 export const listGenerationHistory = async (userId: string) => {
-  const app = await getTaleAppClient()
+  const app = getTaleAppClient()
   const taskType = await getTaskType(app)
   const attachmentTypePage = await app.attachmentTypes.listByRef({
     refType: 'task',
@@ -443,21 +508,22 @@ export const listGenerationHistory = async (userId: string) => {
     page: 0,
     size: 100,
   })
-  const attachmentTypesById = new Map(
-    attachmentTypePage.content.map((attachmentType) => [attachmentType.typeId, attachmentType])
-  )
-
-  const tasks = await app.tasks.list({
-    page: 0,
-    size: 20,
-    sort: 'createdAt,desc',
-    userIds: userId,
-    taskType: taskType.typeName,
-    includeAttachments: true,
-  })
-
+  const types = new Map(attachmentTypePage.content.map((item) => [item.typeId, item]))
+  const visible: UserTask[] = []
+  for (let page = 0; visible.length < 20; page++) {
+    const tasks = await app.tasks.list({
+      page,
+      size: 20,
+      sort: 'createdAt,desc',
+      userIds: userId,
+      taskType: taskType.typeName,
+      includeAttachments: true,
+    })
+    visible.push(...tasks.content.filter((task) => !isLegacyVideoTask(task, types)))
+    if (tasks.last || tasks.content.length === 0 || page + 1 >= tasks.totalPages) break
+  }
   return await Promise.all(
-    tasks.content.map((task) => normalizeHistoryItem(app, task, attachmentTypesById))
+    visible.slice(0, 20).map((task) => normalizeHistoryItem(app, task, types))
   )
 }
 

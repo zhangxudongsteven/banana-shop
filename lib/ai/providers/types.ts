@@ -1,18 +1,11 @@
 export type ProviderCapability =
-  | 'chat'
-  | 'textToImage'
-  | 'imageEdit'
-  | 'visionAnalyze'
-  | 'videoGenerate'
-  | 'referenceImages'
-  | 'maskEdit'
+  'chat' | 'textToImage' | 'imageEdit' | 'visionAnalyze' | 'referenceImages' | 'maskEdit'
 
 export interface ProviderCapabilities {
   chat: boolean
   textToImage: boolean
   imageEdit: boolean
   visionAnalyze: boolean
-  videoGenerate: boolean
   referenceImages: boolean
   maskEdit: boolean
 }
@@ -24,10 +17,6 @@ export interface ProviderImageResult {
 
 export interface ProviderTextResult {
   text: string
-}
-
-export interface ProviderVideoResult {
-  videoUrl: string
 }
 
 export interface ChatMessage {
@@ -65,12 +54,6 @@ export interface EditImageInput {
   size?: string
 }
 
-export interface GenerateVideoInput {
-  prompt: string
-  model: string
-  aspectRatio?: '16:9' | '9:16'
-}
-
 export interface ImageProvider {
   id: string
   capabilities: ProviderCapabilities
@@ -78,5 +61,4 @@ export interface ImageProvider {
   generateImage(input: GenerateImageInput): Promise<ProviderImageResult>
   analyzeImage(input: AnalyzeImageInput): Promise<ProviderTextResult>
   editImage(input: EditImageInput): Promise<ProviderImageResult>
-  generateVideo(input: GenerateVideoInput): Promise<ProviderVideoResult>
 }

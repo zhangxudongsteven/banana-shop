@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react'
-import { ArrowLeft, Grip, ImageIcon, Layers3, Lock, PencilRuler, Video } from 'lucide-react'
+import { ArrowLeft, Grip, ImageIcon, Layers3, Lock, PencilRuler } from 'lucide-react'
 import type { Transformation } from '../types'
 import { useTranslation } from '../i18n/context'
 import { Button } from '@/components/ui/button'
@@ -23,12 +23,10 @@ const getInputTags = (transformation: Transformation) => {
 
   const tags: string[] = []
   if (transformation.isTextToImage) tags.push('textToImage')
-  if (transformation.isVideo) tags.push('video')
   if (transformation.isTwoStep) tags.push('twoStep')
-  if (transformation.supportsMask) tags.push('mask')
   if (transformation.isMultiImage) {
     tags.push(transformation.isSecondaryOptional ? 'optionalReference' : 'doubleImage')
-  } else if (!transformation.isTextToImage && !transformation.isVideo) {
+  } else if (!transformation.isTextToImage) {
     tags.push('singleImage')
   }
 
@@ -116,9 +114,7 @@ const TransformationSelector: React.FC<TransformationSelectorProps> = ({
     return (
       <div className="film-rail flex h-full w-full items-center justify-center">
         <div className="flex flex-col items-center gap-3 text-[var(--text-tertiary)]">
-          {transformation.isVideo ? (
-            <Video className="size-8 text-[var(--accent-secondary)]" />
-          ) : transformation.isTextToImage ? (
+          {transformation.isTextToImage ? (
             <PencilRuler className="size-8 text-[var(--accent-primary)]" />
           ) : (
             <ImageIcon className="size-8 text-[var(--accent-primary)]" />
@@ -174,7 +170,10 @@ const TransformationSelector: React.FC<TransformationSelectorProps> = ({
               </div>
               <div className="mt-auto flex flex-wrap gap-2">
                 {tags.map((tag) => (
-                  <span key={tag} className="cyan-pill rounded-full px-2.5 py-1 text-xs font-medium">
+                  <span
+                    key={tag}
+                    className="cyan-pill rounded-full px-2.5 py-1 text-xs font-medium"
+                  >
                     {t(`transformationSelector.tags.${tag}`)}
                   </span>
                 ))}
@@ -211,11 +210,7 @@ const TransformationSelector: React.FC<TransformationSelectorProps> = ({
               variant={isOrganizing ? 'default' : 'secondary'}
               aria-pressed={isOrganizing}
             >
-              {isOrganizing ? (
-                <Lock data-icon="inline-start" />
-              ) : (
-                <Grip data-icon="inline-start" />
-              )}
+              {isOrganizing ? <Lock data-icon="inline-start" /> : <Grip data-icon="inline-start" />}
               {isOrganizing
                 ? t('transformationSelector.doneOrganizing')
                 : t('transformationSelector.organize')}

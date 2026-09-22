@@ -8,7 +8,7 @@ import type { ApiKeyScope } from '@/lib/api-keys'
 import { optionalTrimmedString } from '@/lib/api-request'
 import { toUserFacingProviderError } from '@/lib/ai/providers/errors'
 import { dataUrlFromBase64, recordGenerationHistorySafely } from '@/lib/generation-history-service'
-import { editImage, generateImage, generateVideo } from '@/lib/generation-service'
+import { editImage, generateImage } from '@/lib/generation-service'
 import { listGenerationHistory } from '@/lib/tale-history'
 import type { GeneratedContent } from '@/types'
 
@@ -22,22 +22,7 @@ const imageContentSchema = {
   text: z.string().nullable(),
   secondaryImageUrl: z.string().nullable().optional(),
   historyTaskId: z.string().optional(),
-  historyStatus: z.enum(['local', 'syncing', 'synced', 'sync_failed']).optional(),
-  historyError: z.string().optional(),
-  createdAt: z.string().optional(),
-  transformationTitle: z.string().optional(),
-  prompt: z.string().optional(),
-  kind: z.string().optional(),
-  source: z.enum(['dashboard', 'api', 'mcp']).optional(),
-}
-
-const videoContentSchema = {
-  videoUrl: z.string(),
-  imageUrl: z.string().nullable(),
-  text: z.string().nullable(),
-  secondaryImageUrl: z.string().nullable().optional(),
-  historyTaskId: z.string().optional(),
-  historyStatus: z.enum(['local', 'syncing', 'synced', 'sync_failed']).optional(),
+  historyStatus: z.enum(['local', 'syncing', 'synced', 'sync_failed', 'sync_unknown']).optional(),
   historyError: z.string().optional(),
   createdAt: z.string().optional(),
   transformationTitle: z.string().optional(),
@@ -91,8 +76,7 @@ const contentForResult = (result: unknown) => {
 
 const imageResponseForResult = (result: GeneratedContent) => {
   const content: (
-    | { type: 'text'; text: string }
-    | { type: 'image'; data: string; mimeType: string }
+    { type: 'text'; text: string } | { type: 'image'; data: string; mimeType: string }
   )[] = contentForResult(result)
   const image = parseDataUrl(result.imageUrl)
   if (image) {
@@ -193,11 +177,13 @@ server.registerTool(
         .string()
         .nullable()
         .optional()
-        .describe('Optional mask image base64 data without a data URL prefix.'),
+        .describe(
+          'Deprecated. Omit or pass null; nonempty masks are rejected because localized editing is unavailable.'
+        ),
       maskMimeType: z
         .string()
         .optional()
-        .describe('Optional mask image MIME type. Defaults to image/png for history storage.'),
+        .describe('Deprecated and ignored; mask editing is unavailable.'),
       secondaryImage: secondaryImageSchema.describe('Optional reference image.'),
       transformationKey: z
         .string()
@@ -273,68 +259,6 @@ server.registerTool(
       return imageResponseForResult(data)
     } catch (error) {
       return toolError(error, '图像编辑失败，请稍后重试')
-    }
-  }
-)
-
-server.registerTool(
-  'banana_generate_video',
-  {
-    title: 'Banana Generate Video',
-    description: 'Generate a video from a text prompt using Banana Shop.',
-    inputSchema: {
-      prompt: z.string().min(1).describe('Text prompt for video generation.'),
-      aspectRatio: z.enum(['16:9', '9:16']).optional().describe('Optional video aspect ratio.'),
-      transformationKey: z
-        .string()
-        .optional()
-        .describe('Optional history transformation key. Defaults to text-to-video.'),
-      transformationTitle: z
-        .string()
-        .optional()
-        .describe('Optional human-readable title stored in history.'),
-      recordHistory: z
-        .boolean()
-        .optional()
-        .default(true)
-        .describe('Whether to write the generation result to Tale history.'),
-    },
-    outputSchema: videoContentSchema,
-  },
-  async ({ prompt, aspectRatio, transformationKey, transformationTitle, recordHistory }) => {
-    try {
-      const auth = await ensureScope('video:generate')
-      const result = await generateVideo(prompt, aspectRatio)
-      const historyTransformationKey = transformationKey || 'text-to-video'
-      const data =
-        recordHistory === false
-          ? result
-          : await recordGenerationHistorySafely(
-              auth.userId,
-              result,
-              {
-                transformationKey: historyTransformationKey,
-                transformationTitle: transformationTitle || historyTransformationKey,
-                prompt,
-                kind: 'video',
-                source: 'mcp',
-                inputs: {
-                  aspectRatio,
-                },
-                outputs: {
-                  videoUrl: result.videoUrl,
-                  text: result.text,
-                },
-              },
-              'MCP history sync error'
-            )
-
-      return {
-        content: contentForResult(data),
-        structuredContent: toStructuredContent(data),
-      }
-    } catch (error) {
-      return toolError(error, '视频生成失败，请稍后重试')
     }
   }
 )

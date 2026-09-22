@@ -41,7 +41,6 @@ const editToolExample = `{
     "base64": "...",
     "mimeType": "image/jpeg"
   },
-  "maskBase64": null,
   "transformationKey": "image-edit",
   "transformationTitle": "Image Edit",
   "profileKey": "defaultImageEdit",
@@ -58,12 +57,7 @@ const toolRows = [
     name: 'banana_edit_image',
     scope: 'image:edit',
     input:
-      '{ base64ImageData, mimeType, prompt, secondaryImage?, maskBase64?, transformationKey?, transformationTitle?, profileKey?, recordHistory? }',
-  },
-  {
-    name: 'banana_generate_video',
-    scope: 'video:generate',
-    input: '{ prompt, aspectRatio?, transformationKey?, transformationTitle?, recordHistory? }',
+      '{ base64ImageData, mimeType, prompt, secondaryImage?, transformationKey?, transformationTitle?, profileKey?, recordHistory? }',
   },
   {
     name: 'banana_list_history',

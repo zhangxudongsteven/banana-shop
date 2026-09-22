@@ -4,7 +4,6 @@ import type {
   EditImageInput,
   GenerateChatInput,
   GenerateImageInput,
-  GenerateVideoInput,
   ImageProvider,
 } from './types'
 
@@ -27,7 +26,10 @@ function assertConfigured() {
 }
 
 function unsupported(capability: string): never {
-  throw new ProviderError('CAPABILITY_UNSUPPORTED', `Aliyun provider does not support ${capability}`)
+  throw new ProviderError(
+    'CAPABILITY_UNSUPPORTED',
+    `Aliyun provider does not support ${capability}`
+  )
 }
 
 function toProviderRequestError(message: string, cause: unknown) {
@@ -79,7 +81,6 @@ export const aliyunProvider: ImageProvider = {
     textToImage: true,
     imageEdit: true,
     visionAnalyze: false,
-    videoGenerate: false,
     referenceImages: true,
     maskEdit: false,
   },
@@ -157,9 +158,5 @@ export const aliyunProvider: ImageProvider = {
     } catch (error) {
       throw toProviderRequestError('Aliyun image edit failed', error)
     }
-  },
-
-  async generateVideo(_input: GenerateVideoInput) {
-    unsupported('videoGenerate')
   },
 }

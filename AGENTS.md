@@ -2,7 +2,7 @@
 
 ## 项目概览
 
-Banana Shop 是一个 AI 图片/视频生成与编辑应用。当前项目基于 Next.js App Router 构建，提供图片上传、风格转换、多图参考、文本生成图片、视频生成、历史记录、认证登录与受保护的 Dashboard 工作流。
+Banana Shop 是一个 AI 图片生成与编辑应用。当前项目基于 Next.js App Router 构建，提供图片上传、风格转换、多图参考、文本生成图片、历史记录、认证登录与受保护的 Dashboard 工作流。
 
 后续开发应优先保持现有产品形态：图片创作工具优先，认证与生成能力服务端封装，前端围绕 Dashboard 编辑体验迭代。
 
@@ -31,7 +31,7 @@ Banana Shop 是一个 AI 图片/视频生成与编辑应用。当前项目基于
 - `app/dashboard/`：受保护的图片编辑与转换主工作区。
 - `components/`：复用 UI 与业务组件。
 - `components/ui/`：基础 UI 原语，新增按钮、输入框、卡片等通用组件时优先放在这里。
-- `actions/`：Server Actions，封装图片、视频、分析等服务端调用。
+- `actions/`：Server Actions，封装图片、分析等服务端调用。
 - `lib/`：服务端/共享工具、认证服务、AI 服务配置与常量。
 - `i18n/`：中英文文案与语言上下文。
 - `theme/`：主题上下文与明暗主题状态。
@@ -69,7 +69,7 @@ Banana Shop 是一个 AI 图片/视频生成与编辑应用。当前项目基于
 
 - Volcengine Ark / OpenAI-compatible 调用集中在 `lib/volcengine.ts`。
 - API Key、Base URL、模型名通过环境变量配置，不要硬编码真实密钥。
-- 图片生成、图片分析、图片编辑、视频生成应通过 `actions/image-actions.ts` 暴露给前端。
+- 图片生成、图片分析、图片编辑应通过 `actions/image-actions.ts` 暴露给前端。
 - 返回给前端的生成内容遵循 `types.ts` 中的 `GeneratedContent`。
 - 客户端不要直接调用 Volcengine 或 OpenAI SDK。
 

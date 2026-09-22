@@ -1,6 +1,13 @@
 'use client'
 
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react'
+import React, {
+  createContext,
+  useState,
+  useContext,
+  ReactNode,
+  useEffect,
+  useCallback,
+} from 'react'
 import en from './en'
 import zh from './zh'
 
@@ -41,22 +48,25 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     setLanguage(lang)
   }
 
-  const t = (key: string): string => {
-    const keys = key.split('.')
-    let result: any = translations[language]
-    for (const k of keys) {
-      result = result?.[k]
-      if (result === undefined) {
-        // Fallback to English if key not found in current language
-        let fallbackResult: any = translations['en']
-        for (const fk of keys) {
-          fallbackResult = fallbackResult?.[fk]
+  const t = useCallback(
+    (key: string): string => {
+      const keys = key.split('.')
+      let result: any = translations[language]
+      for (const k of keys) {
+        result = result?.[k]
+        if (result === undefined) {
+          // Fallback to English if key not found in current language
+          let fallbackResult: any = translations['en']
+          for (const fk of keys) {
+            fallbackResult = fallbackResult?.[fk]
+          }
+          return fallbackResult || key
         }
-        return fallbackResult || key
       }
-    }
-    return result || key
-  }
+      return result || key
+    },
+    [language]
+  )
 
   return (
     <LanguageContext.Provider value={{ language, changeLanguage, t }}>

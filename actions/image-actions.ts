@@ -1,17 +1,12 @@
 'use server'
 
 import { toUserFacingProviderError } from '@/lib/ai/providers/errors'
-import {
-  analyzeImage,
-  editImage,
-  generateImage,
-  generateVideo,
-} from '@/lib/generation-service'
+import { analyzeImage, editImage, generateImage } from '@/lib/generation-service'
 import type { AuthResult } from '@/lib/auth'
 import type { GeneratedContent } from '@/types'
 
 /**
- * Server Actions for image/video generation using the server-side provider registry.
+ * Server Actions for image generation using the server-side provider registry.
  * All actions follow the AuthResult pattern for consistent error handling
  */
 
@@ -71,12 +66,7 @@ export async function analyzeImageAction(
       return { success: false, error: '参数不完整' }
     }
 
-    const result = await analyzeImage(
-      base64ImageData,
-      mimeType,
-      prompt,
-      secondaryImage
-    )
+    const result = await analyzeImage(base64ImageData, mimeType, prompt, secondaryImage)
 
     return {
       success: true,
@@ -126,33 +116,6 @@ export async function editImageAction(
     return {
       success: false,
       error: toUserFacingProviderError(error, '图像编辑失败，请稍后重试'),
-    }
-  }
-}
-
-/**
- * Generate video from text prompt
- */
-export async function generateVideoAction(
-  prompt: string,
-  aspectRatio?: '16:9' | '9:16'
-): Promise<AuthResult<GeneratedContent & { videoUrl: string }>> {
-  try {
-    if (!prompt) {
-      return { success: false, error: '提示词不能为空' }
-    }
-
-    const result = await generateVideo(prompt, aspectRatio)
-
-    return {
-      success: true,
-      data: result,
-    }
-  } catch (error) {
-    console.error('Generate video error:', error)
-    return {
-      success: false,
-      error: toUserFacingProviderError(error, '视频生成失败，请稍后重试'),
     }
   }
 }

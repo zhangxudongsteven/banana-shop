@@ -13,7 +13,7 @@ import {
 
 const workflowSteps = [
   { label: '导入素材', detail: '主图、参考图、历史结果', icon: ImagePlus },
-  { label: '选择工艺', detail: '风格、蒙版、比例、Provider', icon: Layers3 },
+  { label: '选择工艺', detail: '风格、描述、生成模型', icon: Layers3 },
   { label: '对比复用', detail: '滑杆检视、下载、继续编辑', icon: ChevronsLeftRight },
 ]
 
@@ -60,7 +60,8 @@ export default function HomePage() {
                 把上传、生成、对比和继续编辑放进同一张工作台
               </h1>
               <p className="max-w-2xl text-lg leading-relaxed text-[var(--text-secondary)]">
-                Banana Shop 面向图片创作者，把参考图、Prompt、转换风格、历史结果和滑杆对比组织成连续的改图流程。
+                Banana Shop
+                面向图片创作者，把参考图、Prompt、转换风格、历史结果和滑杆对比组织成连续的改图流程。
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">

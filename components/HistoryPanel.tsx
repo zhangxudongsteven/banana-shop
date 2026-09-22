@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useEffect, useRef, useState } from 'react'
 import {
   CheckCircle2,
@@ -9,7 +11,6 @@ import {
   Loader2,
   Paperclip,
   RefreshCw,
-  Video,
   X,
 } from 'lucide-react'
 import type {
@@ -27,6 +28,9 @@ interface HistoryPanelProps {
   isLoading: boolean
   error: string | null
   onRefresh: () => void
+  onRetry: (id: string) => void
+  canRetry: (id: string) => boolean
+  disableUse: boolean
   onUseImage: (imageUrl: string) => void
   onDownload: (url: string, type: string) => void
 }
@@ -40,6 +44,14 @@ const getStatusConfig = (status: HistorySyncStatus) => {
       spin: true,
     }
   }
+
+  if (status === 'sync_unknown')
+    return {
+      key: 'history.status.unknown',
+      className: 'text-amber-500 bg-amber-500/10 border-amber-500/30',
+      icon: CloudOff,
+      spin: false,
+    }
 
   if (status === 'sync_failed') {
     return {
@@ -80,12 +92,6 @@ const getSourceLabelKey = (source: GenerationHistoryItem['source']) => {
 
 const getAttachmentRoleLabelKey = (role: GenerationHistoryAttachment['role']) =>
   `history.attachments.roles.${role}`
-
-const isImageAttachment = (attachment: GenerationHistoryAttachment) =>
-  attachment.mimeType?.startsWith('image/') || attachment.role !== 'video'
-
-const isVideoAttachment = (attachment: GenerationHistoryAttachment) =>
-  attachment.mimeType?.startsWith('video/') || attachment.role === 'video'
 
 const formatCreatedAt = (createdAt: string) => {
   const date = new Date(createdAt)
@@ -140,7 +146,6 @@ const AttachmentPreviewModal: React.FC<{
 
   if (!attachment?.url) return null
 
-  const isVideo = isVideoAttachment(attachment)
   const title = attachment.fileName || attachment.role
 
   return (
@@ -155,19 +160,12 @@ const AttachmentPreviewModal: React.FC<{
         className="relative max-w-4xl max-h-[85vh] w-full h-full flex-grow flex items-center justify-center"
         onClick={(event) => event.stopPropagation()}
       >
-        {isVideo ? (
-          <video
-            src={attachment.url}
-            controls
-            className="max-h-full max-w-full rounded-lg shadow-2xl"
-          />
-        ) : (
-          <img
-            src={attachment.url}
-            alt={title}
-            className="h-full w-full object-contain rounded-lg shadow-2xl"
-          />
-        )}
+        <img
+          src={attachment.url}
+          alt={title}
+          className="h-full w-full object-contain rounded-lg shadow-2xl"
+        />
+
         <Button
           ref={closeButtonRef}
           type="button"
@@ -202,7 +200,7 @@ const AttachmentList: React.FC<{
   const handleBrowse = (attachment: GenerationHistoryAttachment) => {
     if (!attachment.url) return
 
-    if (isImageAttachment(attachment) || isVideoAttachment(attachment)) {
+    if (attachment.mimeType?.startsWith('image/') || !attachment.mimeType) {
       onPreview(attachment)
       return
     }
@@ -263,17 +261,19 @@ const HistoryItem: React.FC<{
   item: GenerationHistoryItem
   onUseImage: (url: string) => void
   onDownload: (url: string, type: string) => void
+  onRetry: (id: string) => void
+  canRetry: boolean
+  disableUse: boolean
   onPreviewAttachment: (attachment: GenerationHistoryAttachment) => void
-}> = ({ item, onUseImage, onDownload, onPreviewAttachment }) => {
+}> = ({ item, onUseImage, onDownload, onPreviewAttachment, onRetry, canRetry, disableUse }) => {
   const { t } = useTranslation()
   const statusConfig = getStatusConfig(item.historyStatus)
   const StatusIcon = statusConfig.icon
   const title = item.transformationTitle || t('history.untitled')
   const createdAt = formatCreatedAt(item.createdAt)
   const outputImageUrl = item.imageUrl
-  const outputVideoUrl = item.videoUrl
   const canUseImage = Boolean(outputImageUrl)
-  const canDownload = Boolean(outputImageUrl || outputVideoUrl)
+  const canDownload = Boolean(outputImageUrl)
   const sourceLabelKey = getSourceLabelKey(item.source)
 
   return (
@@ -320,11 +320,7 @@ const HistoryItem: React.FC<{
       )}
 
       <div className="mt-3">
-        {outputVideoUrl ? (
-          <div className="rounded-md border border-[var(--border-primary)] bg-[var(--bg-primary)] overflow-hidden">
-            <video src={outputVideoUrl} controls className="w-full max-h-56 object-contain" />
-          </div>
-        ) : outputImageUrl ? (
+        {outputImageUrl ? (
           item.secondaryImageUrl ? (
             <div className="grid grid-cols-2 gap-3">
               <Thumb src={item.secondaryImageUrl} label={t('history.lineArt')} />
@@ -349,14 +345,18 @@ const HistoryItem: React.FC<{
 
       <AttachmentList attachments={item.attachments} onPreview={onPreviewAttachment} />
 
+      {item.historyStatus !== 'synced' && (
+        <p className="mt-3 text-xs text-muted-foreground">{t('history.unsavedHint')}</p>
+      )}
+      {canRetry &&
+        (item.historyStatus === 'sync_failed' || item.historyStatus === 'sync_unknown') && (
+          <Button variant="secondary" className="mt-3 w-full" onClick={() => onRetry(item.id)}>
+            {t(item.historyStatus === 'sync_unknown' ? 'history.checkSave' : 'history.retrySave')}
+          </Button>
+        )}
       <div className="mt-3 grid grid-cols-2 gap-2">
         <ActionButton
-          onClick={() =>
-            onDownload(
-              outputVideoUrl || outputImageUrl || '',
-              outputVideoUrl ? 'video-result' : 'image-result'
-            )
-          }
+          onClick={() => onDownload(outputImageUrl || '', 'image-result')}
           disabled={!canDownload}
         >
           <Download className="h-4 w-4" />
@@ -365,7 +365,7 @@ const HistoryItem: React.FC<{
         <ActionButton
           onClick={() => outputImageUrl && onUseImage(outputImageUrl)}
           isPrimary
-          disabled={!canUseImage}
+          disabled={!canUseImage || disableUse}
         >
           <Edit3 className="h-4 w-4" />
           {t('history.use')}
@@ -382,6 +382,9 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
   isLoading,
   error,
   onRefresh,
+  onRetry,
+  canRetry,
+  disableUse,
   onUseImage,
   onDownload,
 }) => {
@@ -424,7 +427,10 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
       >
         <div className="p-4 border-b border-[var(--border-primary)] flex justify-between items-center flex-shrink-0">
           <div>
-            <h2 id="history-panel-title" className="text-xl font-semibold text-[var(--text-primary)]">
+            <h2
+              id="history-panel-title"
+              className="text-xl font-semibold text-[var(--text-primary)]"
+            >
               {t('history.title')}
             </h2>
             <p className="text-xs text-[var(--text-tertiary)]">{t('history.subtitle')}</p>
@@ -469,7 +475,7 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
             </div>
           ) : history.length === 0 ? (
             <div className="text-center text-[var(--text-tertiary)] pt-10 flex flex-col items-center gap-4">
-              <Video className="h-10 w-10" />
+              <ImageIcon className="h-10 w-10" />
               <p>{t('history.empty')}</p>
             </div>
           ) : (
@@ -481,6 +487,9 @@ const HistoryPanel: React.FC<HistoryPanelProps> = ({
                   onUseImage={onUseImage}
                   onDownload={onDownload}
                   onPreviewAttachment={setPreviewAttachment}
+                  onRetry={onRetry}
+                  canRetry={canRetry(item.id)}
+                  disableUse={disableUse}
                 />
               ))}
             </div>

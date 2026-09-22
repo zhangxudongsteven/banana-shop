@@ -1,4 +1,5 @@
 export type ProviderErrorCode =
+  | 'MASK_UNSUPPORTED'
   | 'CONFIG_MISSING'
   | 'PROFILE_NOT_FOUND'
   | 'CAPABILITY_UNSUPPORTED'
@@ -20,6 +21,8 @@ export function toUserFacingProviderError(error: unknown, fallback: string): str
   if (!(error instanceof ProviderError)) return fallback
 
   switch (error.code) {
+    case 'MASK_UNSUPPORTED':
+      return '不支持局部选区编辑，请使用整图编辑'
     case 'CONFIG_MISSING':
       return 'AI 服务配置缺失，请联系管理员检查环境变量'
     case 'PROFILE_NOT_FOUND':

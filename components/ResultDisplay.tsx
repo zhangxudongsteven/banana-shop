@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 import {
   ChevronsLeftRight,
@@ -10,10 +12,12 @@ import {
 } from 'lucide-react'
 import type { GeneratedContent } from '../types'
 import { useTranslation } from '../i18n/context'
-import { downloadImage } from '../utils/fileUtils'
+import { toast } from 'sonner'
+import { downloadImage as downloadImageFile } from '../utils/fileUtils'
 import { Button } from '@/components/ui/button'
 
 interface ResultDisplayProps {
+  disabled?: boolean
   content: GeneratedContent
   onUseImageAsInput: (imageUrl: string) => void
   onImageClick: (imageUrl: string) => void
@@ -29,8 +33,15 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
   onUseImageAsInput,
   onImageClick,
   originalImageUrl,
+  disabled = false,
 }) => {
   const { t } = useTranslation()
+  const downloadImage = useCallback(
+    (url: string, filename: string) => {
+      void downloadImageFile(url, filename).catch(() => toast.error(t('app.error.downloadFailed')))
+    },
+    [t]
+  )
   const [viewMode, setViewMode] = useState<ViewMode>('result')
   const [twoStepViewMode, setTwoStepViewMode] = useState<TwoStepViewMode>('result')
 
@@ -97,44 +108,53 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
     const loadPromises = validImages.map((item) => {
       item.img.crossOrigin = 'anonymous'
       item.img.src = item.url!
-      return new Promise((resolve) => (item.img.onload = resolve))
+      return new Promise((resolve, reject) => {
+        item.img.onload = resolve
+        item.img.onerror = () => reject(new Error('Image load failed'))
+      })
     })
 
-    await Promise.all(loadPromises)
+    try {
+      await Promise.all(loadPromises)
 
-    const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
 
-    const totalWidth = validImages.reduce((sum, item) => sum + item.img.width, 0)
-    const maxHeight = Math.max(...validImages.map((item) => item.img.height))
+      const totalWidth = validImages.reduce((sum, item) => sum + item.img.width, 0)
+      const maxHeight = Math.max(...validImages.map((item) => item.img.height))
 
-    canvas.width = totalWidth
-    canvas.height = maxHeight
+      canvas.width = totalWidth
+      canvas.height = maxHeight
 
-    ctx.fillStyle = getComputedStyle(document.documentElement)
-      .getPropertyValue('--bg-primary')
-      .trim()
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.fillStyle = getComputedStyle(document.documentElement)
+        .getPropertyValue('--bg-primary')
+        .trim()
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-    let currentX = 0
-    for (const item of validImages) {
-      ctx.drawImage(item.img, currentX, (maxHeight - item.img.height) / 2)
-      currentX += item.img.width
+      let currentX = 0
+      for (const item of validImages) {
+        ctx.drawImage(item.img, currentX, (maxHeight - item.img.height) / 2)
+        currentX += item.img.width
+      }
+
+      downloadImage(canvas.toDataURL('image/png'), `comparison-image-${Date.now()}.png`)
+    } catch {
+      toast.error(t('app.error.downloadFailed'))
     }
-
-    downloadImage(canvas.toDataURL('image/png'), `comparison-image-${Date.now()}.png`)
-  }, [originalImageUrl, content.imageUrl, content.secondaryImageUrl])
+  }, [originalImageUrl, content.imageUrl, content.secondaryImageUrl, downloadImage, t])
 
   const ActionButton: React.FC<{
     onClick: () => void
     children: React.ReactNode
     isPrimary?: boolean
     className?: string
-  }> = ({ onClick, children, isPrimary, className }) => (
+    disabled?: boolean
+  }> = ({ onClick, children, isPrimary, className, disabled }) => (
     <Button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       variant={isPrimary ? 'default' : 'secondary'}
       className={`min-w-[150px] flex-1 ${className || ''}`}
     >
@@ -159,27 +179,6 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
       {children}
     </Button>
   )
-
-  // Special view for video results
-  if (content.videoUrl) {
-    const handleDownloadVideo = () => {
-      downloadImage(content.videoUrl!, `generated-video-${Date.now()}.mp4`)
-    }
-
-    return (
-      <div className="flex h-full w-full animate-fade-in flex-col items-center gap-4">
-        <div className="relative flex w-full flex-grow items-center justify-center overflow-hidden rounded-lg border border-[var(--border-primary)] bg-[var(--bg-primary)] shadow-inner">
-          <video src={content.videoUrl} controls className="max-w-full max-h-full object-contain" />
-        </div>
-        <div className="mt-2 flex w-full flex-col gap-3 md:flex-row">
-          <ActionButton onClick={handleDownloadVideo} isPrimary>
-            <Download data-icon="inline-start" />
-            <span>{t('resultDisplay.actions.download')}</span>
-          </ActionButton>
-        </div>
-      </div>
-    )
-  }
 
   // Special view for text results (e.g. Vision API analysis)
   if (!content.imageUrl && content.text) {
@@ -243,15 +242,11 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 <button
                   type="button"
                   key={label}
-                  className="relative flex aspect-square flex-col items-center justify-center overflow-hidden rounded-lg border border-[var(--border-primary)] bg-[var(--bg-primary)] p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] md:aspect-auto"
+                  className="relative flex aspect-square flex-col items-center justify-center overflow-hidden rounded-lg border border-[var(--border-primary)] bg-[var(--bg-primary)] p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
                   onClick={() => onImageClick(src!)}
                   aria-label={`${t('resultDisplay.actions.preview')} ${label}`}
                 >
-                  <img
-                    src={src!}
-                    alt={label}
-                    className="max-w-full max-h-full object-contain"
-                  />
+                  <img src={src!} alt={label} className="max-w-full max-h-full object-contain" />
                   <div className="absolute bottom-1 right-1 rounded bg-black/60 px-2 py-1 text-xs text-white">
                     {label}
                   </div>
@@ -271,11 +266,18 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 <Download data-icon="inline-start" />
                 {t('resultDisplay.actions.download')}
               </ActionButton>
-              <ActionButton onClick={() => onUseImageAsInput(content.secondaryImageUrl!)}>
+              <ActionButton
+                disabled={disabled}
+                onClick={() => onUseImageAsInput(content.secondaryImageUrl!)}
+              >
                 <Edit3 data-icon="inline-start" />
                 {t('resultDisplay.actions.useLineArtAsInput')}
               </ActionButton>
-              <ActionButton onClick={() => onUseImageAsInput(content.imageUrl!)} isPrimary>
+              <ActionButton
+                disabled={disabled}
+                onClick={() => onUseImageAsInput(content.imageUrl!)}
+                isPrimary
+              >
                 <Edit3 data-icon="inline-start" />
                 {t('resultDisplay.actions.useFinalAsInput')}
               </ActionButton>
@@ -292,7 +294,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
             ].map(({ src, label }) => (
               <div
                 key={label}
-                className="relative flex aspect-square flex-col items-center justify-center overflow-hidden rounded-lg border border-[var(--border-primary)] bg-[var(--bg-primary)] p-1 md:aspect-auto"
+                className="relative flex aspect-square flex-col items-center justify-center overflow-hidden rounded-lg border border-[var(--border-primary)] bg-[var(--bg-primary)] p-1"
               >
                 <img src={src} alt={label} className="max-w-full max-h-full object-contain" />
                 <div className="absolute bottom-1 right-1 rounded bg-black/60 px-2 py-1 text-xs text-white">
@@ -341,7 +343,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
             <div
               ref={sliderContainerRef}
               onMouseDown={handleMouseDown}
-              className="relative h-full w-full cursor-ew-resize select-none overflow-hidden rounded-lg border border-[var(--border-strong)] bg-[var(--bg-primary)]"
+              className="relative aspect-square min-h-[240px] w-full cursor-ew-resize select-none overflow-hidden rounded-lg border border-[var(--border-strong)] bg-[var(--bg-primary)]"
             >
               <div className="absolute inset-0 flex items-center justify-center">
                 <img
@@ -395,11 +397,18 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
               <Download data-icon="inline-start" />
               <span>{t('resultDisplay.actions.download')}</span>
             </ActionButton>
-            <ActionButton onClick={() => onUseImageAsInput(content.secondaryImageUrl!)}>
+            <ActionButton
+              disabled={disabled}
+              onClick={() => onUseImageAsInput(content.secondaryImageUrl!)}
+            >
               <Edit3 data-icon="inline-start" />
               <span>{t('resultDisplay.actions.useLineArtAsInput')}</span>
             </ActionButton>
-            <ActionButton onClick={() => onUseImageAsInput(content.imageUrl!)} isPrimary>
+            <ActionButton
+              disabled={disabled}
+              onClick={() => onUseImageAsInput(content.imageUrl!)}
+              isPrimary
+            >
               <Edit3 data-icon="inline-start" />
               <span>{t('resultDisplay.actions.useFinalAsInput')}</span>
             </ActionButton>
@@ -432,7 +441,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
     <div className="flex h-full w-full animate-fade-in flex-col items-center gap-4">
       {content.imageUrl && originalImageUrl && <ViewSwitcher />}
 
-      <div className="w-full flex-grow relative">
+      <div className="relative aspect-square min-h-[240px] w-full">
         {viewMode === 'result' && content.imageUrl && (
           <button
             type="button"
@@ -480,7 +489,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
           <div
             ref={sliderContainerRef}
             onMouseDown={handleMouseDown}
-            className="relative h-full w-full cursor-ew-resize select-none overflow-hidden rounded-lg border border-[var(--border-strong)] bg-[var(--bg-primary)]"
+            className="relative aspect-square min-h-[240px] w-full cursor-ew-resize select-none overflow-hidden rounded-lg border border-[var(--border-strong)] bg-[var(--bg-primary)]"
           >
             <div className="absolute inset-0 flex items-center justify-center">
               <img
@@ -537,7 +546,11 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
               <Download data-icon="inline-start" />
               <span>{t('resultDisplay.actions.download')}</span>
             </ActionButton>
-            <ActionButton onClick={() => onUseImageAsInput(content.imageUrl!)} isPrimary>
+            <ActionButton
+              disabled={disabled}
+              onClick={() => onUseImageAsInput(content.imageUrl!)}
+              isPrimary
+            >
               <Edit3 data-icon="inline-start" />
               <span>{t('resultDisplay.actions.useAsInput')}</span>
             </ActionButton>
@@ -553,17 +566,5 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
     </div>
   )
 }
-
-const style = document.createElement('style')
-style.innerHTML = `
-  @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-  }
-  .animate-fade-in {
-    animation: fadeIn 0.5s ease-out forwards;
-  }
-`
-document.head.appendChild(style)
 
 export default ResultDisplay

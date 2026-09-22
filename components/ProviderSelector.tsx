@@ -6,10 +6,16 @@ import { useTranslation } from '../i18n/context'
 interface ProviderSelectorProps {
   options: ProviderProfileOption[]
   selectedKey: string
+  disabled?: boolean
   onSelect: (key: string) => void
 }
 
-const ProviderSelector: React.FC<ProviderSelectorProps> = ({ options, selectedKey, onSelect }) => {
+const ProviderSelector: React.FC<ProviderSelectorProps> = ({
+  options,
+  selectedKey,
+  onSelect,
+  disabled,
+}) => {
   const { t } = useTranslation()
 
   if (options.length < 2) return null
@@ -28,6 +34,7 @@ const ProviderSelector: React.FC<ProviderSelectorProps> = ({ options, selectedKe
             <button
               key={option.key}
               type="button"
+              disabled={disabled}
               onClick={() => onSelect(option.key)}
               aria-pressed={isSelected}
               className={`min-h-[74px] rounded-lg border p-3 text-left transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[var(--bg-card)] focus:ring-[var(--accent-primary)] ${

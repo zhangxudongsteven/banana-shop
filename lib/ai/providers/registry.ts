@@ -61,11 +61,6 @@ const generationProfiles: Record<string, GenerationProfile> = {
     capability: 'visionAnalyze',
     model: VOLCENGINE_CONFIG.defaultVisionModel,
   },
-  defaultVideoGenerate: {
-    providerId: 'volcengine',
-    capability: 'videoGenerate',
-    model: VOLCENGINE_CONFIG.defaultVideoModel,
-  },
 }
 
 function assertProfileCapability(provider: ImageProvider, profile: GenerationProfile) {
@@ -95,7 +90,10 @@ export function getGenerationProfile(profileKey: string): {
 export function getTextToImageProfile(profileKey: string) {
   const result = getGenerationProfile(profileKey)
   if (result.profile.capability !== 'textToImage') {
-    throw new ProviderError('CAPABILITY_UNSUPPORTED', `${profileKey} is not a text-to-image profile`)
+    throw new ProviderError(
+      'CAPABILITY_UNSUPPORTED',
+      `${profileKey} is not a text-to-image profile`
+    )
   }
   return result
 }
@@ -118,8 +116,4 @@ export function getDefaultImageEditProfile() {
 
 export function getDefaultVisionAnalyzeProfile() {
   return getGenerationProfile('defaultVisionAnalyze')
-}
-
-export function getDefaultVideoGenerateProfile() {
-  return getGenerationProfile('defaultVideoGenerate')
 }

@@ -1,4 +1,5 @@
 import 'server-only'
+import { HistorySaveError } from '@/lib/history-save-error'
 
 import { recordGenerationHistory } from '@/lib/tale-history'
 import type { GeneratedContent, RecordGenerationHistoryInput } from '@/types'
@@ -28,7 +29,11 @@ export async function recordGenerationHistorySafely<T extends GeneratedContent>(
     console.error(`${logPrefix}:`, error)
     return {
       ...result,
-      historyStatus: 'sync_failed',
+      historyStatus:
+        error instanceof HistorySaveError && error.recovery === 'reconcile'
+          ? 'sync_unknown'
+          : 'sync_failed',
+      historyTaskId: error instanceof HistorySaveError ? error.taskId : undefined,
       historyError: '历史记录同步失败',
       transformationTitle: input.transformationTitle,
       prompt: input.prompt,

@@ -1,5 +1,11 @@
 export default {
   app: {
+    inputsLocked:
+      'Inputs are locked while generating. You can still preview and download the previous result.',
+    previousResult: 'Previous result',
+    generationComplete: 'Image ready. Download it or continue editing.',
+    generationFailed:
+      'Generation failed. Check the error and retry. Your previous result is still available.',
     title: '🍌 Banana Shop',
     history: 'History',
     back: 'Back',
@@ -15,12 +21,13 @@ export default {
     exampleResult: 'Effect reference',
     emptyResultHint: 'Once your inputs are ready, the generated result will appear here.',
     emptyResultActionHint:
-      'Upload the required assets and complete the inputs to enable generation. The result will open here in compare view.',
+      'Describe your image or upload the required inputs, then generate. Download the result or continue editing.',
     studioWorkflow: 'Studio workflow',
     workflowRail: 'Input / generate / compare',
     compareReady: 'Compare ready',
     yourImageWillAppear: 'Your generated image will appear here.',
     error: {
+      downloadFailed: 'Could not download the image. Check your connection and retry.',
       uploadAndSelect: 'Please upload an image and select an effect.',
       uploadBoth: 'Please upload both required images.',
       enterPrompt: 'Please enter a prompt describing the change you want to see.',
@@ -32,9 +39,6 @@ export default {
       step2: 'Step 2: Applying color palette...',
       default: 'Generating your masterpiece...',
       wait: 'This can sometimes take a moment.',
-      videoInit: 'Initializing video generation...',
-      videoPolling: 'Processing video, this may take a few minutes...',
-      videoFetching: 'Finalizing and fetching your video...',
     },
     theme: {
       switchToLight: 'Switch to light theme',
@@ -53,16 +57,14 @@ export default {
     tags: {
       category: 'Category',
       textToImage: 'Text to image',
-      video: 'Video',
       twoStep: 'Two-step',
-      mask: 'Mask',
       optionalReference: 'Optional reference',
       doubleImage: 'Two images',
       singleImage: 'Single image',
     },
   },
   providerSelector: {
-    title: 'Generation Provider',
+    title: 'Generation Model',
     profiles: {
       glmImage: {
         title: 'GLM Image',
@@ -78,22 +80,27 @@ export default {
       },
       volcengineImageEdit: {
         title: 'Volcengine Seedream Edit',
-        description: 'Default image editing provider for the current workflow.',
+        description: 'For everyday image edits and style changes.',
       },
       aliyunImageEdit: {
         title: 'Aliyun Qwen Image Edit',
-        description: 'Image editing provider with multi-reference support.',
+        description: 'Use a reference image to guide style and content.',
       },
     },
   },
   imageEditor: {
+    remove: 'Remove',
+    reading: 'Reading image…',
+    limits: 'PNG, JPEG or WebP. Up to 8 MiB each and 16 MiB combined.',
+    invalidType: 'Choose a PNG, JPEG or WebP image.',
+    tooLarge: 'Choose a nonempty image no larger than 8 MiB.',
+    totalTooLarge: 'Combined images exceed 16 MiB. Compress them and try again.',
+    readFailed: 'Could not read the image. Choose it again.',
+    decodeFailed: 'Could not decode this image. Use a valid PNG, JPEG or WebP.',
+    fetchFailed: 'Could not load the saved image. Check your connection and retry.',
+    retryImport: 'Retry loading image',
     upload: 'Click to upload',
     dragAndDrop: 'or drag and drop',
-    drawMask: 'Draw Mask',
-    maskPanelInfo: 'Draw on the image to create a mask for localized edits.',
-    brushSize: 'Brush Size',
-    undo: 'Undo',
-    clearMask: 'Clear Mask',
   },
   resultDisplay: {
     viewModes: {
@@ -125,6 +132,10 @@ export default {
     exampleBadge: 'Example',
   },
   history: {
+    unsavedHint:
+      'Saving is not confirmed. Download this result before refreshing or closing the page.',
+    retrySave: 'Retry saving',
+    checkSave: 'Check save status',
     title: 'Generation Tasks',
     subtitle: 'Persisted by Tale UserTask',
     empty: 'Generation tasks saved in Tale will appear here.',
@@ -142,6 +153,7 @@ export default {
     noPreview: 'No preview',
     untitled: 'Untitled task',
     status: {
+      unknown: 'Save unconfirmed',
       local: 'Local',
       syncing: 'Syncing',
       synced: 'Saved',
@@ -152,7 +164,6 @@ export default {
       'image-edit': 'Image edit',
       'multi-image-edit': 'Multi-image edit',
       'two-step-image-edit': 'Two-step generation',
-      video: 'Video generation',
       unknown: 'Generation task',
     },
     source: {
@@ -169,7 +180,6 @@ export default {
         mask: 'Mask',
         intermediate: 'Intermediate',
         output: 'Output',
-        video: 'Video',
       },
     },
   },
@@ -226,7 +236,7 @@ export default {
     authDescription: 'Every API request must include a Bearer API key in the Authorization header.',
     endpointsTitle: 'Endpoints',
     endpointsDescription:
-      'The first API version covers image generation, image editing, video generation, and history.',
+      'The first API version covers image generation, image editing, and history.',
     method: 'Method',
     path: 'Path',
     scope: 'Scope',
@@ -235,7 +245,6 @@ export default {
     examplesDescription: 'Replace the domain and API key in these examples with your real values.',
     textToImageExample: 'Text to Image',
     imageEditExample: 'Image Edit',
-    videoExample: 'Text to Video',
     responseExample: 'Response Shape',
     viewMcpDocs: 'View MCP Docs',
     errorsTitle: 'Error Codes',
@@ -281,7 +290,7 @@ export default {
       },
       scopes: {
         title: 'Scope Checks',
-        description: 'Image, video, and history tools check image, video, and history scopes.',
+        description: 'Image and history tools check image and history scopes.',
       },
       history: {
         title: 'History',
@@ -306,15 +315,6 @@ export default {
       design: { title: 'Design & Product' },
       tools: { title: 'Creative Tools' },
       effects: { title: '50+ Artistic Effects' },
-    },
-    video: {
-      title: 'Text to Video',
-      description:
-        'Turn a video idea and shot description into a short clip, with landscape or portrait framing.',
-      promptPlaceholder: 'e.g., A majestic lion roaring on a rocky outcrop at sunset',
-      aspectRatio: 'Aspect Ratio',
-      landscape: '16:9 Landscape',
-      portrait: '9:16 Portrait',
     },
     effects: {
       customPrompt: {
@@ -446,10 +446,6 @@ export default {
         title: 'Van Gogh Style',
         description:
           "Repaints your photo with the iconic, swirling brushstrokes of 'Starry Night'.",
-      },
-      isolate: {
-        title: 'Isolate & Enhance',
-        description: 'Cuts out a masked subject and creates a clean, high-definition portrait.',
       },
       screen3d: {
         title: '3D Screen Effect',

@@ -6,7 +6,6 @@ import type {
   EditImageInput,
   GenerateChatInput,
   GenerateImageInput,
-  GenerateVideoInput,
   ImageProvider,
 } from './types'
 
@@ -46,7 +45,6 @@ export const deepseekProvider: ImageProvider = {
     textToImage: false,
     imageEdit: false,
     visionAnalyze: false,
-    videoGenerate: false,
     referenceImages: false,
     maskEdit: false,
   },
@@ -78,9 +76,5 @@ export const deepseekProvider: ImageProvider = {
 
   async editImage(_input: EditImageInput) {
     unsupported('imageEdit')
-  },
-
-  async generateVideo(_input: GenerateVideoInput) {
-    unsupported('videoGenerate')
   },
 }

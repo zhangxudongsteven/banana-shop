@@ -3,7 +3,7 @@
 Banana Shop provides a local stdio MCP server for external agents. The server reuses the same
 server-side services as the REST API:
 
-- `lib/generation-service.ts` for image generation, image editing, and video generation.
+- `lib/generation-service.ts` for image generation and image editing.
 - `lib/tale-history.ts` for generation history.
 - `lib/api-auth.ts` and `lib/api-keys.ts` for API Key authentication and scope checks.
 
@@ -28,7 +28,6 @@ used by the tools you plan to call:
 
 - `image:generate`
 - `image:edit`
-- `video:generate`
 - `history:read`
 
 Provide the API Key to the MCP server with an environment variable:
@@ -129,8 +128,6 @@ Input:
     "base64": "...",
     "mimeType": "image/jpeg"
   },
-  "maskBase64": null,
-  "maskMimeType": "image/png",
   "transformationKey": "image-edit",
   "transformationTitle": "Image Edit",
   "profileKey": "defaultImageEdit",
@@ -142,38 +139,13 @@ Fields:
 
 - `base64ImageData`, `mimeType`, and `prompt` are required.
 - `secondaryImage` is optional and can be `null`.
-- `maskBase64` is optional and can be `null`.
-- `maskMimeType` is only used for history storage when `maskBase64` is provided.
+- `maskBase64` is deprecated. Omit it or pass `null`; nonempty masks are rejected before generation.
+- `maskMimeType` is a legacy parameter with no effect. Localized mask editing is unavailable.
 - `transformationKey`, `transformationTitle`, and `profileKey` are optional.
 - `recordHistory` defaults to `true`.
 
 Output includes `imageUrl`, `text`, and optional history metadata. If `imageUrl` is a data URL, the
 tool also returns MCP image content.
-
-### `banana_generate_video`
-
-Generates a video from text. Requires `video:generate`.
-
-Input:
-
-```json
-{
-  "prompt": "A banana smoothie bottle rotating on a clean studio turntable",
-  "aspectRatio": "16:9",
-  "transformationKey": "text-to-video",
-  "transformationTitle": "Text to Video",
-  "recordHistory": true
-}
-```
-
-Fields:
-
-- `prompt` is required.
-- `aspectRatio` is optional and must be `16:9` or `9:16`.
-- `transformationKey` and `transformationTitle` are optional.
-- `recordHistory` defaults to `true`.
-
-Output includes `videoUrl`, `imageUrl`, `text`, and optional history metadata.
 
 ### `banana_list_history`
 

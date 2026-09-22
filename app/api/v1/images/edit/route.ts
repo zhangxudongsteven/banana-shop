@@ -1,6 +1,6 @@
 import { ApiAuthError, apiErrorResponse, authenticateApiRequest } from '@/lib/api-auth'
 import { ApiRequestError, optionalTrimmedString, parseJsonBody } from '@/lib/api-request'
-import { toUserFacingProviderError } from '@/lib/ai/providers/errors'
+import { ProviderError, toUserFacingProviderError } from '@/lib/ai/providers/errors'
 import { dataUrlFromBase64, recordGenerationHistorySafely } from '@/lib/generation-history-service'
 import { editImage, type SecondaryImageInput } from '@/lib/generation-service'
 
@@ -86,6 +86,9 @@ export async function POST(request: Request) {
   } catch (error) {
     if (error instanceof ApiAuthError) return apiErrorResponse(error.status, error.message)
     if (error instanceof ApiRequestError) return apiErrorResponse(error.status, error.message)
+    if (error instanceof ProviderError && error.code === 'MASK_UNSUPPORTED') {
+      return apiErrorResponse(400, toUserFacingProviderError(error, '不支持局部选区编辑'))
+    }
     console.error('API image edit error:', error)
     return apiErrorResponse(500, toUserFacingProviderError(error, '图像编辑失败，请稍后重试'))
   }

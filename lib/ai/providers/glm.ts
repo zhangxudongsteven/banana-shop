@@ -4,7 +4,6 @@ import type {
   EditImageInput,
   GenerateChatInput,
   GenerateImageInput,
-  GenerateVideoInput,
   ImageProvider,
 } from './types'
 
@@ -36,7 +35,6 @@ export const glmProvider: ImageProvider = {
     textToImage: true,
     imageEdit: false,
     visionAnalyze: false,
-    videoGenerate: false,
     referenceImages: false,
     maskEdit: false,
   },
@@ -89,9 +87,5 @@ export const glmProvider: ImageProvider = {
 
   async editImage(_input: EditImageInput) {
     unsupported('imageEdit')
-  },
-
-  async generateVideo(_input: GenerateVideoInput) {
-    unsupported('videoGenerate')
   },
 }

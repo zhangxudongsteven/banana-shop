@@ -1,19 +1,21 @@
 'use client'
 
+import { toast } from 'sonner'
+import { useTranslation } from '@/i18n/context'
 import React, { useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import { usePathname, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { HistoryProvider, useHistory } from '../../contexts/HistoryContext'
 import DashboardHeader from '../../components/DashboardHeader'
 import { downloadImage } from '../../utils/fileUtils'
 import { useAuth } from '../../components/AuthProvider'
 import LoadingSpinner from '../../components/LoadingSpinner'
-import { findTransformationByKey } from '../../lib/constants'
 
 const HistoryPanel = dynamic(() => import('../../components/HistoryPanel'), { ssr: false })
 
 const DashboardContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { t } = useTranslation()
   const {
     history,
     isLoadingHistory,
@@ -22,10 +24,12 @@ const DashboardContent: React.FC<{ children: React.ReactNode }> = ({ children })
     isHistoryPanelOpen,
     closeHistoryPanel,
     setPendingImageInput,
+    retryHistoryItem,
+    canRetryHistoryItem,
+    isGenerating,
   } = useHistory()
   const { isAuthenticated, isLoading: authLoading } = useAuth()
   const router = useRouter()
-  const pathname = usePathname()
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -68,27 +72,16 @@ const DashboardContent: React.FC<{ children: React.ReactNode }> = ({ children })
   }
 
   const handleDownloadFromHistory = (url: string, type: string) => {
-    const fileExtension = type.includes('video') ? 'mp4' : url.split(';')[0].split('/')[1] || 'png'
-    const filename = `${type}-${Date.now()}.${fileExtension}`
-    downloadImage(url, filename)
+    void downloadImage(url, `image-result-${Date.now()}.png`).catch(() =>
+      toast.error(t('app.error.downloadFailed'))
+    )
   }
 
   const handleUseHistoryImageAsInput = (imageUrl: string) => {
+    if (isGenerating) return
     setPendingImageInput(imageUrl)
     closeHistoryPanel()
-
-    const currentStyleKey = pathname.match(/^\/dashboard\/([^/]+)$/)?.[1]
-    const currentTransformation = currentStyleKey
-      ? findTransformationByKey(currentStyleKey)
-      : undefined
-    const canUseCurrentRoute =
-      currentTransformation &&
-      !currentTransformation.isVideo &&
-      !currentTransformation.isTextToImage
-
-    if (!canUseCurrentRoute) {
-      router.push('/dashboard/customPrompt')
-    }
+    router.push('/dashboard/customPrompt')
   }
 
   return (
@@ -102,6 +95,9 @@ const DashboardContent: React.FC<{ children: React.ReactNode }> = ({ children })
         isLoading={isLoadingHistory}
         error={historyError}
         onRefresh={refreshHistory}
+        onRetry={retryHistoryItem}
+        canRetry={canRetryHistoryItem}
+        disableUse={isGenerating}
         onUseImage={handleUseHistoryImageAsInput}
         onDownload={handleDownloadFromHistory}
       />

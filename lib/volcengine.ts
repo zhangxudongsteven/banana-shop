@@ -1,6 +1,5 @@
 import {
   getDefaultImageEditProfile,
-  getDefaultVideoGenerateProfile,
   getDefaultVisionAnalyzeProfile,
   getGenerationProfile,
 } from './ai/providers/registry'
@@ -68,16 +67,4 @@ export async function editImageWithInstruction(
   })
 
   return { imageUrl: result.imageUrl }
-}
-
-export async function generateVideo(
-  prompt: string,
-  options?: { aspectRatio?: '16:9' | '9:16' }
-): Promise<{ videoUrl: string }> {
-  const { provider, profile } = getDefaultVideoGenerateProfile()
-  return provider.generateVideo({
-    prompt,
-    model: profile.model,
-    aspectRatio: options?.aspectRatio,
-  })
 }

@@ -19,20 +19,18 @@ export interface Transformation {
   secondaryUploaderTitle?: string
   primaryUploaderDescription?: string
   secondaryUploaderDescription?: string
-  isVideo?: boolean
   exampleImage?: string
   isTextToImage?: boolean
   providerProfiles?: ProviderProfileOption[]
-  supportsMask?: boolean
 }
 
 export interface GeneratedContent {
   imageUrl: string | null
   text: string | null
   secondaryImageUrl?: string | null
-  videoUrl?: string
   historyTaskId?: string
   historyStatus?: HistorySyncStatus
+  clientRequestId?: string
   historyError?: string
   createdAt?: string
   transformationTitle?: string
@@ -41,24 +39,15 @@ export interface GeneratedContent {
   source?: GenerationHistorySource
 }
 
-export type HistorySyncStatus = 'local' | 'syncing' | 'synced' | 'sync_failed'
+export type HistorySyncStatus = 'local' | 'syncing' | 'synced' | 'sync_failed' | 'sync_unknown'
 
 export type GenerationHistoryKind =
-  | 'text-to-image'
-  | 'image-edit'
-  | 'multi-image-edit'
-  | 'two-step-image-edit'
-  | 'video'
+  'text-to-image' | 'image-edit' | 'multi-image-edit' | 'two-step-image-edit'
 
 export type GenerationHistorySource = 'dashboard' | 'api' | 'mcp'
 
 export type GenerationHistoryAttachmentRole =
-  | 'input'
-  | 'reference'
-  | 'mask'
-  | 'intermediate'
-  | 'output'
-  | 'video'
+  'input' | 'reference' | 'mask' | 'intermediate' | 'output'
 
 export interface GenerationHistoryAttachment {
   role: GenerationHistoryAttachmentRole
@@ -86,6 +75,10 @@ export interface GenerationHistoryItem extends GeneratedContent {
 }
 
 export interface RecordGenerationHistoryInput {
+  clientRequestId?: string
+  historyTaskId?: string
+  recovery?: HistoryRecovery
+
   transformationKey: string
   transformationTitle: string
   prompt: string
@@ -96,12 +89,20 @@ export interface RecordGenerationHistoryInput {
     primaryImageUrl?: string | null
     referenceImageUrl?: string | null
     maskImageUrl?: string | null
-    aspectRatio?: '16:9' | '9:16'
   }
   outputs: {
     imageUrl?: string | null
     secondaryImageUrl?: string | null
-    videoUrl?: string | null
     text?: string | null
   }
+}
+
+export type HistoryRecovery = 'retry' | 'resume' | 'reconcile'
+
+export interface HistorySaveResult {
+  success: boolean
+  data?: { taskId: string; createdAt: string }
+  error?: string
+  taskId?: string
+  recovery?: HistoryRecovery
 }

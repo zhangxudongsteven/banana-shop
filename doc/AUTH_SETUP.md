@@ -39,7 +39,7 @@ TALE_GENERATION_TASK_TYPE_ID=
 - `TALE_APP_SECRET`: 应用密钥
 - `TALE_GENERATION_TASK_TYPE_ID`: 可选，Banana Shop 生成历史使用的 Tale UserTask 类型 ID；留空时应用会在当前 Tale 应用下自动复用或创建 `Banana Shop Generation`
 
-同一组 Tale 应用凭证也用于生成历史的 UserTask 与 Attachment API。输入图、参考图、蒙版、过程图、输出图和输出视频会保存为任务附件；附件类型默认由应用自动复用或创建，也可通过 `.env.example` 中的可选附件类型 ID 环境变量固定。
+同一组 Tale 应用凭证也用于生成历史的 UserTask 与 Attachment API。输入图、参考图、过程图、输出图会保存为任务附件；旧图像记录中的蒙版附件仍可只读查看；附件类型默认由应用自动复用或创建，也可通过 `.env.example` 中的可选附件类型 ID 环境变量固定。
 
 **获取凭证：**
 

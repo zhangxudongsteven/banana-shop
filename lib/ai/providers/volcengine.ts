@@ -6,7 +6,6 @@ import type {
   EditImageInput,
   GenerateChatInput,
   GenerateImageInput,
-  GenerateVideoInput,
   ImageProvider,
 } from './types'
 
@@ -15,7 +14,6 @@ export const VOLCENGINE_CONFIG = {
   apiKey: process.env.VOLCENGINE_API_KEY || '',
   defaultImageModel: process.env.VOLCENGINE_IMAGE_MODEL || 'doubao-seed-2-0-lite-260215',
   defaultVisionModel: process.env.VOLCENGINE_VISION_MODEL || 'doubao-seed-2-0-lite-260215',
-  defaultVideoModel: process.env.VOLCENGINE_VIDEO_MODEL || 'doubao-video-1',
   defaultEditModel: process.env.VOLCENGINE_EDIT_MODEL || 'doubao-seedream-5-0-260128',
 }
 
@@ -49,7 +47,6 @@ export const volcengineProvider: ImageProvider = {
     textToImage: true,
     imageEdit: true,
     visionAnalyze: true,
-    videoGenerate: true,
     referenceImages: true,
     maskEdit: false,
   },
@@ -80,13 +77,7 @@ export const volcengineProvider: ImageProvider = {
     }
   },
 
-  async analyzeImage({
-    base64Image,
-    mimeType,
-    prompt,
-    model,
-    secondaryImage,
-  }: AnalyzeImageInput) {
+  async analyzeImage({ base64Image, mimeType, prompt, model, secondaryImage }: AnalyzeImageInput) {
     assertConfigured()
 
     try {
@@ -128,7 +119,9 @@ export const volcengineProvider: ImageProvider = {
         response_format: 'b64_json',
         reference_images: [
           `data:${mimeType};base64,${base64Image}`,
-          ...(referenceImages || []).map((image) => `data:${image.mimeType};base64,${image.base64}`),
+          ...(referenceImages || []).map(
+            (image) => `data:${image.mimeType};base64,${image.base64}`
+          ),
         ],
       } as any)
 
@@ -140,43 +133,6 @@ export const volcengineProvider: ImageProvider = {
       return { imageUrl: `data:image/png;base64,${b64Json}`, mimeType: 'image/png' }
     } catch (error) {
       throw toProviderRequestError('Volcengine image edit failed', error)
-    }
-  },
-
-  async generateVideo({ prompt, model, aspectRatio = '16:9' }: GenerateVideoInput) {
-    assertConfigured()
-
-    try {
-      const response = await fetch(`${VOLCENGINE_CONFIG.baseURL}/videos/generations`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${VOLCENGINE_CONFIG.apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model,
-          prompt,
-          aspect_ratio: aspectRatio,
-        }),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        console.error('Volcengine Video Generation API Error:', errorData)
-        throw new ProviderError(
-          'PROVIDER_REQUEST_FAILED',
-          `Volcengine video generation failed: ${response.statusText}`
-        )
-      }
-
-      const data = await response.json()
-      if (!data.video_url) {
-        throw new ProviderError('INVALID_RESPONSE', 'No URL in video response')
-      }
-
-      return { videoUrl: data.video_url }
-    } catch (error) {
-      throw toProviderRequestError('Volcengine video generation failed', error)
     }
   },
 }

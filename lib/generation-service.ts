@@ -1,7 +1,6 @@
 import 'server-only'
 
 import {
-  getDefaultVideoGenerateProfile,
   getDefaultVisionAnalyzeProfile,
   getImageEditProfile,
   getTextToImageProfile,
@@ -74,6 +73,9 @@ export async function editImage(
   secondaryImage?: SecondaryImageInput | null,
   profileKey = 'defaultImageEdit'
 ): Promise<GeneratedContent> {
+  if (maskBase64?.trim()) {
+    throw new ProviderError('MASK_UNSUPPORTED', '不支持局部选区编辑')
+  }
   const { provider: editProvider, profile: editProfile } = getImageEditProfile(profileKey)
   const { provider: analyzeProvider, profile: analyzeProfile } = getDefaultVisionAnalyzeProfile()
 
@@ -95,13 +97,6 @@ export async function editImage(
     }
   }
 
-  if (maskBase64 && !editProvider.capabilities.maskEdit) {
-    console.warn(
-      'Mask editing is unsupported by the selected provider. Using instruction-based editing fallback.'
-    )
-    enhancedPrompt = `${prompt} Focus on transforming the main subject while preserving the overall composition.`
-  }
-
   const result = await editProvider.editImage({
     base64Image: base64ImageData,
     mimeType,
@@ -113,18 +108,4 @@ export async function editImage(
   const imageUrl = await normalizeImageUrl(result.imageUrl, result.mimeType)
 
   return { imageUrl, text: null }
-}
-
-export async function generateVideo(
-  prompt: string,
-  aspectRatio?: '16:9' | '9:16'
-): Promise<GeneratedContent & { videoUrl: string }> {
-  const { provider, profile } = getDefaultVideoGenerateProfile()
-  const result = await provider.generateVideo({
-    prompt,
-    model: profile.model,
-    aspectRatio,
-  })
-
-  return { videoUrl: result.videoUrl, imageUrl: null, text: null }
 }

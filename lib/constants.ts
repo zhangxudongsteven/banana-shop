@@ -41,14 +41,6 @@ const generateTransformations: Transformation[] = [
     ],
     exampleImage: '/examples/glmImage.jpg',
   },
-  {
-    key: 'videoGeneration',
-    titleKey: 'transformations.video.title',
-    emoji: '🎬',
-    descriptionKey: 'transformations.video.description',
-    isVideo: true,
-    prompt: 'CUSTOM',
-  },
 ]
 
 const viralTransformations: Transformation[] = [
@@ -219,15 +211,6 @@ const creativeToolTransformations: Transformation[] = [
     secondaryUploaderTitle: 'transformations.effects.colorPalette.uploader2Title',
     secondaryUploaderDescription: 'transformations.effects.colorPalette.uploader2Desc',
     exampleImage: '/examples/colorPalette.jpg',
-  },
-  {
-    key: 'isolate',
-    titleKey: 'transformations.effects.isolate.title',
-    prompt:
-      'Isolate the person in the masked area and generate a high-definition photo of them against a neutral background.',
-    emoji: '🎯',
-    descriptionKey: 'transformations.effects.isolate.description',
-    supportsMask: true,
   },
   {
     key: 'screen3d',

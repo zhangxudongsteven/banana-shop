@@ -1,3 +1,7 @@
+'use client'
+
+import { toast } from 'sonner'
+import { downloadImage } from '@/utils/fileUtils'
 import React, { useEffect, useRef } from 'react'
 import { Download, X } from 'lucide-react'
 import { useTranslation } from '../i18n/context'
@@ -36,13 +40,9 @@ const ImagePreviewModal: React.FC<ImagePreviewModalProps> = ({ imageUrl, onClose
   const handleDownload = (e: React.MouseEvent) => {
     e.stopPropagation() // Prevent modal from closing
     if (!imageUrl) return
-    const link = document.createElement('a')
-    link.href = imageUrl
-    const fileExtension = imageUrl.split(';')[0].split('/')[1] || 'png'
-    link.download = `generated-image-${Date.now()}.${fileExtension}`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    void downloadImage(imageUrl, `generated-image-${Date.now()}.png`).catch(() =>
+      toast.error(t('app.error.downloadFailed'))
+    )
   }
 
   return (
@@ -78,11 +78,7 @@ const ImagePreviewModal: React.FC<ImagePreviewModalProps> = ({ imageUrl, onClose
         </Button>
       </div>
       <div className="flex-shrink-0 mt-4">
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={handleDownload}
-        >
+        <Button type="button" variant="secondary" onClick={handleDownload}>
           <Download data-icon="inline-start" />
           <span>{t('resultDisplay.actions.download')}</span>
         </Button>

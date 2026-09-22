@@ -19,13 +19,7 @@ const endpointRows = [
     method: 'POST',
     path: '/api/v1/images/edit',
     scope: 'image:edit',
-    body: '{ base64ImageData, mimeType, prompt, transformationKey?, transformationTitle?, maskBase64?, maskMimeType?, secondaryImage?, profileKey? }',
-  },
-  {
-    method: 'POST',
-    path: '/api/v1/videos/generate',
-    scope: 'video:generate',
-    body: '{ prompt, aspectRatio?, transformationKey?, transformationTitle? }',
+    body: '{ base64ImageData, mimeType, prompt, transformationKey?, transformationTitle?, secondaryImage?, profileKey? }',
   },
   {
     method: 'GET',
@@ -62,16 +56,6 @@ const fetchExample = `const response = await fetch("https://your-domain.com/api/
 })
 
 const result = await response.json()`
-
-const videoExample = `curl -X POST https://your-domain.com/api/v1/videos/generate \\
-  -H "Authorization: Bearer ${apiKeyPlaceholder}" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "prompt": "A rotating 3D banana mascot in a clean studio",
-    "aspectRatio": "16:9",
-    "transformationKey": "text-to-video",
-    "transformationTitle": "Text to Video"
-  }'`
 
 const responseExample = `{
   "success": true,
@@ -172,7 +156,6 @@ export default function ApiDocsPage() {
           <div className="flex flex-col gap-4">
             <CodeBlock title={t('apiDocs.textToImageExample')} value={curlExample} />
             <CodeBlock title={t('apiDocs.imageEditExample')} value={fetchExample} />
-            <CodeBlock title={t('apiDocs.videoExample')} value={videoExample} />
             <CodeBlock title={t('apiDocs.responseExample')} value={responseExample} />
           </div>
         </CardContent>

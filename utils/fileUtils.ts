@@ -136,11 +136,17 @@ export const embedWatermark = (imageUrl: string, text: string): Promise<string> 
  * @param url The data URL of the file to download.
  * @param filename The desired name for the downloaded file.
  */
-export const downloadImage = (url: string, filename: string) => {
+export const downloadImage = async (url: string, filename: string): Promise<void> => {
+  const response = await fetch(url)
+  if (!response.ok) throw new Error('图片下载失败，请检查网络后重试')
+  const blob = await response.blob()
+  const extension = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp' }[blob.type]
+  const objectUrl = URL.createObjectURL(blob)
   const link = document.createElement('a')
-  link.href = url
-  link.download = filename
+  link.href = objectUrl
+  link.download = extension ? filename.replace(/\.[^.]+$/, `.${extension}`) : filename
   document.body.appendChild(link)
   link.click()
-  document.body.removeChild(link)
+  link.remove()
+  setTimeout(() => URL.revokeObjectURL(objectUrl), 1000)
 }
